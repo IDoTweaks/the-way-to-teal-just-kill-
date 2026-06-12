@@ -1,9 +1,11 @@
 extends CharacterBody3D
 
-const  sens = 0.005;
+const SENS = 0.005;
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
+const MAXCAMSHAKE = 0.03
 
+#sliding
 var slide :bool = false
 @export var downForceDevide: float
 @export var slideFactor: float = 0.4
@@ -11,15 +13,72 @@ var slide :bool = false
 
 @onready var feet = $feetPos;
 @onready var playerCam = $playerCam;
+@onready var animaPlayer = $AnimationPlayer
+@onready var gunRay = $playerCam/RayCast3D
+@onready var shootingParticles =preload("res://Particles/shootParticles.tscn")
+@onready var gunParticleSpawn = $playerCam/gun/particleSpawnGun
+var particleInstance
+
+#gun
+@export var damage : float = 10
+func _shootAnim():
+	if Input.is_action_pressed("shoot"):
+		animaPlayer.play("shootingAnim")
+		particleInstance = shootingParticles.instantiate()
+		particleInstance.position = gunParticleSpawn.global_position
+		get_parent().add_child(particleInstance)
+		particleInstance.emitting = true
+	else:
+		playerCam.position = Vector3();
+		animaPlayer.stop()
+func _shoot():
+	playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
+	
+	if gunRay.is_colliding():
+		var target = gunRay.get_collider()
+		if target.has_method("enemy"):
+			target.health -= damage
+		_draw_laser_line(gunParticleSpawn.global_position, gunRay.get_collision_point(), 0.25)
+	else:
+		var end_point = gunRay.to_global(gunRay.target_position)
+		_draw_laser_line(gunParticleSpawn.global_position, end_point, 0.5)
+			
+func _draw_laser_line(from_pos: Vector3, to_pos: Vector3, duration: float = 0.1):
+	var line_instance = MeshInstance3D.new()
+	var imm_mesh = ImmediateMesh.new()
+	var material = StandardMaterial3D.new()
+	
+	line_instance.mesh = imm_mesh
+	
+	material.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+	material.albedo_color = Color(0, 0.5, 1)
+	line_instance.material_override = material
+	
+	imm_mesh.surface_begin(Mesh.PRIMITIVE_LINES)
+	imm_mesh.surface_add_vertex(from_pos)
+	imm_mesh.surface_add_vertex(to_pos)
+	imm_mesh.surface_end()
+	
+	get_parent().add_child(line_instance)
+	await get_tree().create_timer(duration).timeout
+	line_instance.queue_free()
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED;
 	
+	
+func _process(delta: float) -> void:
+	#call input functions
+	_shootAnim()
+	#NOTE-use only when unhandles input isnt good enough
+	
 func _unhandled_input(event: InputEvent) -> void:
+	#cam
 	if event is InputEventMouseMotion:
-		rotate_y(-event.relative.x * sens)
-		playerCam.rotate_x(-event.relative.y * sens)
+		rotate_y(-event.relative.x * SENS)
+		playerCam.rotate_x(-event.relative.y * SENS)
 		playerCam.rotation.x = clamp(playerCam.rotation.x,deg_to_rad(-60),deg_to_rad(70))
+		
 
 func _calcDownForce():
 	#calculate the position in the future

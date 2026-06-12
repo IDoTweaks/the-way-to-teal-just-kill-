@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://bcugc3piu2xws"]
 
 [ext_resource type="Script" uid="uid://ck51rj4rdst7j" path="res://Scripts/player.gd" id="1_m8bbn"]
+[ext_resource type="PackedScene" uid="uid://dnfrb64vva6ff" path="res://Models/scorpious9.glb" id="2_iixog"]
+[ext_resource type="Texture2D" uid="uid://mul631bkn51k" path="res://Sprites/blueCross.png" id="3_ramtr"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m8bbn"]
 albedo_color = Color(0.21568628, 0.5686275, 1, 1)
@@ -14,7 +16,156 @@ albedo_color = Color(0.28669193, 0.50101376, 1, 1)
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_ramtr"]
 
+[sub_resource type="BoxMesh" id="BoxMesh_ramtr"]
+
 [sub_resource type="BoxMesh" id="BoxMesh_m8bbn"]
+
+[sub_resource type="Animation" id="Animation_iixog"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("playerCam/gun:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.007999897, -0.259, -0.87200004)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("playerCam/gun:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-0.15707986, -2.9757862, 0.15707934)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("playerCam/gun:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.09000002, 0.09000001, 0.09000002)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("playerCam/rightArm:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.1692597, -0.29702726, -0.55258656)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("playerCam/rightArm:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.4778762, 2.4596107, -1.0551388)]
+}
+
+[sub_resource type="Animation" id="Animation_ramtr"]
+resource_name = "shootingAnim"
+length = 0.08
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("playerCam/gun:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.03363337, 0.08),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0.388, -0.31, -0.652), Vector3(0.373, -0.34, -0.607), Vector3(0.388, -0.31, -0.652)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("playerCam/gun:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.03363337, 0.08),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(-0.15707964, -3.2637658, 0.15707964), Vector3(-0.34906584, -3.3597589, 0.15707964), Vector3(-0.15707964, -3.2637658, 0.15707964)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("playerCam/gun:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.09000002, 0.09000001, 0.09000002)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("playerCam/rightArm:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.03363337, 0.08),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0.523, -0.40280876, -0.55258656), Vector3(0.493, -0.403, -0.423), Vector3(0.523, -0.40280876, -0.55258656)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("playerCam/rightArm:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.03363337, 0.08),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0.4778762, 2.4596107, -1.0551388), Vector3(0.10297442, 1.8483037, -0.8813913), Vector3(0.4778762, 2.4596107, -1.0551388)]
+}
+tracks/5/type = "method"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0.033333335),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"_shoot"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_tut37"]
+_data = {
+&"RESET": SubResource("Animation_iixog"),
+&"shootingAnim": SubResource("Animation_ramtr")
+}
 
 [node name="Player" type="CharacterBody3D" unique_id=659499291]
 script = ExtResource("1_m8bbn")
@@ -32,15 +183,39 @@ shape = SubResource("CapsuleShape3D_m8bbn")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.590254, 0)
 
 [node name="leftArm" type="MeshInstance3D" parent="playerCam" unique_id=1259226239]
-transform = Transform3D(-6.712804e-05, -0.00023131243, 0.34499997, -0.3313299, 0.096153624, 0, -0.096153595, -0.33132985, -0.000240856, -0.4055989, -0.29702726, -0.21109307)
+transform = Transform3D(-6.712804e-05, -0.00023131243, 0.34499997, -0.3313299, 0.096153624, 0, -0.096153595, -0.33132985, -0.000240856, -0.5891691, -0.40280876, -0.21109307)
 material_override = SubResource("ORMMaterial3D_iixog")
 mesh = SubResource("CapsuleMesh_ramtr")
 
 [node name="rightArm" type="MeshInstance3D" parent="playerCam" unique_id=1446399764]
-transform = Transform3D(-6.712806e-05, -0.00023131244, 0.34499997, -0.3277667, -0.107675456, -0.00013596816, 0.107675515, -0.32776672, -0.00019880713, 0.4428725, -0.29702726, -0.21109307)
+transform = Transform3D(-0.21907628, -0.18368958, 0.19310309, -0.26651582, 0.15106383, -0.15866357, -7.54993e-05, -0.2499259, -0.2378279, 0.1692597, -0.29702726, -0.55258656)
 material_override = SubResource("ORMMaterial3D_iixog")
 mesh = SubResource("CapsuleMesh_ramtr")
+
+[node name="RayCast3D" type="RayCast3D" parent="playerCam" unique_id=1374155071]
+target_position = Vector3(0, 0, -200)
+
+[node name="hand" type="Node3D" parent="playerCam" unique_id=800072338]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.022098154, -0.109722495, -0.78610706)
+
+[node name="gun" parent="playerCam" unique_id=1487719564 instance=ExtResource("2_iixog")]
+transform = Transform3D(-0.08730936, 0.01618111, -0.014671421, 0.013905741, 0.08779755, 0.014079125, 0.016843671, 0.011391357, -0.08767287, 0.007999897, -0.259, -0.87200004)
+
+[node name="particleSpawnGun" type="MeshInstance3D" parent="playerCam/gun" unique_id=1268103117]
+transform = Transform3D(0.4209742, 1.8626451e-09, 2.6077032e-08, 2.2817403e-08, 0.5239, 4.4703484e-08, 2.2351742e-08, -1.4901161e-08, 0.42500958, 0.0027680397, 3.6811652, 7.116807)
+visible = false
+mesh = SubResource("BoxMesh_ramtr")
+
+[node name="TextureRect" type="TextureRect" parent="playerCam" unique_id=1320434718]
+offset_left = 556.0
+offset_top = 304.0
+offset_right = 596.0
+offset_bottom = 344.0
+texture = ExtResource("3_ramtr")
 
 [node name="feetPos" type="MeshInstance3D" parent="." unique_id=114077523]
 transform = Transform3D(0.07, 0, 0, 0, 0.07, 0, 0, 0, 0.07, 0, -0.97684103, 0)
 mesh = SubResource("BoxMesh_m8bbn")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1489247655]
+libraries/ = SubResource("AnimationLibrary_tut37")

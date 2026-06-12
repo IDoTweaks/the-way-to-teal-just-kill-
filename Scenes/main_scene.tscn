@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="1_52fb6"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_52fb6"]
-albedo_color = Color(4.5724212e-07, 0.29423055, 0.03251834, 1)
+albedo_color = Color(0, 0.5294118, 0, 1)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_6l7je"]
 
@@ -16,16 +16,16 @@ fog_enabled = true
 fog_light_energy = 2.15
 fog_density = 0.005
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6l7je"]
+albedo_color = Color(0, 1, 0, 1)
+
 [sub_resource type="PrismMesh" id="PrismMesh_52fb6"]
+material = SubResource("StandardMaterial3D_6l7je")
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_52fb6"]
 points = PackedVector3Array(0, 0.5, 0.5, 0.5, -0.5, 0.5, 0, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5)
 
 [node name="MainScene" type="Node3D" unique_id=59475580]
-
-[node name="Player" parent="." unique_id=659499291 instance=ExtResource("1_52fb6")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3510525, 0)
-downForceDevide = 1.0
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1544043293]
 
@@ -52,3 +52,6 @@ mesh = SubResource("PrismMesh_52fb6")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="slope" unique_id=1128850371]
 shape = SubResource("ConvexPolygonShape3D_52fb6")
+
+[node name="Player" parent="." unique_id=659499291 instance=ExtResource("1_52fb6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.159593, 0)
