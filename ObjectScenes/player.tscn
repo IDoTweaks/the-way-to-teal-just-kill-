@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://bcugc3piu2xws"]
+
+[ext_resource type="Script" uid="uid://ck51rj4rdst7j" path="res://Scripts/player.gd" id="1_m8bbn"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m8bbn"]
+albedo_color = Color(0.21568628, 0.5686275, 1, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_8heul"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_m8bbn"]
+
+[sub_resource type="ORMMaterial3D" id="ORMMaterial3D_iixog"]
+albedo_color = Color(0.28669193, 0.50101376, 1, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_ramtr"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_m8bbn"]
+
+[node name="Player" type="CharacterBody3D" unique_id=659499291]
+script = ExtResource("1_m8bbn")
+downForceDevide = 1.0
+slideDownforce = 5.0
+
+[node name="body" type="MeshInstance3D" parent="." unique_id=1599943581]
+material_override = SubResource("StandardMaterial3D_m8bbn")
+mesh = SubResource("CapsuleMesh_8heul")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=29317526]
+shape = SubResource("CapsuleShape3D_m8bbn")
+
+[node name="playerCam" type="Camera3D" parent="." unique_id=1441979209]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.590254, 0)
+
+[node name="leftArm" type="MeshInstance3D" parent="playerCam" unique_id=1259226239]
+transform = Transform3D(-6.712804e-05, -0.00023131243, 0.34499997, -0.3313299, 0.096153624, 0, -0.096153595, -0.33132985, -0.000240856, -0.4055989, -0.29702726, -0.21109307)
+material_override = SubResource("ORMMaterial3D_iixog")
+mesh = SubResource("CapsuleMesh_ramtr")
+
+[node name="rightArm" type="MeshInstance3D" parent="playerCam" unique_id=1446399764]
+transform = Transform3D(-6.712806e-05, -0.00023131244, 0.34499997, -0.3277667, -0.107675456, -0.00013596816, 0.107675515, -0.32776672, -0.00019880713, 0.4428725, -0.29702726, -0.21109307)
+material_override = SubResource("ORMMaterial3D_iixog")
+mesh = SubResource("CapsuleMesh_ramtr")
+
+[node name="feetPos" type="MeshInstance3D" parent="." unique_id=114077523]
+transform = Transform3D(0.07, 0, 0, 0, 0.07, 0, 0, 0, 0.07, 0, -0.97684103, 0)
+mesh = SubResource("BoxMesh_m8bbn")
