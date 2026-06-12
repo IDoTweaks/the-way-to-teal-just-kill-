@@ -124,8 +124,8 @@ func _shoot():
 	
 	if gunRay.is_colliding():
 		var target = gunRay.get_collider()
-		if target.has_method("enemy"):
-			target.health -= damage
+		if target.has_method("_damage"):
+			target._damage(damage)
 		var hit_pos = gunRay.get_collision_point()
 		var hit_normal = gunRay.get_collision_normal()
 		_spawn_bullet_hole(hit_pos, hit_normal)

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bbkbl3s5vn620"]
 
 [ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="1_52fb6"]
+[ext_resource type="PackedScene" uid="uid://b5q0axdmxxqxk" path="res://ObjectScenes/enemy.tscn" id="2_6l7je"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_52fb6"]
 albedo_color = Color(0, 0.5294118, 0, 1)
@@ -55,3 +56,6 @@ shape = SubResource("ConvexPolygonShape3D_52fb6")
 
 [node name="Player" parent="." unique_id=659499291 instance=ExtResource("1_52fb6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.159593, 0)
+
+[node name="Enemy" parent="." unique_id=1301325712 instance=ExtResource("2_6l7je")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1461563, 1.7448134, -12.403276)

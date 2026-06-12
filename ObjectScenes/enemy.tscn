@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://b5q0axdmxxqxk"]
+
+[ext_resource type="Script" uid="uid://br0oyucu7isde" path="res://Scripts/enemy.gd" id="1_11qr2"]
+[ext_resource type="Shader" uid="uid://bloi2q6drjuc1" path="res://Scripts/enemy.gdshader" id="1_eab72"]
+[ext_resource type="Script" uid="uid://cpvjm0sd3x7sb" path="res://Scripts/body.gd" id="2_sdrrn"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sdrrn"]
+render_priority = 0
+shader = ExtResource("1_eab72")
+shader_parameter/base_color = Color(0.29411766, 0.5568628, 0.78039217, 1)
+shader_parameter/fill_color = Color(0, 0.8039216, 0.19607843, 1)
+shader_parameter/fill_percent = 1.0
+shader_parameter/min_y = -1.0
+shader_parameter/max_y = 1.0
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_11qr2"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_cwb1f"]
+
+[node name="Enemy" type="CharacterBody3D" unique_id=1301325712]
+script = ExtResource("1_11qr2")
+
+[node name="body" type="MeshInstance3D" parent="." unique_id=591488221]
+material_override = SubResource("ShaderMaterial_sdrrn")
+mesh = SubResource("CapsuleMesh_11qr2")
+script = ExtResource("2_sdrrn")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=162224433]
+shape = SubResource("CapsuleShape3D_cwb1f")

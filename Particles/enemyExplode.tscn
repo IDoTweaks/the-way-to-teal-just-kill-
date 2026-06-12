@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://c2e4rlvi3bcpo"]
+
+[ext_resource type="Script" uid="uid://bc6ahec3jfp1w" path="res://Scripts/shoot_particles.gd" id="1_o80je"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4vteu"]
+albedo_color = Color(0.24997973, 0.4812979, 1, 1)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_c5iod"]
+direction = Vector3(0, 1, 0)
+spread = 25.837
+initial_velocity_min = 6.6499996
+initial_velocity_max = 9.599999
+orbit_velocity_min = 1.3760002
+orbit_velocity_max = 2.0000002
+scale_min = 0.39999998
+scale_max = 0.59999996
+
+[sub_resource type="BoxMesh" id="BoxMesh_5e4ic"]
+size = Vector3(0.1, 0.1, 0.1)
+
+[node name="ShootParticles" type="GPUParticles3D" unique_id=962218895]
+material_override = SubResource("StandardMaterial3D_4vteu")
+emitting = false
+amount = 1988
+lifetime = 2.4
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_c5iod")
+draw_pass_1 = SubResource("BoxMesh_5e4ic")
+script = ExtResource("1_o80je")
+
+[connection signal="finished" from="." to="." method="_on_finished"]
