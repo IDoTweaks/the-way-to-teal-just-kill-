@@ -215,6 +215,7 @@ texture = ExtResource("3_ramtr")
 
 [node name="feetPos" type="MeshInstance3D" parent="." unique_id=114077523]
 transform = Transform3D(0.07, 0, 0, 0, 0.07, 0, 0, 0, 0.07, 0, -0.97684103, 0)
+visible = false
 mesh = SubResource("BoxMesh_m8bbn")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1489247655]
