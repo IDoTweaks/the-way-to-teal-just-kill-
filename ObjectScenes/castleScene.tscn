@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://ckh3p25vbgxmc"]
+
+[ext_resource type="PackedScene" uid="uid://dvmf0fshtdft5" path="res://Models/low_poly_castle.glb" id="1_xkivw"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gt40o"]
+albedo_color = Color(0, 0.36078432, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mwv5q"]
+albedo_color = Color(0, 0.5137255, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f5y2p"]
+albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s6n61"]
+albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gkngo"]
+albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cd7pw"]
+albedo_color = Color(0, 1, 0, 1)
+
+[node name="Sketchfab_Scene" unique_id=147884172 instance=ExtResource("1_xkivw")]
+
+[node name="main_mat_grey03_0" parent="Sketchfab_model/ee5f36f1191d48268434ef190472b742_fbx/RootNode/main" parent_id_path=PackedInt32Array(1699645645) index="0" unique_id=794587473]
+material_override = SubResource("StandardMaterial3D_gt40o")
+
+[node name="main_mat_grey01_0" parent="Sketchfab_model/ee5f36f1191d48268434ef190472b742_fbx/RootNode/main" parent_id_path=PackedInt32Array(1699645645) index="1" unique_id=678794182]
+material_override = SubResource("StandardMaterial3D_mwv5q")
+
+[node name="tower01_mat_grey01_0" parent="Sketchfab_model/ee5f36f1191d48268434ef190472b742_fbx/RootNode/tower01" parent_id_path=PackedInt32Array(119568163) index="0" unique_id=1763391109]
+material_override = SubResource("StandardMaterial3D_f5y2p")
+
+[node name="tower02_mat_grey01_0" parent="Sketchfab_model/ee5f36f1191d48268434ef190472b742_fbx/RootNode/tower02" parent_id_path=PackedInt32Array(299484805) index="0" unique_id=1171102897]
+material_override = SubResource("StandardMaterial3D_s6n61")
+
+[node name="tower03_mat_grey01_0" parent="Sketchfab_model/ee5f36f1191d48268434ef190472b742_fbx/RootNode/tower03" parent_id_path=PackedInt32Array(1378638530) index="0" unique_id=239282721]
+material_override = SubResource("StandardMaterial3D_gkngo")
+
+[node name="tower04_mat_grey01_0" parent="Sketchfab_model/ee5f36f1191d48268434ef190472b742_fbx/RootNode/tower04" parent_id_path=PackedInt32Array(1044860216) index="0" unique_id=861144210]
+material_override = SubResource("StandardMaterial3D_cd7pw")

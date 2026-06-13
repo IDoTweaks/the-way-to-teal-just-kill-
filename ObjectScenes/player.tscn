@@ -193,6 +193,7 @@ material_override = SubResource("ORMMaterial3D_iixog")
 mesh = SubResource("CapsuleMesh_ramtr")
 
 [node name="RayCast3D" type="RayCast3D" parent="playerCam" unique_id=1374155071]
+visible = false
 target_position = Vector3(0, 0, -200)
 
 [node name="hand" type="Node3D" parent="playerCam" unique_id=800072338]

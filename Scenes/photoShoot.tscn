@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://x4ck4yere4fi"]
+
+[ext_resource type="PackedScene" uid="uid://ckh3p25vbgxmc" path="res://ObjectScenes/castleScene.tscn" id="1_fdp0r"]
+[ext_resource type="PackedScene" uid="uid://dje4o3vb2fy7c" path="res://ObjectScenes/flagScene.tscn" id="2_fjp2v"]
+[ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="3_dcgwn"]
+[ext_resource type="PackedScene" uid="uid://dce47a6ml6af7" path="res://Models/minecraft_sunglasses.glb" id="4_nrwnh"]
+[ext_resource type="PackedScene" uid="uid://b3kg0rcmi5hmw" path="res://Models/vfx explosion.glb" id="5_0utub"]
+[ext_resource type="PackedScene" uid="uid://b5q0axdmxxqxk" path="res://ObjectScenes/enemy.tscn" id="6_26oaw"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_olma7"]
+energy_multiplier = 0.0
+
+[sub_resource type="Sky" id="Sky_3dg0n"]
+sky_material = SubResource("PanoramaSkyMaterial_olma7")
+
+[sub_resource type="Environment" id="Environment_ncojl"]
+background_mode = 1
+background_color = Color(0, 0.49315646, 0.49315646, 1)
+sky = SubResource("Sky_3dg0n")
+ssr_enabled = true
+ssil_enabled = true
+glow_enabled = true
+
+[node name="PhotoShoot" type="Node3D" unique_id=1121155617]
+
+[node name="Sketchfab_Scene" parent="." unique_id=147884172 instance=ExtResource("1_fdp0r")]
+transform = Transform3D(0.21, 0, 0, 0, 0.21, 0, 0, 0, 0.21, 0, 0, 0)
+
+[node name="Sketchfab_Scene2" parent="." unique_id=214110643 instance=ExtResource("2_fjp2v")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.133179, 339.89603, 173.82579)
+
+[node name="Player" parent="." unique_id=659499291 instance=ExtResource("3_dcgwn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4572067, 65.27299, 55.82552)
+
+[node name="Sketchfab_Scene3" parent="." unique_id=1187064538 instance=ExtResource("4_nrwnh")]
+transform = Transform3D(-0.049999177, 2.3826957e-05, -0.00028523288, -0.00028622636, -0.0041629407, 0.049825575, -4.4703485e-09, 0.049826395, 0.0041630086, -5.8104362, 66.27365, 55.31093)
+
+[node name="vfx explosion" parent="." unique_id=957587061 instance=ExtResource("5_0utub")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.7683573, 65.21414, 60.84117)
+
+[node name="vfx explosion2" parent="." unique_id=1731680517 instance=ExtResource("5_0utub")]
+transform = Transform3D(2.206, 0, 0, 0, 1.806, 0, 0, 0, 2.239, -5.356474, 65.21414, 60.84117)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1894312281]
+environment = SubResource("Environment_ncojl")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1009323175]
+transform = Transform3D(1, 0, 0, 0, 0.8963549, 0.44333717, 0, -0.44333717, 0.8963549, 0, 97.17082, 0)
+light_color = Color(0, 1.6197081, 0, 1)
+
+[node name="Enemy" parent="." unique_id=1301325712 instance=ExtResource("6_26oaw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.539038, 51.3395, 46.80379)
+
+[node name="Enemy2" parent="." unique_id=1154085310 instance=ExtResource("6_26oaw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.539038, 63.260532, 34.64185)
+
+[node name="Enemy3" parent="." unique_id=45369334 instance=ExtResource("6_26oaw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.00774, 63.260532, 34.64185)
+
+[node name="Enemy4" parent="." unique_id=1196885590 instance=ExtResource("6_26oaw")]
+transform = Transform3D(0.93736714, 0.348343, 0, -0.348343, 0.93736714, 0, 0, 0, 1, -4.8339562, 63.260532, 37.332264)
+
+[node name="Enemy6" parent="." unique_id=1275337043 instance=ExtResource("6_26oaw")]
+transform = Transform3D(0.71453243, 0.6297235, 0.30478117, -0.6611809, 0.75022644, 0, -0.22865494, -0.20151553, 0.9524224, -11.9253845, 65.53088, 56.517143)
+
+[node name="Enemy7" parent="." unique_id=1400755603 instance=ExtResource("6_26oaw")]
+transform = Transform3D(0.66739655, -0.5110338, 0.5416885, 0.4268016, 0.8585547, 0.2841202, -0.6102643, 0.04157266, 0.79110646, -0.46058655, 65.53088, 53.792984)
+
+[node name="Enemy5" parent="." unique_id=149834424 instance=ExtResource("6_26oaw")]
+transform = Transform3D(0.5886039, -0.80842155, 0, 0.80842155, 0.5886039, 0, 0, 0, 1, -6.00774, 58.567574, 40.25878)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1452966386]
+transform = Transform3D(-0.82365143, 0, 0.5670965, 0, 1, 0, -0.5670965, 0, -0.82365143, -2.1870327, 64.40134, 33.359905)

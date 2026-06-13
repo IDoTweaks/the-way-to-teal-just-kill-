@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dje4o3vb2fy7c"]
+
+[ext_resource type="PackedScene" uid="uid://j2v83y60y8qm" path="res://Models/pirate_flag.glb" id="1_0o06p"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0o06p"]
+albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_67v4x"]
+albedo_color = Color(0, 0.5047722, 0, 1)
+
+[node name="Sketchfab_Scene" unique_id=214110643 instance=ExtResource("1_0o06p")]
+
+[node name="Object_3" parent="Sketchfab_model/36c27f9e1463418b8883b7815feeb024_obj_cleaner_materialmerger_gles" parent_id_path=PackedInt32Array(1064132888) index="1" unique_id=1049343215]
+material_override = SubResource("StandardMaterial3D_0o06p")
+
+[node name="Object_4" parent="Sketchfab_model/36c27f9e1463418b8883b7815feeb024_obj_cleaner_materialmerger_gles" parent_id_path=PackedInt32Array(1064132888) index="2" unique_id=1339776277]
+material_override = SubResource("StandardMaterial3D_67v4x")
