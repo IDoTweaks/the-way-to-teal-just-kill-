@@ -6,18 +6,16 @@ const JUMP_VELOCITY = 4.5
 const MAXCAMSHAKE = 0.03
 
 #sliding
+var wasSliding: bool = false
 var slide :bool = false
 @export var downForceDevide: float
 @export var slideFactor: float = 0.4
-@export var slideDownforce: float = 20.0
+@export var slideDownforce: float = 20
 #dashing
-@export var dashBoost: float = 25.0
-@export var dashDuration: float = 0.15
+@export var dashBoost: float = 18
 @export var dashCooldown: float = 0.6
-
 var dashing: bool = false
-var dashTimer: float = 0.0
-var dashCdTimer: float = 0.0
+var dashCdTimer: float = 0
 var dashDir: Vector3 = Vector3.ZERO
 
 @onready var feet = $feetPos;
@@ -27,6 +25,13 @@ var dashDir: Vector3 = Vector3.ZERO
 @onready var shootingParticles =preload("res://Particles/shootParticles.tscn")
 @onready var gunParticleSpawn = $playerCam/gun/particleSpawnGun
 var particleInstance
+
+#general movement
+var airAccel = 8
+var coyoteTimer: float = 0
+const COYOTE_TIME = 0.12
+var jumpBuffer: float = 0
+const JUMP_BUFFER_TIME = 0.12
 
 
 #footprint system
@@ -182,6 +187,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		playerCam.rotate_x(-event.relative.y * SENS)
 		playerCam.rotation.x = clamp(playerCam.rotation.x,deg_to_rad(-60),deg_to_rad(70))
 		
+	if Input.is_action_just_pressed("jump"):
+		jumpBuffer = JUMP_BUFFER_TIME
+		
 
 func _calcDownForce():
 	#calculate the position in the future
@@ -210,66 +218,108 @@ func _calcDownForce():
 		return 0
 
 func _physics_process(delta: float) -> void:
-	if dashTimer > 0:
-		dashTimer -= delta
-		if dashTimer <= 0:
-			dashing = false
 	if dashCdTimer > 0:
 		dashCdTimer -= delta
-
+	if jumpBuffer > 0:
+		jumpBuffer -= delta
+		
+	if is_on_floor():
+		coyoteTimer = COYOTE_TIME
+		dashing = false
+	elif coyoteTimer > 0:
+		coyoteTimer -= delta
+		
 	slide = Input.is_action_pressed("slide") and is_on_floor()
-	if Input.is_action_just_pressed("dash") and dashCdTimer <= 0 and not dashing:
+	if slide and not wasSliding:
+		var currentDir = Vector3(velocity.x,0,velocity.z).normalized()
+		if currentDir.length() > 0.1:
+			velocity.x += currentDir.x * 6
+			velocity.z += currentDir.z * 6
+	wasSliding = slide
+	
+	if Input.is_action_just_pressed("dash") and dashCdTimer <= 0:
 		var input_dir := Input.get_vector("left", "right", "forward", "backward")
 		if input_dir.length() > 0.1:
 			dashDir = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 		else:
 			dashDir = -transform.basis.z
-		dashing = true
-		dashTimer = dashDuration
 		dashCdTimer = dashCooldown
 		velocity.x = dashDir.x * dashBoost
 		velocity.z = dashDir.z * dashBoost
-
+		if is_on_floor():
+			velocity.y = 2
+		
+	if jumpBuffer > 0 and coyoteTimer > 0:
+		coyoteTimer = 0.0
+		jumpBuffer = 0.0
+		velocity.y = JUMP_VELOCITY
+		
+	if not is_on_floor() and Input.is_action_just_released("jump") and velocity.y > 0:
+		velocity.y *= 0.45
+		
+	if not is_on_floor():
+		velocity += get_gravity() * delta
+		
 	if not slide:
-		if not is_on_floor():
-			velocity += get_gravity() * delta
-
-		if Input.is_action_just_pressed("jump") and is_on_floor():
+		if Input.is_action_just_pressed("jump") and coyoteTimer > 0:
+			coyoteTimer = 0.0
 			velocity.y = JUMP_VELOCITY
 
 		var input_dir := Input.get_vector("left", "right", "forward", "backward")
 		var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-		if dashing:
-			velocity.x = move_toward(velocity.x, dashDir.x * dashBoost, 80.0 * delta)
-			velocity.z = move_toward(velocity.z, dashDir.z * dashBoost, 80.0 * delta)
-		elif direction:
-			var target_x = direction.x * SPEED
-			var target_z = direction.z * SPEED
-			velocity.x = move_toward(velocity.x, target_x, 30.0 * delta)
-			velocity.z = move_toward(velocity.z, target_z, 30.0 * delta)
+		var horizontal_speed = Vector2(velocity.x, velocity.z).length()
+
+		if is_on_floor():
+			if direction:
+				var accel = 30.0 if horizontal_speed < SPEED else 10.0
+				velocity.x = move_toward(velocity.x, direction.x * SPEED, accel * delta)
+				velocity.z = move_toward(velocity.z, direction.z * SPEED, accel * delta)
+			else:
+				velocity.x = move_toward(velocity.x, 0, 28 * delta)
+				velocity.z = move_toward(velocity.z, 0, 28 * delta)
+
 		else:
-			var brake = 28.0 if is_on_floor() else 8.0
-			velocity.x = move_toward(velocity.x, 0, brake * delta)
-			velocity.z = move_toward(velocity.z, 0, brake * delta)
+			if direction:
+				velocity.x += direction.x * airAccel * delta
+				velocity.z += direction.z * airAccel * delta
+				var horizontal = Vector2(velocity.x, velocity.z)
+				var cap = max(SPEED * 1.5, horizontal_speed) 
+				if horizontal.length() > cap:
+					horizontal = horizontal.normalized() * cap
+					velocity.x = horizontal.x
+					velocity.z = horizontal.y
+			else:
+				velocity.x = move_toward(velocity.x, 0, 2 * delta)
+				velocity.z = move_toward(velocity.z, 0, 2 * delta)
+				
 	else:
 		var force = _calcDownForce()
 		var slideMod = clamp(slideFactor + (force / downForceDevide), 0, 2.5)
 		if force > 0:
 			velocity.y = -force * slideDownforce
-
+			
 		if Input.is_action_just_pressed("jump") and is_on_floor():
 			velocity.y = JUMP_VELOCITY
-
+			
 		var input_dir := Input.get_vector("left", "right", "forward", "backward")
 		var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 		var slide_accel = 5
 		if direction:
-			velocity.x = lerp(velocity.x, direction.x * SPEED * slideMod, slide_accel * delta)
-			velocity.z = lerp(velocity.z, direction.z * SPEED * slideMod, slide_accel * delta)
+			var target_x = direction.x * SPEED * slideMod
+			var target_z = direction.z * SPEED * slideMod
+			var current_h = Vector2(velocity.x, velocity.z).length()
+			var target_h = Vector2(target_x, target_z).length()
+			if target_h < current_h:
+				var scale = current_h / max(target_h, 0.001)
+				target_x *= scale
+				target_z *= scale
+			velocity.x = lerp(velocity.x, target_x, slide_accel * delta)
+			velocity.z = lerp(velocity.z, target_z, slide_accel * delta)
 		else:
-			velocity.x = move_toward(velocity.x, 0, SPEED * slideMod * delta * slide_accel)
-			velocity.z = move_toward(velocity.z, 0, SPEED * slideMod * delta * slide_accel)
-
+			# Very low friction when sliding with no input — coast
+			velocity.x = move_toward(velocity.x, 0, 2.0 * delta)
+			velocity.z = move_toward(velocity.z, 0, 2.0 * delta)
+	
 	if is_on_floor():
 		var flat_pos = Vector3(global_position.x, 0, global_position.z)
 		var flat_last = Vector3(_last_footprint_pos.x, 0, _last_footprint_pos.z)
