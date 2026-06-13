@@ -12,6 +12,11 @@ var particleInstance
 @export var accelaration = 10
 var target
 var mode : String = "idle"
+var gotShot = false
+
+func _makeTarg(targ):
+	gotShot = true
+	target = targ
 
 func _ready() -> void:
 	body._updateMat(1)
@@ -35,7 +40,7 @@ func _physics_process(delta: float) -> void:
 	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta
-	if mode == "chase":
+	if mode == "chase" or gotShot:
 		navAgent.target_position = Vector3(target.global_position.x,target.global_position.y,target.global_position.z)
 		var dir = (navAgent.get_next_path_position() - global_position).normalized()
 		velocity = velocity.lerp(dir * SPEED, delta * accelaration)
@@ -52,18 +57,21 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_attack_body_entered(body: Node3D) -> void:
-	if body.has_method("player"):
-		mode = "attack"
-	if target == null:
-		target = body
+	if not gotShot:
+		if body.has_method("player"):
+			mode = "attack"
+		if target == null:
+			target = body
 
 
 func _on_attack_body_exited(body: Node3D) -> void:
-	if body.has_method("player"):
-		mode = "chase"
+	if not gotShot:
+		if body.has_method("player"):
+			mode = "chase"
 
 
 func _on_chase_body_entered(body: Node3D) -> void:
-	if body.has_method("player"):
-		target = body
-		mode = "chase"
+	if not gotShot:
+		if body.has_method("player"):
+			target = body
+			mode = "chase"
