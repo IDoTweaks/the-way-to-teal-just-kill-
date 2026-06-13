@@ -123,6 +123,9 @@ func _spawn_bullet_hole(pos: Vector3, normal: Vector3) -> void:
 		var oldest = _bullet_pool.pop_front()
 		oldest.queue_free()
 
+func _startInSlide():
+	animaPlayer.play("inSlide")
+
 func _shootAnim():
 	if Input.is_action_pressed("shoot"):
 		animaPlayer.play("shootingAnim")
@@ -132,7 +135,8 @@ func _shootAnim():
 		particleInstance.emitting = true
 	else:
 		playerCam.position = Vector3();
-		animaPlayer.stop()
+		if animaPlayer.current_animation == "shootingAnim":
+			animaPlayer.stop()
 func _shoot():
 	playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
 	
@@ -189,7 +193,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 	if Input.is_action_just_pressed("jump"):
 		jumpBuffer = JUMP_BUFFER_TIME
-		
 
 func _calcDownForce():
 	#calculate the position in the future
@@ -231,13 +234,18 @@ func _physics_process(delta: float) -> void:
 		
 	slide = Input.is_action_pressed("slide") and is_on_floor()
 	if slide and not wasSliding:
+		animaPlayer.play("slide")
 		var currentDir = Vector3(velocity.x,0,velocity.z).normalized()
 		if currentDir.length() > 0.1:
 			velocity.x += currentDir.x * 6
 			velocity.z += currentDir.z * 6
 	wasSliding = slide
+	if !slide:
+		if animaPlayer.current_animation == "inSlide":
+			animaPlayer.stop()
 	
 	if Input.is_action_just_pressed("dash") and dashCdTimer <= 0:
+		animaPlayer.play("dash")
 		var input_dir := Input.get_vector("left", "right", "forward", "backward")
 		if input_dir.length() > 0.1:
 			dashDir = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
