@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://br0oyucu7isde" path="res://Scripts/enemy.gd" id="1_11qr2"]
 [ext_resource type="Shader" uid="uid://bloi2q6drjuc1" path="res://Scripts/enemy.gdshader" id="1_eab72"]
-[ext_resource type="Script" uid="uid://cpvjm0sd3x7sb" path="res://Scripts/body.gd" id="2_sdrrn"]
+[ext_resource type="Script" uid="uid://4gxcy6cx0q1m" path="res://Scripts/meshInstanceBody.gd" id="3_11qr2"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_sdrrn"]
 render_priority = 0
@@ -23,7 +23,7 @@ script = ExtResource("1_11qr2")
 [node name="body" type="MeshInstance3D" parent="." unique_id=591488221]
 material_override = SubResource("ShaderMaterial_sdrrn")
 mesh = SubResource("CapsuleMesh_11qr2")
-script = ExtResource("2_sdrrn")
+script = ExtResource("3_11qr2")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=162224433]
 shape = SubResource("CapsuleShape3D_cwb1f")

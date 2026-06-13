@@ -1,9 +1,8 @@
-[gd_scene format=3 uid="uid://bcugc3piu2xws"]
+[gd_scene format=3 uid="uid://dnw8rjl6he2be"]
 
-[ext_resource type="Script" uid="uid://ck51rj4rdst7j" path="res://Scripts/player.gd" id="1_m8bbn"]
-[ext_resource type="PackedScene" uid="uid://dnfrb64vva6ff" path="res://Models/scorpious9.glb" id="2_iixog"]
-[ext_resource type="Texture2D" uid="uid://mul631bkn51k" path="res://Sprites/blueCross.png" id="3_ramtr"]
-[ext_resource type="Script" uid="uid://cr7xwuhtd8dr1" path="res://Scripts/texture_rect.gd" id="4_tut37"]
+[ext_resource type="Script" uid="uid://ck51rj4rdst7j" path="res://Scripts/player.gd" id="1_w072s"]
+[ext_resource type="PackedScene" uid="uid://dnfrb64vva6ff" path="res://Models/scorpious9.glb" id="2_mtyr6"]
+[ext_resource type="Texture2D" uid="uid://mul631bkn51k" path="res://Sprites/blueCross.png" id="3_0xblt"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m8bbn"]
 albedo_color = Color(0.21568628, 0.5686275, 1, 1)
@@ -462,7 +461,7 @@ _data = {
 }
 
 [node name="Player" type="CharacterBody3D" unique_id=659499291]
-script = ExtResource("1_m8bbn")
+script = ExtResource("1_w072s")
 downForceDevide = 1.0
 slideDownforce = 5.0
 
@@ -494,7 +493,7 @@ target_position = Vector3(0, 0, -200)
 [node name="hand" type="Node3D" parent="playerCam" unique_id=800072338]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.022098154, -0.109722495, -0.78610706)
 
-[node name="gun" parent="playerCam" unique_id=1487719564 instance=ExtResource("2_iixog")]
+[node name="gun" parent="playerCam" unique_id=1487719564 instance=ExtResource("2_mtyr6")]
 transform = Transform3D(-0.088497795, 0.012279472, 0.010833216, 0.013905769, 0.08779756, 0.014079106, -0.0086471755, 0.015517929, -0.08822939, 0.388, -0.31, -0.652)
 
 [node name="particleSpawnGun" type="MeshInstance3D" parent="playerCam/gun" unique_id=1268103117]
@@ -507,8 +506,7 @@ offset_left = 556.0
 offset_top = 304.0
 offset_right = 596.0
 offset_bottom = 344.0
-texture = ExtResource("3_ramtr")
-script = ExtResource("4_tut37")
+texture = ExtResource("3_0xblt")
 
 [node name="feetPos" type="MeshInstance3D" parent="." unique_id=114077523]
 transform = Transform3D(0.07, 0, 0, 0, 0.07, 0, 0, 0, 0.07, 0, -0.97684103, 0)

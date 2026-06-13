@@ -1,0 +1,251 @@
+[gd_scene format=3 uid="uid://cxradqn2o1i4b"]
+
+[ext_resource type="Script" uid="uid://r68xyadwcdin" path="res://Scripts/mainMenu.gd" id="1_k7s4i"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+resource_name = "black_button_hover"
+bg_color = Color(0.3, 0.3, 0.3, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.6, 0.6, 0.6, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+resource_name = "black_button_normal"
+bg_color = Color(0.15, 0.15, 0.15, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5, 0.5, 0.5, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3"]
+resource_name = "black_button_pressed"
+bg_color = Color(0.25, 0.25, 0.25, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7, 0.7, 0.7, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Theme" id="Theme_1"]
+Button/styles/focus = SubResource("StyleBoxFlat_2")
+Button/styles/hover = SubResource("StyleBoxFlat_2")
+Button/styles/normal = SubResource("StyleBoxFlat_1")
+Button/styles/pressed = SubResource("StyleBoxFlat_3")
+
+[node name="MainMenu2" type="Control" unique_id=527281505]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_k7s4i")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1268340044]
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.05, 0.08, 1)
+
+[node name="BackgroundPattern" type="TextureRect" parent="." unique_id=788495792]
+modulate = Color(0.15, 0.15, 0.18, 0.3)
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+expand_mode = 3
+stretch_mode = 6
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=144437507]
+
+[node name="MainContainer" type="Control" parent="UI" unique_id=1845957440]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="UI/MainContainer" unique_id=1373354903]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -250.0
+offset_right = 200.0
+offset_bottom = -200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0.7411765, 1, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.2, 0.2, 0.8)
+theme_override_constants/outline_size = 26
+theme_override_font_sizes/font_size = 56
+text = "THE WAY TO TEAL"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Title2" type="Label" parent="UI/MainContainer" unique_id=1398267125]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -237.625
+offset_top = -257.365
+offset_right = 240.37488
+offset_bottom = -180.36441
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 0.22340214
+theme_override_colors/font_color = Color(0.74658525, 2.0094587e-06, 8.663535e-07, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.2, 0.2, 0.8)
+theme_override_constants/outline_size = 26
+theme_override_font_sizes/font_size = 56
+text = "(just kill:)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MenuButtons" type="VBoxContainer" parent="UI/MainContainer" unique_id=404229236]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -577.0
+offset_top = 78.94
+offset_right = -341.0
+offset_bottom = 318.9402
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_1")
+
+[node name="JoinGameBtn" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=66041543]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "START"
+
+[node name="VSeparator" type="VSeparator" parent="UI/MainContainer/MenuButtons" unique_id=1799183135]
+layout_mode = 2
+
+[node name="SettingsBtn" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=1666292464]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "SETTINGS"
+
+[node name="QuitBtn" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=810246644]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "QUIT"
+
+[node name="Settings" type="VBoxContainer" parent="UI/MainContainer" unique_id=468676707]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -113.0
+offset_top = -66.0
+offset_right = 123.0
+offset_bottom = 174.00018
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_1")
+
+[node name="vlText" type="Label" parent="UI/MainContainer/Settings" unique_id=469044709]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.7411765, 1, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.2, 0.2, 0.8)
+theme_override_constants/outline_size = 26
+theme_override_font_sizes/font_size = 56
+text = "VOLUME"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="volumeSlider" type="HSlider" parent="UI/MainContainer/Settings" unique_id=1617484612]
+layout_mode = 2
+
+[node name="vlText2" type="Label" parent="UI/MainContainer/Settings" unique_id=1090479122]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.7411765, 1, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.2, 0.2, 0.8)
+theme_override_constants/outline_size = 26
+theme_override_font_sizes/font_size = 56
+text = "RESOLUTION"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResOptionButt" type="OptionButton" parent="UI/MainContainer/Settings" unique_id=118613445]
+layout_mode = 2
+selected = 0
+item_count = 4
+popup/item_0/text = "1920x1080"
+popup/item_0/id = 0
+popup/item_1/text = "1600x900"
+popup/item_1/id = 1
+popup/item_2/text = "1280x720"
+popup/item_2/id = 2
+popup/item_3/text = "1152x648"
+popup/item_3/id = 3
+
+[node name="fsOptionButt2" type="OptionButton" parent="UI/MainContainer/Settings" unique_id=112190865]
+layout_mode = 2
+selected = 0
+item_count = 3
+popup/item_0/text = "windowed"
+popup/item_0/id = 0
+popup/item_1/text = "borderless"
+popup/item_1/id = 1
+popup/item_2/text = "fullscreen"
+popup/item_2/id = 2
+
+[node name="AmbientLight" type="ColorRect" parent="." unique_id=1833103425]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1358.0
+offset_top = 260.0
+offset_right = 1358.0
+offset_bottom = 260.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.3)
+
+[connection signal="button_down" from="UI/MainContainer/MenuButtons/JoinGameBtn" to="." method="_on_join_game_btn_button_down"]
+[connection signal="button_down" from="UI/MainContainer/MenuButtons/SettingsBtn" to="." method="_on_settings_btn_button_down"]
+[connection signal="button_down" from="UI/MainContainer/MenuButtons/QuitBtn" to="." method="_on_quit_btn_button_down"]
+[connection signal="value_changed" from="UI/MainContainer/Settings/volumeSlider" to="." method="_on_volume_slider_value_changed"]
+[connection signal="item_selected" from="UI/MainContainer/Settings/ResOptionButt" to="." method="_on_res_option_butt_item_selected"]
+[connection signal="item_selected" from="UI/MainContainer/Settings/fsOptionButt2" to="." method="_on_fs_option_butt_2_item_selected"]

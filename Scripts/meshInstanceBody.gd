@@ -4,8 +4,7 @@ extends MeshInstance3D
 func _process(delta):
 	pass
 	
-func _ready() -> void:
-	_updateMat(.33)
+func _ready() -> void:pass
 		
 		
 func _updateMat(perc):
