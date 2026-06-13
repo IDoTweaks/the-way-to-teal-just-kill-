@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://oftku5x50jul"]
+
+[ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="1_vly50"]
+[ext_resource type="PackedScene" uid="uid://dh8322144axab" path="res://ObjectScenes/walker.tscn" id="2_vly50"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_52fb6"]
+size = Vector3(1, 0.5, 0.027008057)
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_vly50"]
+vertices = PackedVector3Array(-99.5, 0.4624262, 2.25, -19.25, 0.7124262, 2.25, -19.25, 0.4624262, 1.75, -17.75, 0.4624262, 1.75, -18, 0.4624262, -99.5, -99.5, 0.4624262, -99.5, 17.75, 0.4624262, 1.75, 18, 0.4624262, -99.5, 19.25, 0.4624262, 1.75, 19.25, 0.7124262, 2.25, 99.5, 0.4624262, 2.25, 99.5, 0.4624262, -99.5, -19.25, 0.7124262, 11.5, -17.5, 1.4624262, 11.5, -17.5, 1.4624262, 2.75, -19.25, 0.7124262, 2.75, -99.5, 0.4624262, 12, -19.25, 0.7124262, 12, 17.5, 1.4624262, 2.75, 17.5, 1.4624262, 11.5, 19.25, 0.7124262, 11.5, 19.25, 0.7124262, 2.75, 99.5, 0.4624262, 12, 19.25, 0.7124262, 12, 0, 9.962426, 11.5, 0, 9.962426, 2.75, -15.5, 0.4624262, 3, -15.5, 0.4624262, 11.25, 15.5, 0.4624262, 11.25, 15.5, 0.4624262, 3, -19.25, 0.4624262, 12.5, -17.25, 0.4624262, 99.5, -17.25, 0.4624262, 12.5, -99.5, 0.4624262, 99.5, 19.25, 0.4624262, 12.5, 17.25, 0.4624262, 12.5, 17.25, 0.4624262, 99.5, 99.5, 0.4624262, 99.5)
+polygons = [PackedInt32Array(2, 1, 0), PackedInt32Array(4, 3, 2), PackedInt32Array(0, 5, 2), PackedInt32Array(2, 5, 4), PackedInt32Array(3, 4, 6), PackedInt32Array(6, 4, 7), PackedInt32Array(10, 9, 8), PackedInt32Array(8, 6, 7), PackedInt32Array(10, 8, 11), PackedInt32Array(11, 8, 7), PackedInt32Array(15, 14, 12), PackedInt32Array(12, 14, 13), PackedInt32Array(12, 16, 15), PackedInt32Array(15, 16, 0), PackedInt32Array(12, 17, 16), PackedInt32Array(0, 1, 15), PackedInt32Array(21, 20, 18), PackedInt32Array(18, 20, 19), PackedInt32Array(21, 10, 20), PackedInt32Array(20, 10, 22), PackedInt32Array(22, 23, 20), PackedInt32Array(21, 9, 10), PackedInt32Array(14, 25, 13), PackedInt32Array(13, 25, 24), PackedInt32Array(24, 25, 18), PackedInt32Array(24, 18, 19), PackedInt32Array(29, 28, 26), PackedInt32Array(26, 28, 27), PackedInt32Array(16, 17, 30), PackedInt32Array(30, 32, 31), PackedInt32Array(16, 30, 33), PackedInt32Array(33, 30, 31), PackedInt32Array(34, 23, 22), PackedInt32Array(36, 35, 34), PackedInt32Array(22, 37, 34), PackedInt32Array(34, 37, 36), PackedInt32Array(32, 35, 31), PackedInt32Array(31, 35, 36)]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_52fb6"]
+albedo_color = Color(0, 0.5294118, 0, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_6l7je"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6l7je"]
+albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="PrismMesh" id="PrismMesh_52fb6"]
+material = SubResource("StandardMaterial3D_6l7je")
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_52fb6"]
+points = PackedVector3Array(0, 0.5, 0.5, 0.5, -0.5, 0.5, 0, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5)
+
+[sub_resource type="Environment" id="Environment_52fb6"]
+ssao_enabled = true
+fog_enabled = true
+fog_light_energy = 2.15
+fog_density = 0.005
+
+[node name="MainScene" type="Node3D" unique_id=59475580]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1544043293]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=809830899]
+transform = Transform3D(170.28792, 0, 0, 0, 1, 0, 0, 0, 6931.8047, 0, -0.25, -0.1596322)
+shape = SubResource("BoxShape3D_52fb6")
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="StaticBody3D" unique_id=649674902]
+navigation_mesh = SubResource("NavigationMesh_vly50")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D/NavigationRegion3D" unique_id=269194139]
+transform = Transform3D(100, 0, 0, 0, 1, 0, 0, 0, 100, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_52fb6")
+mesh = SubResource("PlaneMesh_6l7je")
+
+[node name="slope" type="StaticBody3D" parent="StaticBody3D/NavigationRegion3D" unique_id=442927987]
+transform = Transform3D(39.582985, 0, 0, 0, 9.51, 0, 0, 0, 9.51, 0, 4.7174263, 7.1252127)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D/NavigationRegion3D/slope" unique_id=1855994132]
+mesh = SubResource("PrismMesh_52fb6")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D/NavigationRegion3D/slope" unique_id=1128850371]
+shape = SubResource("ConvexPolygonShape3D_52fb6")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1742044166]
+environment = SubResource("Environment_52fb6")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1034259849]
+transform = Transform3D(1, 0, 0, 0, -0.37609485, 0.9265812, 0, -0.9265812, -0.37609485, 0, 18.215263, 0)
+
+[node name="Player" parent="." unique_id=659499291 instance=ExtResource("1_vly50")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.159593, 0)
+
+[node name="Enemy" parent="." unique_id=1301325712 instance=ExtResource("2_vly50")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.255983, 1.4953787, 0)
+
+[node name="Enemy2" parent="." unique_id=1638045631 instance=ExtResource("2_vly50")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.913727, 1.4953787, 0)

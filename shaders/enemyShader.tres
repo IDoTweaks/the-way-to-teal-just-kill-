@@ -1,0 +1,24 @@
+[gd_resource type="Shader" format=3 uid="uid://bbccypq442uup"]
+
+[resource]
+code = "shader_type spatial;
+
+uniform vec4 base_color : source_color = vec4(0, 1.0, .2, 1.0);
+uniform vec4 fill_color : source_color = vec4(0, 0.75, 1.0, 1.0);
+uniform float fill_percent : hint_range(0.0, 1.0) = 0.5;
+uniform float min_y = -0.5;
+uniform float max_y = 0.5;
+varying float local_y;
+
+void vertex() {
+	local_y = VERTEX.y;
+}
+
+void fragment() {
+    float height = max_y - min_y;
+    float normalized_y = (local_y - min_y) / height;
+    float stretched_fill = (fill_percent * 1.2) - 0.1;
+    float mask = smoothstep(normalized_y - 0.1, normalized_y + 0.1, stretched_fill);
+    vec3 final_color = mix(base_color.rgb, fill_color.rgb, mask);
+    ALBEDO = final_color;
+}"

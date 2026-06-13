@@ -1,0 +1,65 @@
+[gd_scene format=3 uid="uid://dh8322144axab"]
+
+[ext_resource type="Script" uid="uid://cpjdvndycm1ft" path="res://Scripts/walker.gd" id="1_p5c4o"]
+[ext_resource type="Shader" uid="uid://dq3vdacty25sx" path="res://shaders/enemyShader.gdshader" id="2_8bwe2"]
+[ext_resource type="Script" uid="uid://cpvjm0sd3x7sb" path="res://Scripts/body.gd" id="3_nv1fp"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_p5c4o"]
+render_priority = 0
+shader = ExtResource("2_8bwe2")
+shader_parameter/base_color = Color(0, 0.7490196, 1, 1)
+shader_parameter/fill_color = Color(0, 1, 0.2, 1)
+shader_parameter/fill_percent = 0.0
+shader_parameter/min_y = -0.9
+shader_parameter/max_y = 0.9
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_0ogls"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_nv1fp"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_cwb1f"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_p5c4o"]
+size = Vector3(1, 2.7114258, 1)
+
+[node name="Enemy" type="CharacterBody3D" unique_id=1301325712 node_paths=PackedStringArray("navAgent")]
+script = ExtResource("1_p5c4o")
+navAgent = NodePath("NavigationAgent3D")
+
+[node name="body" type="CSGCombiner3D" parent="." unique_id=454545955]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+material_override = SubResource("ShaderMaterial_p5c4o")
+script = ExtResource("3_nv1fp")
+
+[node name="CSGMesh3D" type="CSGMesh3D" parent="body" unique_id=2124767781]
+mesh = SubResource("CapsuleMesh_0ogls")
+
+[node name="CSGMesh3D2" type="CSGMesh3D" parent="body" unique_id=788943767]
+transform = Transform3D(0.023170492, -0.45440966, 0, 0.45440966, 0.023170492, 0, 0, 0, 0.455, 0.29995632, 0, -0.4510225)
+mesh = SubResource("CapsuleMesh_nv1fp")
+
+[node name="CSGMesh3D3" type="CSGMesh3D" parent="body" unique_id=1614576333]
+transform = Transform3D(0.023170492, -0.45440966, 0, 0.45440966, 0.023170492, 0, 0, 0, 0.455, 0.29995632, 0, 0.24066412)
+mesh = SubResource("CapsuleMesh_nv1fp")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=162224433]
+shape = SubResource("CapsuleShape3D_cwb1f")
+
+[node name="attack" type="Area3D" parent="." unique_id=894137081]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="attack" unique_id=350887654]
+transform = Transform3D(5, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0.8557129, 0)
+shape = SubResource("BoxShape3D_p5c4o")
+
+[node name="chase" type="Area3D" parent="." unique_id=1226484706]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="chase" unique_id=1144846124]
+transform = Transform3D(22.53, 0, 0, 0, 4.506, 0, 0, 0, 22.53, 0, 0.8557129, 0)
+shape = SubResource("BoxShape3D_p5c4o")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1271920877]
+
+[connection signal="body_entered" from="attack" to="." method="_on_attack_body_entered"]
+[connection signal="body_exited" from="attack" to="." method="_on_attack_body_exited"]
+[connection signal="body_entered" from="chase" to="." method="_on_chase_body_entered"]
+[connection signal="body_exited" from="chase" to="." method="_on_chase_body_exited"]

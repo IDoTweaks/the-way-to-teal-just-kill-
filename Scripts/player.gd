@@ -1,9 +1,10 @@
 extends CharacterBody3D
-
+func player():pass
 const SENS = 0.005;
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
 const MAXCAMSHAKE = 0.03
+@export var health = 100
 
 #sliding
 var wasSliding: bool = false
@@ -338,3 +339,9 @@ func _physics_process(delta: float) -> void:
 			_last_footprint_pos = global_position
 
 	move_and_slide()
+
+
+
+func _takeDamage(damage):
+	health -= damage
+	print("taken", damage)
