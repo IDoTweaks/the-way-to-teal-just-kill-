@@ -261,7 +261,7 @@ func _physics_process(delta: float) -> void:
 		#since the y velocity will always be much smaller we can use velocity x and z to determine how much jump we need
 		#and since we dont want spiderman here lets nerf it
 		var vericalNerf = .05
-		if abs(velocity.y) > 0:
+		if !is_on_floor():
 			if velocity.x > velocity.y:
 				velocity.y = (((velocity.x) / 2) * dashBoost) * vericalNerf
 			else:
