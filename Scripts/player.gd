@@ -33,6 +33,7 @@ var coyoteTimer: float = 0
 const COYOTE_TIME = 0.12
 var jumpBuffer: float = 0
 const JUMP_BUFFER_TIME = 0.12
+var justDashed = false
 
 
 #footprint system
@@ -257,8 +258,16 @@ func _physics_process(delta: float) -> void:
 		dashCdTimer = dashCooldown
 		velocity.x = dashDir.x * dashBoost
 		velocity.z = dashDir.z * dashBoost
+		#since the y velocity will always be much smaller we can use velocity x and z to determine how much jump we need
+		#and since we dont want spiderman here lets nerf it
+		var vericalNerf = .05
+		if abs(velocity.y) > 0:
+			if velocity.x > velocity.y:
+				velocity.y = (((velocity.x) / 2) * dashBoost) * vericalNerf
+			else:
+				velocity.y = (((velocity.z) / 2) * dashBoost) * vericalNerf
 		if is_on_floor():
-			velocity.y = 2
+			velocity += get_gravity()* delta;
 		
 	if jumpBuffer > 0 and coyoteTimer > 0:
 		coyoteTimer = 0.0
