@@ -33,7 +33,7 @@ var coyoteTimer: float = 0
 const COYOTE_TIME = 0.12
 var jumpBuffer: float = 0
 const JUMP_BUFFER_TIME = 0.12
-var justDashed = false
+var upDashed = false;
 
 
 #footprint system
@@ -261,12 +261,11 @@ func _physics_process(delta: float) -> void:
 		#since the y velocity will always be much smaller we can use velocity x and z to determine how much jump we need
 		#and since we dont want spiderman here lets nerf it
 		var vericalNerf = .05
-		if !is_on_floor():
-			if velocity.x > velocity.z:
-				velocity.y = (((velocity.x) / 2) * dashBoost) * vericalNerf
-			else:
-				velocity.y = (((velocity.z) / 2) * dashBoost) * vericalNerf
+		if !is_on_floor() and !upDashed:
+				velocity.y = ((Vector2(velocity.x,velocity.z).length() / 2) * dashBoost) * vericalNerf
+				upDashed = true
 		if is_on_floor():
+			upDashed = false
 			velocity += get_gravity()* delta;
 		
 	if jumpBuffer > 0 and coyoteTimer > 0:
