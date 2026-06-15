@@ -39,7 +39,7 @@ var upDashed = false;
 #footprint system
 @export var step_distance: float = 0.5
 @export var decal_size: float = 0.4
-@export var max_footprints: int = 60
+@export var max_footprints: int = 120
 
 var _last_footprint_pos: Vector3 = Vector3.ZERO
 var _footprint_pool: Array[Node] = []
@@ -76,7 +76,7 @@ func _spawn_footprint(pos: Vector3) -> void:
 #gun
 @export var damage : float = 10
 @export var bullet_hole_size: float = 0.15
-@export var max_bullet_holes: int = 40
+@export var max_bullet_holes: int = 100
 
 var _bullet_pool: Array[Node] = []
 var _bullet_tex: ImageTexture
@@ -225,6 +225,7 @@ func _calcDownForce():
 		return 0
 
 func _physics_process(delta: float) -> void:
+	print(velocity.x + velocity.y)
 	if dashCdTimer > 0:
 		dashCdTimer -= delta
 	if jumpBuffer > 0:
@@ -256,14 +257,14 @@ func _physics_process(delta: float) -> void:
 		else:
 			dashDir = -transform.basis.z
 		dashCdTimer = dashCooldown
+		var vericalNerf = 1
+		if velocity.y != 0 and !upDashed:
+				velocity.y = (Vector2(abs(velocity.x),abs(velocity.z)).length() / 2) * vericalNerf
+				upDashed = true
 		velocity.x = dashDir.x * dashBoost
 		velocity.z = dashDir.z * dashBoost
 		#since the y velocity will always be much smaller we can use velocity x and z to determine how much jump we need
 		#and since we dont want spiderman here lets nerf it
-		var vericalNerf = .05
-		if !is_on_floor() and !upDashed:
-				velocity.y = ((Vector2(velocity.x,velocity.z).length() / 2) * dashBoost) * vericalNerf
-				upDashed = true
 		if is_on_floor():
 			upDashed = false
 			velocity += get_gravity()* delta;
