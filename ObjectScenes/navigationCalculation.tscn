@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://d8bt3lb3ds60"]
+
+[ext_resource type="Script" uid="uid://d3ujvpyo1gjsd" path="res://Scripts/navigation_calculation.gd" id="1_0biit"]
+
+[node name="NavigationCalculation" type="Node3D" unique_id=1289349344]
+script = ExtResource("1_0biit")

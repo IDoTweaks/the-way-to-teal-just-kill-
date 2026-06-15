@@ -13,6 +13,7 @@ var particleInstance
 var target
 var mode : String = "idle"
 var gotShot = false
+var shouldMove = false
 
 func _makeTarg(targ):
 	gotShot = true
@@ -20,6 +21,7 @@ func _makeTarg(targ):
 
 func _ready() -> void:
 	body._updateMat(1)
+	await get_tree().physics_frame
 
 func _damage(dmg):
 	health -= dmg
@@ -40,20 +42,20 @@ func _physics_process(delta: float) -> void:
 	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta
-	if mode == "chase" or gotShot:
-		navAgent.target_position = Vector3(target.global_position.x,target.global_position.y,target.global_position.z)
-		var dir = (navAgent.get_next_path_position() - global_position).normalized()
-		velocity = velocity.lerp(dir * SPEED, delta * accelaration)
-		look_at(Vector3(target.global_position.x,global_position.y,target.global_position.z),Vector3.UP,true)
-	elif mode == "attack":
-		navAgent.target_position = Vector3(target.global_position.x,target.global_position.y,target.global_position.z)
-		var jumblePos = Vector3(global_position.x + randf_range(-3,3),global_position.y,global_position.z+ randf_range(-3,3))
-		var dir = (navAgent.get_next_path_position() - jumblePos).normalized()
-		velocity = velocity.lerp(dir * SPEED, delta * accelaration)
-		look_at(Vector3(target.global_position.x,global_position.y,target.global_position.z),Vector3.UP,true)
-		target._takeDamage(10)
-
+		
+	var space = get_world_3d().direct_space_state
+	var horizontal = Vector3(velocity.x,0,velocity.z).normalized()
+	if horizontal.length() > 0.1:
+		var ray = PhysicsRayQueryParameters3D.create(global_position + horizontal * .6, global_position + horizontal * .6 + Vector3(0,-2,0))
+		ray.exclude = [self.get_rid()]
+		var hit = space.intersect_ray(ray)
+		if !hit:
+			velocity.x = 0
+			velocity.z = 0
+	#if shouldMove:
 	move_and_slide()
+	if mode == "attack":
+		target._takeDamage(10)
 
 
 func _on_attack_body_entered(body: Node3D) -> void:
