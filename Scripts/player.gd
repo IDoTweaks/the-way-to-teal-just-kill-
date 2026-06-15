@@ -40,8 +40,8 @@ var wallNormal  = Vector3.ZERO
 var canWallJump = false
 var wallJumpCd = 0
 const WALL_JUMP_VELOCITY = 6
-const WALL_JUMP_BOOST = 12
-const WALL_JUMP_COOLDOWN= .1
+const WALL_JUMP_BOOST = 8
+const WALL_JUMP_COOLDOWN= 0
 
 #footprint system
 @export var step_distance: float = 0.5
@@ -387,45 +387,90 @@ func _checkWall():
 	if is_on_floor():
 		canWallJump = false
 		return
-	var veloc = Vector3(velocity.x,velocity.y,velocity.z)
-	#var future = self.global_position + veloc
-	for i in get_slide_collision_count():
-		var collision = get_slide_collision(i)
-		if collision.get_normal().y < .3:
-			wallNormal = collision.get_normal()
-			canWallJump = true
-			return
-			
 	
-	if veloc.length() > 0.5:
-		var spaceState = get_world_3d().direct_space_state
-		var ray = PhysicsRayQueryParameters3D.create(global_position,global_position + veloc.normalized() * 1.2)
-		ray.exclude = [self.get_rid()]
-		var hit = spaceState.intersect_ray(ray)
-		if hit and hit.normal.y < .3:
-			wallNormal = hit.normal
-			canWallJump = true
-			return
+	if abs(velocity.x) + abs(velocity.y) > 1:
+		var veloc = Vector3(velocity.x,0,velocity.z)
+		#var future = self.global_position + veloc
+		for i in get_slide_collision_count():
+			var collision = get_slide_collision(i)
+			if collision.get_normal().y < .3:
+				wallNormal = collision.get_normal()
+				canWallJump = true
+				return
+				
+		
+		if veloc.length() > 0.5:
+			var spaceState = get_world_3d().direct_space_state
+			var ray = PhysicsRayQueryParameters3D.create(global_position,global_position + veloc.normalized() * 1.2)
+			ray.exclude = [self.get_rid()]
+			var hit = spaceState.intersect_ray(ray)
+			if hit and hit.normal.y < .3:
+				wallNormal = hit.normal
+				canWallJump = true
+				return
+		
+		var altVeloc = Vector3(-velocity.x,0,velocity.z)
+		if altVeloc.length() > 0.5:
+			var spaceState = get_world_3d().direct_space_state
+			var ray = PhysicsRayQueryParameters3D.create(global_position,global_position + altVeloc.normalized() * 1.2)
+			ray.exclude = [self.get_rid()]
+			var hit = spaceState.intersect_ray(ray)
+			if hit and hit.normal.y < .3:
+				wallNormal = hit.normal
+				canWallJump = true
+				return
+		altVeloc = Vector3(velocity.x,0,-velocity.z)
+		if altVeloc.length() > 0.5:
+			var spaceState = get_world_3d().direct_space_state
+			var ray = PhysicsRayQueryParameters3D.create(global_position,global_position + altVeloc.normalized() * 1.2)
+			ray.exclude = [self.get_rid()]
+			var hit = spaceState.intersect_ray(ray)
+			if hit and hit.normal.y < .3:
+				wallNormal = hit.normal
+				canWallJump = true
+				return
+	else:
+		var veloc = Vector3(1,0,1)
+		#var future = self.global_position + veloc
+		for i in get_slide_collision_count():
+			var collision = get_slide_collision(i)
+			if collision.get_normal().y < .3:
+				wallNormal = collision.get_normal()
+				canWallJump = true
+				return
+				
+		
+		if veloc.length() > 0.5:
+			var spaceState = get_world_3d().direct_space_state
+			var ray = PhysicsRayQueryParameters3D.create(global_position,global_position + veloc.normalized() * 1.2)
+			ray.exclude = [self.get_rid()]
+			var hit = spaceState.intersect_ray(ray)
+			if hit and hit.normal.y < .3:
+				wallNormal = hit.normal
+				canWallJump = true
+				return
+		
+		var altVeloc = Vector3(-1,0,1)
+		if altVeloc.length() > 0.5:
+			var spaceState = get_world_3d().direct_space_state
+			var ray = PhysicsRayQueryParameters3D.create(global_position,global_position + altVeloc.normalized() * 1.2)
+			ray.exclude = [self.get_rid()]
+			var hit = spaceState.intersect_ray(ray)
+			if hit and hit.normal.y < .3:
+				wallNormal = hit.normal
+				canWallJump = true
+				return
+		altVeloc = Vector3(1,0,-1)
+		if altVeloc.length() > 0.5:
+			var spaceState = get_world_3d().direct_space_state
+			var ray = PhysicsRayQueryParameters3D.create(global_position,global_position + altVeloc.normalized() * 1.2)
+			ray.exclude = [self.get_rid()]
+			var hit = spaceState.intersect_ray(ray)
+			if hit and hit.normal.y < .3:
+				wallNormal = hit.normal
+				canWallJump = true
+				return
 	
-	var altVeloc = Vector3(-velocity.x,velocity.y,velocity.z)
-	if altVeloc.length() > 0.5:
-		var spaceState = get_world_3d().direct_space_state
-		var ray = PhysicsRayQueryParameters3D.create(global_position,global_position + altVeloc.normalized() * 1.2)
-		ray.exclude = [self.get_rid()]
-		var hit = spaceState.intersect_ray(ray)
-		if hit and hit.normal.y < .3:
-			wallNormal = hit.normal
-			canWallJump = true
-			return
-	altVeloc = Vector3(velocity.x,velocity.y,-velocity.z)
-	if altVeloc.length() > 0.5:
-		var spaceState = get_world_3d().direct_space_state
-		var ray = PhysicsRayQueryParameters3D.create(global_position,global_position + altVeloc.normalized() * 1.2)
-		ray.exclude = [self.get_rid()]
-		var hit = spaceState.intersect_ray(ray)
-		if hit and hit.normal.y < .3:
-			wallNormal = hit.normal
-			canWallJump = true
-			return
+	
 	
 	canWallJump = false
