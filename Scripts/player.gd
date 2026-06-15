@@ -35,6 +35,13 @@ var jumpBuffer: float = 0
 const JUMP_BUFFER_TIME = 0.12
 var upDashed = false;
 
+# wall jumping
+var wallNormal  = Vector3.ZERO
+var canWallJump = false
+var wallJumpCd = 0
+const WALL_JUMP_VELOCITY = 6
+const WALL_JUMP_BOOST = 12
+const WALL_JUMP_COOLDOWN= .1
 
 #footprint system
 @export var step_distance: float = 0.5
@@ -230,13 +237,18 @@ func _physics_process(delta: float) -> void:
 		dashCdTimer -= delta
 	if jumpBuffer > 0:
 		jumpBuffer -= delta
+	if wallJumpCd > 0:
+		wallJumpCd -= delta
 		
 	if is_on_floor():
 		coyoteTimer = COYOTE_TIME
 		dashing = false
+		upDashed = false
 	elif coyoteTimer > 0:
 		coyoteTimer -= delta
 		
+		
+	
 	slide = Input.is_action_pressed("slide") and is_on_floor()
 	if slide and not wasSliding:
 		animaPlayer.play("slide")
@@ -266,8 +278,16 @@ func _physics_process(delta: float) -> void:
 		#since the y velocity will always be much smaller we can use velocity x and z to determine how much jump we need
 		#and since we dont want spiderman here lets nerf it
 		if is_on_floor():
-			upDashed = false
 			velocity += get_gravity()* delta;
+			
+	if jumpBuffer > 0 and canWallJump and !is_on_floor() and wallJumpCd <= 0:
+		var bounced = velocity.bounce(wallNormal)
+		velocity.x = bounced.x * .4 + wallNormal.x *WALL_JUMP_BOOST
+		velocity.z = bounced.z * .4 + wallNormal.z *WALL_JUMP_BOOST
+		velocity.y = WALL_JUMP_VELOCITY
+		wallJumpCd = WALL_JUMP_COOLDOWN
+		jumpBuffer = 0
+		upDashed = false
 		
 	if jumpBuffer > 0 and coyoteTimer > 0:
 		coyoteTimer = 0.0
@@ -350,9 +370,62 @@ func _physics_process(delta: float) -> void:
 			_last_footprint_pos = global_position
 
 	move_and_slide()
+	_checkWall()
 
 
 
 func _takeDamage(damage):
 	health -= damage
 	print("taken", damage)
+
+
+
+#func here so i can jump here fast
+func wallJump():pass
+
+func _checkWall():
+	if is_on_floor():
+		canWallJump = false
+		return
+	var veloc = Vector3(velocity.x,velocity.y,velocity.z)
+	#var future = self.global_position + veloc
+	for i in get_slide_collision_count():
+		var collision = get_slide_collision(i)
+		if collision.get_normal().y < .3:
+			wallNormal = collision.get_normal()
+			canWallJump = true
+			return
+			
+	
+	if veloc.length() > 0.5:
+		var spaceState = get_world_3d().direct_space_state
+		var ray = PhysicsRayQueryParameters3D.create(global_position,global_position + veloc.normalized() * 1.2)
+		ray.exclude = [self.get_rid()]
+		var hit = spaceState.intersect_ray(ray)
+		if hit and hit.normal.y < .3:
+			wallNormal = hit.normal
+			canWallJump = true
+			return
+	
+	var altVeloc = Vector3(-velocity.x,velocity.y,velocity.z)
+	if altVeloc.length() > 0.5:
+		var spaceState = get_world_3d().direct_space_state
+		var ray = PhysicsRayQueryParameters3D.create(global_position,global_position + altVeloc.normalized() * 1.2)
+		ray.exclude = [self.get_rid()]
+		var hit = spaceState.intersect_ray(ray)
+		if hit and hit.normal.y < .3:
+			wallNormal = hit.normal
+			canWallJump = true
+			return
+	altVeloc = Vector3(velocity.x,velocity.y,-velocity.z)
+	if altVeloc.length() > 0.5:
+		var spaceState = get_world_3d().direct_space_state
+		var ray = PhysicsRayQueryParameters3D.create(global_position,global_position + altVeloc.normalized() * 1.2)
+		ray.exclude = [self.get_rid()]
+		var hit = spaceState.intersect_ray(ray)
+		if hit and hit.normal.y < .3:
+			wallNormal = hit.normal
+			canWallJump = true
+			return
+	
+	canWallJump = false
