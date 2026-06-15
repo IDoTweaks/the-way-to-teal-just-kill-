@@ -262,7 +262,7 @@ func _physics_process(delta: float) -> void:
 		#and since we dont want spiderman here lets nerf it
 		var vericalNerf = .05
 		if !is_on_floor():
-			if velocity.x > velocity.y:
+			if velocity.x > velocity.z:
 				velocity.y = (((velocity.x) / 2) * dashBoost) * vericalNerf
 			else:
 				velocity.y = (((velocity.z) / 2) * dashBoost) * vericalNerf
