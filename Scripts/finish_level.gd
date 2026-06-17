@@ -18,6 +18,7 @@ func _process(delta: float) -> void:
 		ui.visible = false
 	else:
 		ui.visible = true
+		print("CanvasLayer visible: ", ui.visible)
 		_forceVisible(ui)
 	if targScore > score:
 		score += upEach * delta
@@ -29,5 +30,6 @@ func _forceVisible(entity):
 		for child in children:
 			_forceVisible(child)
 	if entity is CanvasItem:
+		print("forcing visible: ", entity.name, " was: ", entity.visible)
 		entity.visible = true
 	
