@@ -3,6 +3,7 @@ extends CharacterBody3D
 
 const SPEED = 7.5
 const JUMP_VELOCITY = 4.5
+@export var scoreWorth = 5000
 @export var health = 100
 @onready var body =$body
 @onready var explosionParticles = preload("res://Particles/enemyExplode.tscn")

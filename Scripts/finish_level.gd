@@ -10,7 +10,9 @@ func _ready() -> void:
 
 func _setScore(newScore:int):
 	targScore = newScore
-	upEach = newScore / 50
+	upEach = newScore / 2.5
+func _setGrade(newGrade: String):
+	$UI/MainContainer/title/gradeShow.text = "GRADE: %s" % newGrade
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -18,7 +20,7 @@ func _process(delta: float) -> void:
 		ui.visible = false
 	else:
 		ui.visible = true
-		print("CanvasLayer visible: ", ui.visible)
+		print(ui.visible)
 		_forceVisible(ui)
 	if targScore > score:
 		score += upEach * delta
@@ -30,6 +32,5 @@ func _forceVisible(entity):
 		for child in children:
 			_forceVisible(child)
 	if entity is CanvasItem:
-		print("forcing visible: ", entity.name, " was: ", entity.visible)
 		entity.visible = true
 	

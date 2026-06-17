@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://oftku5x50jul"]
 
+[ext_resource type="Script" uid="uid://2pcnmn74i67n" path="res://Scripts/level_1.gd" id="1_4iphx"]
 [ext_resource type="Material" uid="uid://dagdbpsvta3ue" path="res://shaders/new_standard_material_3d.tres" id="1_c5erv"]
 [ext_resource type="Texture2D" uid="uid://ep187n5c5y83" path="res://Textures/AquilariusRetroTextures/t38.png" id="1_didp7"]
 [ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="1_vly50"]
@@ -46,6 +47,7 @@ fog_light_energy = 2.15
 fog_density = 0.005
 
 [node name="MainScene" type="Node3D" unique_id=59475580]
+script = ExtResource("1_4iphx")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1544043293]
 
@@ -204,10 +206,6 @@ material = ExtResource("1_c5erv")
 [node name="CSGBakedCollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1685426945]
 shape = SubResource("ConcavePolygonShape3D_didp7")
 
-[node name="FinishOrb" parent="StaticBody3D" unique_id=1930821478 instance=ExtResource("4_2a60c")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.0244055, 0.80502295, -0.9943242)
-toLevel = 2
-
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1742044166]
 environment = SubResource("Environment_52fb6")
 
@@ -232,3 +230,8 @@ transform = Transform3D(-0.9659258, 0, -0.25881898, 0, 1, 0, 0.25881898, 0, -0.9
 
 [node name="NavigationCalculation" parent="." unique_id=1289349344 node_paths=PackedStringArray("navObjects") instance=ExtResource("4_lyd6k")]
 navObjects = [null, NodePath("../Enemy2"), NodePath("../Enemy3"), NodePath("../Enemy4"), NodePath("../Enemy")]
+
+[node name="FinishOrb" parent="." unique_id=1930821478 node_paths=PackedStringArray("player") instance=ExtResource("4_2a60c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.798532, 10.544792, -6.048655)
+toLevel = 2
+player = NodePath("../Player")

@@ -6,6 +6,10 @@ const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
 const MAXCAMSHAKE = 0.03
 @export var health = 100
+var time = 0.0;
+var count = true
+@onready var maxScore = 0
+
 
 #sliding
 var wasSliding: bool = false
@@ -31,8 +35,9 @@ var dashDir: Vector3 = Vector3.ZERO
 @onready var shotGun = $playerCam/shotGun
 @onready var shotgunDemo = $playerCam/gun/shotGunDemo
 @onready var shotgunForcePnt = $playerCam/shotGun/shotGunForcePoint
-@onready var finishOrb = $"../StaticBody3D/FinishOrb"
+@onready var finishOrb = $"../FinishOrb"
 @onready var levelEnd = $levelEnd
+@onready var timer :Label = $HUD/timer
 var particleInstance
 
 #general movement
@@ -159,7 +164,60 @@ func _switchGuns():
 		else:
 			currentGun +=1
 
+func _finishLevel():
+	count = false
+	var perfectTime = $"..".perfectTime
+	var earnedScore = maxScore - _calcMaxScore()
+	var finalScore = earnedScore
+	if time > perfectTime and perfectTime > 0:
+		var overTime = time - perfectTime
+		var penaltyPercent = clamp(overTime / perfectTime, 0.0, 0.5)
+		finalScore -= int(finalScore * penaltyPercent)
+	finalScore = clamp(finalScore, 0, maxScore)
+	var grade = _calcGrade(finalScore, maxScore)
 
+	levelEnd._setScore(finalScore)
+	levelEnd._setGrade(grade)
+	levelEnd.visible = true
+
+func _calcGrade(num, maxVal):
+	if maxVal <= 0:
+		return "S+" if num >= 0 else "F"
+	if num >= maxVal:
+		return "S+"
+	var perecent = maxVal / 100.0
+	if num >= (maxVal - 5 * perecent):
+		return "S"
+	if num >= (maxVal - 10 * perecent):
+		return "S-"
+	if num >= (maxVal - 15 * perecent):
+		return "A+"
+	if num >= (maxVal - 20 * perecent):
+		return "A"
+	if num >= (maxVal - 25 * perecent):
+		return "A-"
+	if num >= (maxVal - 30 * perecent):
+		return "B+"
+	if num >= (maxVal - 35 * perecent):
+		return "B"
+	if num >= (maxVal - 40 * perecent):
+		return "B-"
+	if num >= (maxVal - 45 * perecent):
+		return "C+"
+	if num >= (maxVal - 50 * perecent):
+		return "C"
+	if num >= (maxVal - 55 * perecent):
+		return "C-"
+	if num >= (maxVal - 60 * perecent):
+		return "D+"
+	if num >= (maxVal - 65 * perecent):
+		return "D"
+	if num >= (maxVal - 70 * perecent):
+		return "D-"
+	if num >= (maxVal - 75 * perecent):
+		return "F"
+	return "F"
+	
 
 
 func _make_bullet_texture() -> ImageTexture:
@@ -249,7 +307,6 @@ func _shootAnim():
 		if animaPlayer.current_animation == "shootingAnim":
 			animaPlayer.stop()
 func _shoot():
-	levelEnd._setScore(4829482)
 	if currentGun == 0:
 		playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
 		if gunRay.is_colliding():
@@ -324,6 +381,8 @@ func _draw_laser_line(from_pos: Vector3, to_pos: Vector3, duration: float = 0.1)
 	line_instance.queue_free()
 
 func _ready() -> void:
+	maxScore = _calcMaxScore()
+	print("maxScore: ", maxScore)
 	finishOrb.open = true
 	finishOrb.canvas =$levelEnd
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -336,6 +395,9 @@ func _ready() -> void:
 	
 	
 func _process(delta: float) -> void:
+	if count:
+		time +=  delta
+		timer.text = str(int(time))
 	#call input functions
 	_shootAnim()
 	#NOTE-use only when unhandles input isnt good enough
@@ -622,6 +684,16 @@ func _checkWall():
 	
 	canWallJump = false
 
+func _calcMaxScore():
+	var max = _calcMaxScoreRecursion(self.get_parent_node_3d())
+	return max
 
+func _calcMaxScoreRecursion(body):
+	var total = 0
+	if body.get("scoreWorth") != null:
+		total += body.scoreWorth
+	for child in body.get_children():
+		total += _calcMaxScoreRecursion(child)
+	return total
 func _on_shot_gun_cd_timeout() -> void:
 	shotGunCd = false

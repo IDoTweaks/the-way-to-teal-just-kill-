@@ -640,7 +640,7 @@ visible = false
 mesh = SubResource("BoxMesh_e3k8h")
 
 [node name="gun" parent="playerCam" unique_id=1487719564 instance=ExtResource("2_iixog")]
-transform = Transform3D(-0.088497795, 0.012279472, 0.010833216, 0.013905769, 0.08779756, 0.014079106, -0.0086471755, 0.015517929, -0.08822939, 0.388, -0.31, -0.652)
+transform = Transform3D(-0.088497795, 0.012279473, 0.010833217, 0.013905769, 0.08779757, 0.014079107, -0.0086471755, 0.0155179305, -0.088229395, 0.388, -0.31, -0.652)
 
 [node name="particleSpawnGun" type="MeshInstance3D" parent="playerCam/gun" unique_id=1268103117]
 transform = Transform3D(0.4209742, 1.8626451e-09, 2.6077032e-08, 2.2817403e-08, 0.5239, 4.4703484e-08, 2.2351742e-08, -1.4901161e-08, 0.42500958, 0.0027680397, 3.6811652, 7.116807)
@@ -706,5 +706,20 @@ wait_time = 1.5
 
 [node name="levelEnd" parent="." unique_id=421539132 instance=ExtResource("7_lvdpo")]
 visible = false
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=351614418]
+
+[node name="timer" type="Label" parent="HUD" unique_id=1972703702]
+offset_left = 816.0
+offset_top = 3.0
+offset_right = 1099.0
+offset_bottom = 91.0
+theme_override_colors/font_color = Color(0, 0.45104724, 0.3438277, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 7
+theme_override_font_sizes/font_size = 64
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [connection signal="timeout" from="shotGunCd" to="." method="_on_shot_gun_cd_timeout"]
