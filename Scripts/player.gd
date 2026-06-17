@@ -1,5 +1,6 @@
 extends CharacterBody3D
 func player():pass
+func _player():pass
 const SENS = 0.005;
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
@@ -30,6 +31,8 @@ var dashDir: Vector3 = Vector3.ZERO
 @onready var shotGun = $playerCam/shotGun
 @onready var shotgunDemo = $playerCam/gun/shotGunDemo
 @onready var shotgunForcePnt = $playerCam/shotGun/shotGunForcePoint
+@onready var finishOrb = $"../StaticBody3D/FinishOrb"
+@onready var levelEnd = $levelEnd
 var particleInstance
 
 #general movement
@@ -201,6 +204,16 @@ func _spawn_bullet_hole(pos: Vector3, normal: Vector3) -> void:
 		var oldest = _bullet_pool.pop_front()
 		oldest.queue_free()
 
+func _startDashAnim():
+	if currentGun == 0:
+		shotGun.visible = false
+		gun.visible = true
+		shotgunDemo.visible = false
+	elif currentGun == 1:
+		shotGun.visible = false
+		gun.visible = true
+		shotgunDemo.visible = true
+
 func _startInSlide():
 	if currentGun == 0:
 		shotGun.visible = false
@@ -236,6 +249,7 @@ func _shootAnim():
 		if animaPlayer.current_animation == "shootingAnim":
 			animaPlayer.stop()
 func _shoot():
+	levelEnd._setScore(4829482)
 	if currentGun == 0:
 		playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
 		if gunRay.is_colliding():
@@ -310,6 +324,8 @@ func _draw_laser_line(from_pos: Vector3, to_pos: Vector3, duration: float = 0.1)
 	line_instance.queue_free()
 
 func _ready() -> void:
+	finishOrb.open = true
+	finishOrb.canvas =$levelEnd
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	_footprint_tex = _make_teal_texture()
 	_last_footprint_pos = global_position

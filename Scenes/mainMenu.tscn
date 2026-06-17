@@ -82,10 +82,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.133179, 339.89603, 173.825
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4572067, 65.27299, 55.82552)
 script = null
 
-[node name="gun" parent="Node3D/Player/playerCam" parent_id_path=PackedInt32Array(659499291, 1441979209) index="4" unique_id=1487719564]
-transform = Transform3D(-0.088497795, 0.012279476, 0.010833219, 0.013905769, 0.08779759, 0.014079109, -0.0086471755, 0.015517934, -0.0882294, 0.388, -0.31, -0.652)
+[node name="gun" parent="Node3D/Player/playerCam" parent_id_path=PackedInt32Array(659499291, 1441979209) index="5" unique_id=1487719564]
+transform = Transform3D(-0.088497795, 0.012279477, 0.010833219, 0.013905769, 0.0877976, 0.014079109, -0.0086471755, 0.015517935, -0.0882294, 0.388, -0.31, -0.652)
 
-[node name="TextureRect" parent="Node3D/Player/playerCam" parent_id_path=PackedInt32Array(659499291, 1441979209) index="5" unique_id=1320434718]
+[node name="TextureRect" parent="Node3D/Player/playerCam" parent_id_path=PackedInt32Array(659499291, 1441979209) index="6" unique_id=1320434718]
 visible = false
 
 [node name="Sketchfab_Scene3" parent="Node3D" unique_id=1187064538 instance=ExtResource("4_wofhc")]

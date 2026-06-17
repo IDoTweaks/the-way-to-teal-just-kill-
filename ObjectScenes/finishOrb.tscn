@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://bo37d1e2o4rkn"]
+
+[ext_resource type="Script" uid="uid://clqvnyjvmm0rk" path="res://Scripts/finish_orb.gd" id="1_d2j6h"]
+[ext_resource type="Shader" uid="uid://dvtrpkg23hsor" path="res://shaders/finishOrb.gdshader" id="1_hma1g"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_d2j6h"]
+render_priority = 0
+shader = ExtResource("1_hma1g")
+shader_parameter/core_color = Color(0.03, 0.18, 0.13, 1)
+shader_parameter/mid_color = Color(0.11, 0.62, 0.46, 1)
+shader_parameter/rim_color = Color(0.3, 1, 0.75, 1)
+shader_parameter/wisp_color = Color(0.15, 0.65, 1, 1)
+shader_parameter/swirl_speed = 0.6
+shader_parameter/pulse_speed = 1.5
+shader_parameter/pulse_strength = 0.25
+shader_parameter/band_count = 5.0
+shader_parameter/rim_power = 2.5
+shader_parameter/noise_scale = 6.0
+shader_parameter/distort_strength = 0.08
+
+[sub_resource type="SphereMesh" id="SphereMesh_oybyt"]
+material = SubResource("ShaderMaterial_d2j6h")
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_dlgab"]
+
+[node name="FinishOrb" type="Node3D" unique_id=1930821478]
+script = ExtResource("1_d2j6h")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2036454828]
+mesh = SubResource("SphereMesh_oybyt")
+
+[node name="finish area" type="Area3D" parent="." unique_id=2138442051]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="finish area" unique_id=318815351]
+shape = SubResource("SphereShape3D_dlgab")
+
+[connection signal="body_entered" from="finish area" to="." method="_on_finish_area_body_entered"]

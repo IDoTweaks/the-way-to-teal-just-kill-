@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="1_vly50"]
 [ext_resource type="Texture2D" uid="uid://b5rofp7b01qpc" path="res://Textures/AquilariusRetroTextures/t13.png" id="2_2a60c"]
 [ext_resource type="PackedScene" uid="uid://dh8322144axab" path="res://ObjectScenes/walker.tscn" id="3_c5erv"]
+[ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="4_2a60c"]
 [ext_resource type="PackedScene" uid="uid://d8bt3lb3ds60" path="res://ObjectScenes/navigationCalculation.tscn" id="4_lyd6k"]
 
 [sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_c5erv"]
@@ -203,6 +204,10 @@ material = ExtResource("1_c5erv")
 [node name="CSGBakedCollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1685426945]
 shape = SubResource("ConcavePolygonShape3D_didp7")
 
+[node name="FinishOrb" parent="StaticBody3D" unique_id=1930821478 instance=ExtResource("4_2a60c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.0244055, 0.80502295, -0.9943242)
+toLevel = 2
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1742044166]
 environment = SubResource("Environment_52fb6")
 
@@ -217,7 +222,7 @@ shotGunDmg = 7.5
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.849379, 5.382955, -1.5715952)
 
 [node name="Enemy2" parent="." unique_id=1885862654 instance=ExtResource("3_c5erv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.698757, 10.76591, -6.1431904)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.698757, 10.76591, -3.635006)
 
 [node name="Enemy3" parent="." unique_id=1898540928 instance=ExtResource("3_c5erv")]
 transform = Transform3D(-0.9659258, 0, 0.25881913, 0, 1, 0, -0.25881913, 0, -0.9659258, 21.698757, 10.76591, 12.85681)

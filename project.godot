@@ -17,7 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-CyclopsAutoload="*uid://4siqre3jhe80"
+Global="*uid://t2dgc0yarvoq"
 
 [display]
 
