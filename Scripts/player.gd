@@ -28,6 +28,8 @@ var dashDir: Vector3 = Vector3.ZERO
 @onready var rayContainer = $playerCam/rayContainer
 @onready var gun = $playerCam/gun
 @onready var shotGun = $playerCam/shotGun
+@onready var shotgunDemo = $playerCam/gun/shotGunDemo
+@onready var shotgunForcePnt = $playerCam/shotGun/shotGunForcePoint
 var particleInstance
 
 #general movement
@@ -37,6 +39,9 @@ const COYOTE_TIME = 0.12
 var jumpBuffer: float = 0
 const JUMP_BUFFER_TIME = 0.12
 var upDashed = false;
+var knockbackTimer: float = 0.0
+const KNOCKBACK_LOCK_TIME = 0.15
+
 
 # wall jumping
 var wallNormal  = Vector3.ZERO
@@ -101,7 +106,9 @@ func _switchGuns():
 		currentGun = 0
 		shotGun.visible = false
 		gun.visible = true
+		shotgunDemo.visible = false
 	elif Input.is_action_just_pressed("gun2"):
+		shotgunDemo.visible = false
 		currentGun = 1
 		shotGun.visible = true
 		gun.visible = false
@@ -156,6 +163,14 @@ func _spawn_bullet_hole(pos: Vector3, normal: Vector3) -> void:
 		oldest.queue_free()
 
 func _startInSlide():
+	if currentGun == 0:
+		shotGun.visible = false
+		gun.visible = true
+		shotgunDemo.visible = false
+	elif currentGun == 1:
+		shotGun.visible = false
+		gun.visible = true
+		shotgunDemo.visible = true
 	animaPlayer.play("inSlide")
 
 func _shootAnim():
@@ -221,8 +236,18 @@ func _shoot():
 				else:
 					var end_point = ray.to_global(ray.target_position)
 					_draw_laser_line(gunParticleSpawn.global_position, end_point, 0.5)
+			_applyForce(shotgunForcePnt.global_position,10)
 
 
+func _applyForce(point :Vector3,force , maxRange:float = 10):
+	var dir = global_position - point
+	var dist = dir.length()
+	if dist > maxRange:
+		return
+	dir = dir.normalized()
+	var fallOff = clamp(1 - (dist/ maxRange),0,1)
+	velocity += dir * force * fallOff
+	knockbackTimer = KNOCKBACK_LOCK_TIME
 
 
 func _draw_laser_line(from_pos: Vector3, to_pos: Vector3, duration: float = 0.1):
@@ -263,7 +288,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		rotate_y(-event.relative.x * SENS)
 		playerCam.rotate_x(-event.relative.y * SENS)
-		playerCam.rotation.x = clamp(playerCam.rotation.x,deg_to_rad(-60),deg_to_rad(70))
+		playerCam.rotation.x = clamp(playerCam.rotation.x,deg_to_rad(-90),deg_to_rad(90))
 		
 	if Input.is_action_just_pressed("jump"):
 		jumpBuffer = JUMP_BUFFER_TIME
@@ -295,7 +320,8 @@ func _calcDownForce():
 		return 0
 
 func _physics_process(delta: float) -> void:
-	print(velocity.x + velocity.y)
+	if knockbackTimer > 0:
+		knockbackTimer -= delta
 	if dashCdTimer > 0:
 		dashCdTimer -= delta
 	if jumpBuffer > 0:
@@ -311,117 +337,117 @@ func _physics_process(delta: float) -> void:
 		coyoteTimer -= delta
 		
 		
+	if knockbackTimer <= 0:
+		slide = Input.is_action_pressed("slide") and is_on_floor()
+		if slide and not wasSliding:
+			animaPlayer.play("slide")
+			var currentDir = Vector3(velocity.x,0,velocity.z).normalized()
+			if currentDir.length() > 0.1:
+				velocity.x += currentDir.x * 6
+				velocity.z += currentDir.z * 6
+		wasSliding = slide
+		if !slide:
+			if animaPlayer.current_animation == "inSlide":
+				animaPlayer.stop()
 	
-	slide = Input.is_action_pressed("slide") and is_on_floor()
-	if slide and not wasSliding:
-		animaPlayer.play("slide")
-		var currentDir = Vector3(velocity.x,0,velocity.z).normalized()
-		if currentDir.length() > 0.1:
-			velocity.x += currentDir.x * 6
-			velocity.z += currentDir.z * 6
-	wasSliding = slide
-	if !slide:
-		if animaPlayer.current_animation == "inSlide":
-			animaPlayer.stop()
-	
-	if Input.is_action_just_pressed("dash") and dashCdTimer <= 0:
-		animaPlayer.play("dash")
-		var input_dir := Input.get_vector("left", "right", "forward", "backward")
-		if input_dir.length() > 0.1:
-			dashDir = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-		else:
-			dashDir = -transform.basis.z
-		dashCdTimer = dashCooldown
-		var vericalNerf = 1
-		if velocity.y != 0 and !upDashed:
-				velocity.y = (Vector2(abs(velocity.x),abs(velocity.z)).length() / 2) * vericalNerf
-				upDashed = true
-		velocity.x = dashDir.x * dashBoost
-		velocity.z = dashDir.z * dashBoost
-		#since the y velocity will always be much smaller we can use velocity x and z to determine how much jump we need
-		#and since we dont want spiderman here lets nerf it
+		if Input.is_action_just_pressed("dash") and dashCdTimer <= 0:
+			animaPlayer.play("dash")
+			var input_dir := Input.get_vector("left", "right", "forward", "backward")
+			if input_dir.length() > 0.1:
+				dashDir = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+			else:
+				dashDir = -transform.basis.z
+			dashCdTimer = dashCooldown
+			var vericalNerf = 1
+			if velocity.y != 0 and !upDashed:
+					velocity.y = (Vector2(abs(velocity.x),abs(velocity.z)).length() / 2) * vericalNerf
+					upDashed = true
+			velocity.x = dashDir.x * dashBoost
+			velocity.z = dashDir.z * dashBoost
+			#since the y velocity will always be much smaller we can use velocity x and z to determine how much jump we need
+			#and since we dont want spiderman here lets nerf it
 		if is_on_floor():
 			velocity += get_gravity()* delta;
+	if knockbackTimer <= 0:
+		if jumpBuffer > 0 and canWallJump and !is_on_floor() and wallJumpCd <= 0:
+			var bounced = velocity.bounce(wallNormal)
+			velocity.x = bounced.x * .4 + wallNormal.x *WALL_JUMP_BOOST
+			velocity.z = bounced.z * .4 + wallNormal.z *WALL_JUMP_BOOST
+			velocity.y = WALL_JUMP_VELOCITY
+			wallJumpCd = WALL_JUMP_COOLDOWN
+			jumpBuffer = 0
+			upDashed = false
 			
-	if jumpBuffer > 0 and canWallJump and !is_on_floor() and wallJumpCd <= 0:
-		var bounced = velocity.bounce(wallNormal)
-		velocity.x = bounced.x * .4 + wallNormal.x *WALL_JUMP_BOOST
-		velocity.z = bounced.z * .4 + wallNormal.z *WALL_JUMP_BOOST
-		velocity.y = WALL_JUMP_VELOCITY
-		wallJumpCd = WALL_JUMP_COOLDOWN
-		jumpBuffer = 0
-		upDashed = false
-		
-	if jumpBuffer > 0 and coyoteTimer > 0:
-		coyoteTimer = 0.0
-		jumpBuffer = 0.0
-		velocity.y = JUMP_VELOCITY
+		if jumpBuffer > 0 and coyoteTimer > 0:
+			coyoteTimer = 0.0
+			jumpBuffer = 0.0
+			velocity.y = JUMP_VELOCITY
 		
 	if not is_on_floor() and Input.is_action_just_released("jump") and velocity.y > 0:
 		velocity.y *= 0.45
 		
 	if not is_on_floor():
 		velocity += get_gravity() * delta
-		
-	if not slide:
-		if Input.is_action_just_pressed("jump") and coyoteTimer > 0:
-			coyoteTimer = 0.0
-			velocity.y = JUMP_VELOCITY
+	if knockbackTimer <= 0:
+		if not slide:
+			if Input.is_action_just_pressed("jump") and coyoteTimer > 0:
+				coyoteTimer = 0.0
+				velocity.y = JUMP_VELOCITY
 
-		var input_dir := Input.get_vector("left", "right", "forward", "backward")
-		var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-		var horizontal_speed = Vector2(velocity.x, velocity.z).length()
+			var input_dir := Input.get_vector("left", "right", "forward", "backward")
+			var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+			var horizontal_speed = Vector2(velocity.x, velocity.z).length()
 
-		if is_on_floor():
-			if direction:
-				var accel = 30.0 if horizontal_speed < SPEED else 10.0
-				velocity.x = move_toward(velocity.x, direction.x * SPEED, accel * delta)
-				velocity.z = move_toward(velocity.z, direction.z * SPEED, accel * delta)
+			if is_on_floor():
+				if direction:
+					var accel = 30.0 if horizontal_speed < SPEED else 10.0
+					velocity.x = move_toward(velocity.x, direction.x * SPEED, accel * delta)
+					velocity.z = move_toward(velocity.z, direction.z * SPEED, accel * delta)
+				else:
+					velocity.x = move_toward(velocity.x, 0, 28 * delta)
+					velocity.z = move_toward(velocity.z, 0, 28 * delta)
+
 			else:
-				velocity.x = move_toward(velocity.x, 0, 28 * delta)
-				velocity.z = move_toward(velocity.z, 0, 28 * delta)
-
+				if direction:
+					velocity.x += direction.x * airAccel * delta
+					velocity.z += direction.z * airAccel * delta
+					var horizontal = Vector2(velocity.x, velocity.z)
+					var cap = max(SPEED * 1.5, horizontal_speed) 
+					if horizontal.length() > cap:
+						horizontal = horizontal.normalized() * cap
+						velocity.x = horizontal.x
+						velocity.z = horizontal.y
+				else:
+					velocity.x = move_toward(velocity.x, 0, 2 * delta)
+					velocity.z = move_toward(velocity.z, 0, 2 * delta)
+					
 		else:
-			if direction:
-				velocity.x += direction.x * airAccel * delta
-				velocity.z += direction.z * airAccel * delta
-				var horizontal = Vector2(velocity.x, velocity.z)
-				var cap = max(SPEED * 1.5, horizontal_speed) 
-				if horizontal.length() > cap:
-					horizontal = horizontal.normalized() * cap
-					velocity.x = horizontal.x
-					velocity.z = horizontal.y
-			else:
-				velocity.x = move_toward(velocity.x, 0, 2 * delta)
-				velocity.z = move_toward(velocity.z, 0, 2 * delta)
+			var force = _calcDownForce()
+			var slideMod = clamp(slideFactor + (force / downForceDevide), 0, 2.5)
+			if force > 0:
+				velocity.y = -force * slideDownforce
 				
-	else:
-		var force = _calcDownForce()
-		var slideMod = clamp(slideFactor + (force / downForceDevide), 0, 2.5)
-		if force > 0:
-			velocity.y = -force * slideDownforce
-			
-		if Input.is_action_just_pressed("jump") and is_on_floor():
-			velocity.y = JUMP_VELOCITY
-			
-		var input_dir := Input.get_vector("left", "right", "forward", "backward")
-		var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-		var slide_accel = 5
-		if direction:
-			var target_x = direction.x * SPEED * slideMod
-			var target_z = direction.z * SPEED * slideMod
-			var current_h = Vector2(velocity.x, velocity.z).length()
-			var target_h = Vector2(target_x, target_z).length()
-			if target_h < current_h:
-				var scale = current_h / max(target_h, 0.001)
-				target_x *= scale
-				target_z *= scale
-			velocity.x = lerp(velocity.x, target_x, slide_accel * delta)
-			velocity.z = lerp(velocity.z, target_z, slide_accel * delta)
-		else:
-			# Very low friction when sliding with no input — coast
-			velocity.x = move_toward(velocity.x, 0, 2.0 * delta)
-			velocity.z = move_toward(velocity.z, 0, 2.0 * delta)
+			if Input.is_action_just_pressed("jump") and is_on_floor():
+				velocity.y = JUMP_VELOCITY
+				
+			var input_dir := Input.get_vector("left", "right", "forward", "backward")
+			var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+			var slide_accel = 5
+			if direction:
+				var target_x = direction.x * SPEED * slideMod
+				var target_z = direction.z * SPEED * slideMod
+				var current_h = Vector2(velocity.x, velocity.z).length()
+				var target_h = Vector2(target_x, target_z).length()
+				if target_h < current_h:
+					var scale = current_h / max(target_h, 0.001)
+					target_x *= scale
+					target_z *= scale
+				velocity.x = lerp(velocity.x, target_x, slide_accel * delta)
+				velocity.z = lerp(velocity.z, target_z, slide_accel * delta)
+			else:
+				# Very low friction when sliding with no input — coast
+				velocity.x = move_toward(velocity.x, 0, 2.0 * delta)
+				velocity.z = move_toward(velocity.z, 0, 2.0 * delta)
 	
 	if is_on_floor():
 		var flat_pos = Vector3(global_position.x, 0, global_position.z)

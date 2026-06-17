@@ -19,6 +19,8 @@ albedo_color = Color(0.28669193, 0.50101376, 1, 1)
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_ramtr"]
 
+[sub_resource type="BoxMesh" id="BoxMesh_e3k8h"]
+
 [sub_resource type="BoxMesh" id="BoxMesh_ramtr"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_m8bbn"]
@@ -617,6 +619,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.022098154, -0.109722495, -
 transform = Transform3D(0.004387453, 0.004973183, 0.035841603, 0.0057020364, 0.03555799, -0.0056318343, -0.035732906, 0.006284756, 0.0035021058, 0.44230926, -0.0076372027, -0.6982862)
 visible = false
 
+[node name="shotGunForcePoint" type="MeshInstance3D" parent="playerCam/shotGun" unique_id=1122982092]
+transform = Transform3D(1, 2.9802322e-08, 5.2154064e-08, -8.940697e-08, 1, 5.2154064e-08, -5.9604645e-08, -1.2107193e-07, 1, 16.999542, -5.9808464, 0.5125623)
+visible = false
+mesh = SubResource("BoxMesh_e3k8h")
+
 [node name="gun" parent="playerCam" unique_id=1487719564 instance=ExtResource("2_iixog")]
 transform = Transform3D(-0.088497795, 0.012279472, 0.010833216, 0.013905769, 0.08779756, 0.014079106, -0.0086471755, 0.015517929, -0.08822939, 0.388, -0.31, -0.652)
 
@@ -626,7 +633,7 @@ visible = false
 mesh = SubResource("BoxMesh_ramtr")
 
 [node name="shotGunDemo" parent="playerCam/gun" unique_id=52586278 instance=ExtResource("2_e3k8h")]
-transform = Transform3D(-7.450581e-09, 3.7252903e-09, -0.40499994, -1.4901161e-08, 0.40499976, 1.3038516e-08, 0.40500003, 7.450581e-09, 0, -0.024866581, 3.271028, 1.1023626)
+transform = Transform3D(-2.0107239e-08, 4.231196e-09, -0.46, -1.6924774e-08, 0.46, 4.2311967e-09, 0.46, 1.6924774e-08, -2.0107239e-08, -0.025, 3.271, -0.628)
 visible = false
 
 [node name="TextureRect" type="TextureRect" parent="playerCam" unique_id=1320434718]
