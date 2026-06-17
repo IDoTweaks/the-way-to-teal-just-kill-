@@ -25,6 +25,9 @@ var dashDir: Vector3 = Vector3.ZERO
 @onready var gunRay = $playerCam/RayCast3D
 @onready var shootingParticles =preload("res://Particles/shootParticles.tscn")
 @onready var gunParticleSpawn = $playerCam/gun/particleSpawnGun
+@onready var rayContainer = $playerCam/rayContainer
+@onready var gun = $playerCam/gun
+@onready var shotGun = $playerCam/shotGun
 var particleInstance
 
 #general movement
@@ -47,7 +50,6 @@ const WALL_JUMP_COOLDOWN= 0
 @export var step_distance: float = 0.5
 @export var decal_size: float = 0.4
 @export var max_footprints: int = 120
-
 var _last_footprint_pos: Vector3 = Vector3.ZERO
 var _footprint_pool: Array[Node] = []
 var _footprint_tex: ImageTexture
@@ -84,9 +86,30 @@ func _spawn_footprint(pos: Vector3) -> void:
 @export var damage : float = 10
 @export var bullet_hole_size: float = 0.15
 @export var max_bullet_holes: int = 100
+@export var shotGunDmg : float = 4
+@onready var shotGunCdTimer = $shotGunCd
 
 var _bullet_pool: Array[Node] = []
 var _bullet_tex: ImageTexture
+var currentGun : int = 0
+var shotGunCd = false
+#0 - rifle
+#1 - shotgun
+
+func _switchGuns():
+	if Input.is_action_just_pressed("gun1"):
+		currentGun = 0
+		shotGun.visible = false
+		gun.visible = true
+	elif Input.is_action_just_pressed("gun2"):
+		currentGun = 1
+		shotGun.visible = true
+		gun.visible = false
+	elif Input.is_action_just_pressed("scrollUp"):
+		if currentGun >= 1:
+			currentGun = 0
+		else:
+			currentGun +=1
 
 func _make_bullet_texture() -> ImageTexture:
 	var img = Image.create(64, 64, false, Image.FORMAT_RGBA8)
@@ -137,32 +160,71 @@ func _startInSlide():
 
 func _shootAnim():
 	if Input.is_action_pressed("shoot"):
-		animaPlayer.play("shootingAnim")
-		particleInstance = shootingParticles.instantiate()
-		particleInstance.position = gunParticleSpawn.global_position
-		get_parent().add_child(particleInstance)
-		particleInstance.emitting = true
+		if currentGun == 0:
+			shotGun.visible = false
+			gun.visible = true
+			animaPlayer.play("shootingAnim")
+			particleInstance = shootingParticles.instantiate()
+			particleInstance.position = gunParticleSpawn.global_position
+			get_parent().add_child(particleInstance)
+			particleInstance.emitting = true
+		elif currentGun == 1:
+			if !shotGunCd:
+				shotGun.visible = true
+				gun.visible = false
+				animaPlayer.play("shotGunShoot")
+				particleInstance = shootingParticles.instantiate()
+				particleInstance.position = gunParticleSpawn.global_position
+				get_parent().add_child(particleInstance)
+				particleInstance.emitting = true
 	else:
 		playerCam.position = Vector3();
 		if animaPlayer.current_animation == "shootingAnim":
 			animaPlayer.stop()
 func _shoot():
-	playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
-	
-	if gunRay.is_colliding():
-		var target = gunRay.get_collider()
-		if target.has_method("_damage"):
-			target._damage(damage)
-		if target.has_method("_makeTarg"):
-			target._makeTarg(self)
-		var hit_pos = gunRay.get_collision_point()
-		var hit_normal = gunRay.get_collision_normal()
-		_spawn_bullet_hole(hit_pos, hit_normal)
-		_draw_laser_line(gunParticleSpawn.global_position, gunRay.get_collision_point(), 0.25)
-	else:
-		var end_point = gunRay.to_global(gunRay.target_position)
-		_draw_laser_line(gunParticleSpawn.global_position, end_point, 0.5)
-			
+	if currentGun == 0:
+		playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
+		if gunRay.is_colliding():
+			var target = gunRay.get_collider()
+			if target.has_method("_damage"):
+				target._damage(damage)
+			if target.has_method("_makeTarg"):
+				target._makeTarg(self)
+			var hit_pos = gunRay.get_collision_point()
+			var hit_normal = gunRay.get_collision_normal()
+			_spawn_bullet_hole(hit_pos, hit_normal)
+			_draw_laser_line(gunParticleSpawn.global_position, gunRay.get_collision_point(), 0.25)
+		else:
+			var end_point = gunRay.to_global(gunRay.target_position)
+			_draw_laser_line(gunParticleSpawn.global_position, end_point, 0.5)
+	elif currentGun == 1:
+		if !shotGunCd:
+			playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
+			shotGunCd = true
+			shotGunCdTimer.start()
+			rayContainer.randomizeRays()
+			for ray in rayContainer.get_children():
+				particleInstance = shootingParticles.instantiate()
+				particleInstance.position = gunParticleSpawn.global_position
+				get_parent().add_child(particleInstance)
+				particleInstance.emitting = true
+				if ray.is_colliding():
+					var target = ray.get_collider()
+					if target.has_method("_damage"):
+						target._damage(shotGunDmg)
+					if target.has_method("_makeTarg"):
+						target._makeTarg(self)
+					var hit_pos = ray.get_collision_point()
+					var hit_normal = ray.get_collision_normal()
+					_spawn_bullet_hole(hit_pos, hit_normal)
+					_draw_laser_line(gunParticleSpawn.global_position, ray.get_collision_point(), 0.25)
+				else:
+					var end_point = ray.to_global(ray.target_position)
+					_draw_laser_line(gunParticleSpawn.global_position, end_point, 0.5)
+
+
+
+
 func _draw_laser_line(from_pos: Vector3, to_pos: Vector3, duration: float = 0.1):
 	var line_instance = MeshInstance3D.new()
 	var imm_mesh = ImmediateMesh.new()
@@ -196,6 +258,7 @@ func _process(delta: float) -> void:
 	#NOTE-use only when unhandles input isnt good enough
 	
 func _unhandled_input(event: InputEvent) -> void:
+	_switchGuns()
 	#cam
 	if event is InputEventMouseMotion:
 		rotate_y(-event.relative.x * SENS)
@@ -474,3 +537,7 @@ func _checkWall():
 	
 	
 	canWallJump = false
+
+
+func _on_shot_gun_cd_timeout() -> void:
+	shotGunCd = false
