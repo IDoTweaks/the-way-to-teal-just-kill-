@@ -61,18 +61,56 @@ var _footprint_tex: ImageTexture
 
 func _make_teal_texture() -> ImageTexture:
 	var img = Image.create(64, 64, false, Image.FORMAT_RGBA8)
-	var center = Vector2(32, 32)
+	img.fill(Color(0, 0, 0, 0))
+
+	# Sole shape: two overlapping ellipses (ball of foot + heel),
+	# offset along Y to form a basic shoe-sole silhouette.
+	var ball_center = Vector2(32, 22)
+	var ball_radii = Vector2(15, 17)
+	var heel_center = Vector2(32, 46)
+	var heel_radii = Vector2(10, 12)
+
 	for x in range(64):
 		for y in range(64):
-			var d = Vector2(x, y).distance_to(center)
-			if d < 30:
-				var alpha = clamp(1.0 - (d / 30) * 0.3, 0.0, 1.0)
-				img.set_pixel(x, y, Color(0.11, 0.62, 0.46, alpha))
+			var p = Vector2(x, y)
+
+			# normalized distance into each ellipse (1.0 = on edge, 0 = center)
+			var ball_d = ((p.x - ball_center.x) / ball_radii.x) ** 2 + ((p.y - ball_center.y) / ball_radii.y) ** 2
+			var heel_d = ((p.x - heel_center.x) / heel_radii.x) ** 2 + ((p.y - heel_center.y) / heel_radii.y) ** 2
+			var inside_ball = ball_d <= 1.0
+			var inside_heel = heel_d <= 1.0
+
+			if not (inside_ball or inside_heel):
+				continue
+
+			# pick whichever shape we're closer to the center of, for shading
+			var norm_d = min(ball_d, heel_d)
+
+			var col: Color
+			if norm_d < 0.35:
+				# bright glowing core
+				col = Color(0.25, 0.95, 0.7, 0.95)
+			elif norm_d < 0.7:
+				# mid teal body
+				var t = (norm_d - 0.35) / 0.35
+				col = Color(0.11, 0.62, 0.46, 1).lerp(Color(0.06, 0.4, 0.3, 1), t)
+				col.a = 0.9
+			elif norm_d < 0.92:
+				# darker inner rim before the edge glow
+				col = Color(0.04, 0.22, 0.17, 0.85)
 			else:
-				img.set_pixel(x, y, Color(0, 0, 0, 0))
-	var tex = ImageTexture.new()
-	tex.create_from_image(img)
-	return tex
+				# bright outer rim glow, then fade to transparent past d=1.0
+				var t = clamp((norm_d - 0.92) / 0.18, 0.0, 1.0)
+				col = Color(0.3, 1.0, 0.75, 1).lerp(Color(0.3, 1.0, 0.75, 0), t)
+
+			# subtle radial streaks for a "scanned/etched" tech look
+			var angle = p.angle_to_point(ball_center if inside_ball else heel_center)
+			var streak = sin(angle * 10.0) * 0.08
+			col.a = clamp(col.a + streak, 0.0, 1.0)
+
+			img.set_pixel(x, y, col)
+
+	return ImageTexture.create_from_image(img)
 
 func _spawn_footprint(pos: Vector3) -> void:
 	var decal = Decal.new()
@@ -118,6 +156,9 @@ func _switchGuns():
 		else:
 			currentGun +=1
 
+
+
+
 func _make_bullet_texture() -> ImageTexture:
 	var img = Image.create(64, 64, false, Image.FORMAT_RGBA8)
 	var center = Vector2(32, 32)
@@ -125,25 +166,23 @@ func _make_bullet_texture() -> ImageTexture:
 		for y in range(64):
 			var d = Vector2(x, y).distance_to(center)
 			if d < 10:
-				img.set_pixel(x, y, Color(0.02, 0.05, 0.15, 1))
+				img.set_pixel(x, y, Color(0.03, 0.18, 0.13, 1))
 			elif d < 18:
 				var t = (d - 10) / 8.0
-				img.set_pixel(x, y, Color(0.15, 0.65, 1, 1 - t * 0.3))
+				img.set_pixel(x, y, Color(0.11, 0.62, 0.46, 1 - t * 0.3))
 			elif d < 28.0:
 				var t = (d - 18) / 10
-				img.set_pixel(x, y, Color(0.1, 0.4, 0.8, (1 - t) * 0.6))
+				img.set_pixel(x, y, Color(0.08, 0.45, 0.35, (1 - t) * 0.6))
 			else:
 				img.set_pixel(x, y, Color(0, 0, 0, 0))
-	var tex = ImageTexture.new()
-	tex.create_from_image(img)
-	return tex
+	return ImageTexture.create_from_image(img)
 
 func _spawn_bullet_hole(pos: Vector3, normal: Vector3) -> void:
 	var decal = Decal.new()
 	decal.size = Vector3(bullet_hole_size, 1.0, bullet_hole_size)
 	decal.texture_albedo = _bullet_tex
 	decal.albedo_mix = 1.0
-	decal.modulate = Color(0.11,.62,.4,1)
+	decal.modulate = Color(1, 1, 1, 1)
 	decal.position = pos + normal * 0.05
 	var up = normal
 	var right: Vector3
@@ -271,10 +310,13 @@ func _draw_laser_line(from_pos: Vector3, to_pos: Vector3, duration: float = 0.1)
 	line_instance.queue_free()
 
 func _ready() -> void:
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED;
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	_footprint_tex = _make_teal_texture()
 	_last_footprint_pos = global_position
 	_bullet_tex = _make_bullet_texture()
+	print("bullet tex: ", _bullet_tex)
+	if _bullet_tex:
+		print("bullet tex image: ", _bullet_tex.get_image())
 	
 	
 func _process(delta: float) -> void:
