@@ -6,9 +6,12 @@ var reload = preload("res://Scenes/level1.tscn")
 func _ready() -> void:
 	pass # Replace with function body.
 
+func _reload():
+	get_tree().change_scene_to_packed(reload)
+
 func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("restart"):
-		get_tree().change_scene_to_packed(reload)
+		_reload()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

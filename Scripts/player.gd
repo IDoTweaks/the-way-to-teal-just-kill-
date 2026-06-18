@@ -172,7 +172,7 @@ func _finishLevel():
 	if time > perfectTime and perfectTime > 0:
 		var overTime = time - perfectTime
 		var maxPenalty = 0.85
-		var tau = perfectTime * 1.5  # how many seconds of "overtime" it takes to approach maxPenalty
+		var tau = perfectTime * 1.5
 		var penaltyPercent = maxPenalty * (1.0 - exp(-overTime / tau))
 		finalScore -= int(finalScore * penaltyPercent)
 	finalScore = clamp(finalScore, 0, maxScore)

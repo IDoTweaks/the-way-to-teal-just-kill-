@@ -20,6 +20,7 @@ func _process(delta: float) -> void:
 		ui.visible = false
 	else:
 		ui.visible = true
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		print(ui.visible)
 		_forceVisible(ui)
 	if targScore > score:
@@ -34,3 +35,11 @@ func _forceVisible(entity):
 	if entity is CanvasItem:
 		entity.visible = true
 	
+
+
+func _on_quit_btn_button_down() -> void:
+	get_tree().quit(6967)
+
+
+func _on_retry_button_down() -> void:
+	get_tree().change_scene_to_packed(Global.levels[1])
