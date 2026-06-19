@@ -3,6 +3,9 @@ extends CharacterBody3D
 
 const SPEED = 7.5
 const JUMP_VELOCITY = 4.5
+@onready var attackTimer = $attackCd
+@onready var animPlayer = $AnimationPlayer
+
 @export var scoreWorth = 5000
 @export var health = 100
 @onready var body =$body
@@ -15,6 +18,7 @@ var target
 var mode : String = "idle"
 var gotShot = false
 var shouldMove = false
+var canAttack : bool = true
 
 func _makeTarg(targ):
 	gotShot = true
@@ -39,24 +43,29 @@ func _die():
 	particleInstance.emitting = true
 	queue_free()
 
+
 func _physics_process(delta: float) -> void:
+	if mode == "attack" and canAttack and target != null:
+		#animPlayer.play("attack")
+		canAttack = false
+		attackTimer.start()
+		target._takeDamage(10)
 	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 		
-	var space = get_world_3d().direct_space_state
-	var horizontal = Vector3(velocity.x,0,velocity.z).normalized()
-	if horizontal.length() > 0.1:
-		var ray = PhysicsRayQueryParameters3D.create(global_position + horizontal * .6, global_position + horizontal * .6 + Vector3(0,-2,0))
-		ray.exclude = [self.get_rid()]
-		var hit = space.intersect_ray(ray)
-		if !hit:
-			velocity.x = 0
-			velocity.z = 0
+	if mode != "attack":
+		var space = get_world_3d().direct_space_state
+		var horizontal = Vector3(velocity.x,0,velocity.z).normalized()
+		if horizontal.length() > 0.1:
+			var ray = PhysicsRayQueryParameters3D.create(global_position + horizontal * .6, global_position + horizontal * .6 + Vector3(0,-2,0))
+			ray.exclude = [self.get_rid()]
+			var hit = space.intersect_ray(ray)
+			if !hit:
+				velocity.x = 0
+				velocity.z = 0
 	#if shouldMove:
 	move_and_slide()
-	if mode == "attack":
-		target._takeDamage(10)
 
 
 func _on_attack_body_entered(body: Node3D) -> void:
@@ -78,3 +87,7 @@ func _on_chase_body_entered(body: Node3D) -> void:
 		if body.has_method("player"):
 			target = body
 			mode = "chase"
+
+
+func _on_attack_cd_timeout() -> void:
+	canAttack = true

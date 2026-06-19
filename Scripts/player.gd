@@ -10,6 +10,17 @@ var time = 0.0;
 var count = true
 @onready var maxScore = 0
 
+#ghost
+func ghost():pass
+var positionSaves : Array[Vector3]
+var posI : int
+var rotationSaves : Array[Vector3]
+var rotI : int
+var camPositionSaves : Array[Vector3]
+var camPosI : int
+var camRotationSaves : Array[Vector3]
+var camRotI : int
+
 
 #sliding
 var wasSliding: bool = false
@@ -165,6 +176,10 @@ func _switchGuns():
 			currentGun +=1
 
 func _finishLevel():
+	Global.positionSave = positionSaves.duplicate()
+	Global.rotationSave = rotationSaves.duplicate()
+	Global.camPositionSave = camPositionSaves.duplicate()
+	Global.camRotationSave = camRotationSaves.duplicate()
 	count = false
 	var perfectTime = $"..".perfectTime
 	var earnedScore = maxScore - _calcMaxScore()
@@ -405,6 +420,7 @@ func _process(delta: float) -> void:
 	#NOTE-use only when unhandles input isnt good enough
 	
 func _unhandled_input(event: InputEvent) -> void:
+	
 	_switchGuns()
 	#cam
 	if event is InputEventMouseMotion:
@@ -442,6 +458,16 @@ func _calcDownForce():
 		return 0
 
 func _physics_process(delta: float) -> void:
+	#THIS IS FOR THE GHOST DO NOT PUT CODE BEFORE
+	positionSaves.insert(posI,global_position)
+	posI+=1
+	rotationSaves.insert(rotI,global_rotation)
+	rotI+=1
+	camPositionSaves.insert(camPosI,playerCam.global_position)
+	camPosI+=1
+	camRotationSaves.insert(camRotI,playerCam.global_rotation)
+	camRotI+=1
+	
 	if knockbackTimer > 0:
 		knockbackTimer -= delta
 	if dashCdTimer > 0:

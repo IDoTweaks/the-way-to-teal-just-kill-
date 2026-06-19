@@ -17,5 +17,4 @@ void fragment() {
     float stretched_fill = (fill_percent * 1.2) - 0.1;
     float mask = smoothstep(normalized_y - 0.1, normalized_y + 0.1, stretched_fill);
     vec3 final_color = mix(base_color.rgb, fill_color.rgb, mask);
-    ALBEDO = final_color;
-}
+    ALBEDO = final_color;}

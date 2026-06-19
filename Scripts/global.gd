@@ -5,6 +5,12 @@ extends Node
 @onready var levels : Array
 var currentLevel = 1
 
+var positionSave : Array[Vector3] = []
+var rotationSave : Array[Vector3] = []
+var camPositionSave : Array[Vector3] = []
+var camRotationSave : Array[Vector3] = []
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	levels.append(mainMenu);
