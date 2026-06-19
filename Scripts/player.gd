@@ -176,10 +176,6 @@ func _switchGuns():
 			currentGun +=1
 
 func _finishLevel():
-	Global.positionSave = positionSaves.duplicate()
-	Global.rotationSave = rotationSaves.duplicate()
-	Global.camPositionSave = camPositionSaves.duplicate()
-	Global.camRotationSave = camRotationSaves.duplicate()
 	count = false
 	var perfectTime = $"..".perfectTime
 	var earnedScore = maxScore - _calcMaxScore()
@@ -192,7 +188,12 @@ func _finishLevel():
 		finalScore -= int(finalScore * penaltyPercent)
 	finalScore = clamp(finalScore, 0, maxScore)
 	var grade = _calcGrade(finalScore, maxScore)
-
+	if finalScore > Global.maxScore:
+		Global.positionSave = positionSaves.duplicate()
+		Global.rotationSave = rotationSaves.duplicate()
+		Global.camPositionSave = camPositionSaves.duplicate()
+		Global.camRotationSave = camRotationSaves.duplicate()
+		Global.maxScore = finalScore
 	levelEnd._setScore(finalScore)
 	levelEnd._setGrade(grade)
 	levelEnd.visible = true
