@@ -175,6 +175,13 @@ func _switchGuns():
 		else:
 			currentGun +=1
 
+func _die():
+	count = false
+	$GameOver.visible = true
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	
+	
+
 func _finishLevel():
 	count = false
 	var perfectTime = $"..".perfectTime
@@ -616,6 +623,8 @@ func _updateHud():
 func _takeDamage(damage):
 	health -= damage
 	_updateHud()
+	if health <= 0:
+		_die()
 
 
 

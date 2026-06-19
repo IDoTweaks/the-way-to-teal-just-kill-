@@ -7,6 +7,57 @@
 [ext_resource type="Script" uid="uid://cr7xwuhtd8dr1" path="res://Scripts/texture_rect.gd" id="4_tut37"]
 [ext_resource type="Script" uid="uid://be2ahx4n0x8mp" path="res://Scripts/ray_container.gd" id="5_ij4ia"]
 [ext_resource type="PackedScene" uid="uid://cmf4i5g6obn3y" path="res://ObjectScenes/finishLevel.tscn" id="7_lvdpo"]
+[ext_resource type="Script" uid="uid://us4lk8xgjfay" path="res://Scripts/game_over.gd" id="8_rfol3"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rfol3"]
+resource_name = "purple_button_hover"
+bg_color = Color(0.5, 0.3, 0.7, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7, 0.5, 0.9, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rt1b1"]
+resource_name = "purple_button_normal"
+bg_color = Color(0.4, 0.2, 0.6, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.6, 0.4, 0.8, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hspm8"]
+resource_name = "purple_button_pressed"
+bg_color = Color(0.6, 0.4, 0.8, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8, 0.6, 1, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Theme" id="Theme_rt1b1"]
+Button/styles/focus = SubResource("StyleBoxFlat_rfol3")
+Button/styles/hover = SubResource("StyleBoxFlat_rfol3")
+Button/styles/normal = SubResource("StyleBoxFlat_rt1b1")
+Button/styles/pressed = SubResource("StyleBoxFlat_hspm8")
+
+[sub_resource type="Gradient" id="Gradient_gacgy"]
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_rt1b1"]
+gradient = SubResource("Gradient_gacgy")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m8bbn"]
 albedo_color = Color(0.21568628, 0.5686275, 1, 1)
@@ -602,6 +653,93 @@ slideDownforce = 5.0
 decal_size = 0.5
 max_footprints = 100
 
+[node name="GameOver" type="CanvasLayer" parent="." unique_id=597525550]
+visible = false
+script = ExtResource("8_rfol3")
+
+[node name="MainContainer" type="Control" parent="GameOver" unique_id=1252809543]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="GameOver/MainContainer" unique_id=1728092983]
+self_modulate = Color(4.042983e-06, 0.6874465, 0.6920509, 1)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -250.0
+offset_right = 150.0
+offset_bottom = -200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.8, 0.6, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 34
+theme_override_font_sizes/font_size = 48
+text = "YOU FUCKING DIED
+GAME OVER"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MenuButtons" type="VBoxContainer" parent="GameOver/MainContainer" unique_id=1438979862]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -120.0
+offset_right = 100.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_rt1b1")
+
+[node name="retry" type="Button" parent="GameOver/MainContainer/MenuButtons" unique_id=79681632]
+self_modulate = Color(4.042983e-06, 0.6874465, 0.6920509, 1)
+z_index = 7
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "RETRY
+"
+
+[node name="VSeparator" type="VSeparator" parent="GameOver/MainContainer/MenuButtons" unique_id=1002454785]
+self_modulate = Color(4.042983e-06, 0.6874465, 0.6920509, 1)
+layout_mode = 2
+
+[node name="SettingsBtn" type="Button" parent="GameOver/MainContainer/MenuButtons" unique_id=1682905405]
+visible = false
+self_modulate = Color(4.042983e-06, 0.6874465, 0.6920509, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "SETTINGS"
+
+[node name="QuitBtn" type="Button" parent="GameOver/MainContainer/MenuButtons" unique_id=206990400]
+self_modulate = Color(4.042983e-06, 0.6874465, 0.6920509, 1)
+z_index = 7
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "QUIT"
+
+[node name="TextureRect" type="TextureRect" parent="GameOver" unique_id=859501969]
+modulate = Color(0.50980395, 1, 1, 1)
+z_index = -1
+offset_left = -492.0
+offset_top = -602.0
+offset_right = 2213.0
+offset_bottom = 1297.0
+mouse_filter = 2
+texture = SubResource("GradientTexture1D_rt1b1")
+
 [node name="body" type="MeshInstance3D" parent="." unique_id=1599943581]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
 material_override = SubResource("StandardMaterial3D_m8bbn")
@@ -640,7 +778,7 @@ visible = false
 mesh = SubResource("BoxMesh_e3k8h")
 
 [node name="gun" parent="playerCam" unique_id=1487719564 instance=ExtResource("2_iixog")]
-transform = Transform3D(-0.088497795, 0.012279475, 0.010833219, 0.013905769, 0.08779758, 0.014079109, -0.0086471755, 0.015517932, -0.0882294, 0.388, -0.31, -0.652)
+transform = Transform3D(-0.088497795, 0.012279476, 0.010833219, 0.013905769, 0.08779759, 0.014079109, -0.0086471755, 0.015517934, -0.0882294, 0.388, -0.31, -0.652)
 
 [node name="particleSpawnGun" type="MeshInstance3D" parent="playerCam/gun" unique_id=1268103117]
 transform = Transform3D(0.4209742, 1.8626451e-09, 2.6077032e-08, 2.2817403e-08, 0.5239, 4.4703484e-08, 2.2351742e-08, -1.4901161e-08, 0.42500958, 0.0027680397, 3.6811652, 7.116807)
@@ -732,4 +870,7 @@ theme_override_constants/outline_size = 7
 step = 1.0
 value = 100.0
 
+[connection signal="button_down" from="GameOver/MainContainer/MenuButtons/retry" to="." method="_on_retry_button_down"]
+[connection signal="button_down" from="GameOver/MainContainer/MenuButtons/retry" to="GameOver" method="_on_retry_button_down"]
+[connection signal="button_down" from="GameOver/MainContainer/MenuButtons/QuitBtn" to="GameOver" method="_on_quit_btn_button_down"]
 [connection signal="timeout" from="shotGunCd" to="." method="_on_shot_gun_cd_timeout"]

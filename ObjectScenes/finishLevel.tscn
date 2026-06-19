@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cunl3i248huq6" path="res://Scripts/finish_level.gd" id="1_c24de"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c24de"]
 resource_name = "purple_button_hover"
 bg_color = Color(0.5, 0.3, 0.7, 1)
 border_width_left = 2
@@ -15,7 +15,7 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_juqyi"]
 resource_name = "purple_button_normal"
 bg_color = Color(0.4, 0.2, 0.6, 1)
 border_width_left = 2
@@ -28,7 +28,7 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vlw2s"]
 resource_name = "purple_button_pressed"
 bg_color = Color(0.6, 0.4, 0.8, 1)
 border_width_left = 2
@@ -42,10 +42,10 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="Theme" id="Theme_1"]
-Button/styles/focus = SubResource("StyleBoxFlat_2")
-Button/styles/hover = SubResource("StyleBoxFlat_2")
-Button/styles/normal = SubResource("StyleBoxFlat_1")
-Button/styles/pressed = SubResource("StyleBoxFlat_3")
+Button/styles/focus = SubResource("StyleBoxFlat_c24de")
+Button/styles/hover = SubResource("StyleBoxFlat_c24de")
+Button/styles/normal = SubResource("StyleBoxFlat_juqyi")
+Button/styles/pressed = SubResource("StyleBoxFlat_vlw2s")
 
 [node name="levelEnd" type="Control" unique_id=421539132]
 layout_mode = 3
