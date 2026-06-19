@@ -1,6 +1,6 @@
 extends CharacterBody3D
 
-
+func _enemy():pass
 const SPEED = 7.5
 const JUMP_VELOCITY = 4.5
 @onready var attackTimer = $attackCd
@@ -31,7 +31,7 @@ func _ready() -> void:
 func _damage(dmg):
 	health -= dmg
 	if health >= 0:
-		body._updateMat(health / 100)
+		body._updateMat(health / 100.0)
 	else:
 		_die()
 		

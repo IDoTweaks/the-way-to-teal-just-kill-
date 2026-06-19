@@ -40,6 +40,7 @@ var dashDir: Vector3 = Vector3.ZERO
 @onready var animaPlayer = $AnimationPlayer
 @onready var gunRay = $playerCam/RayCast3D
 @onready var shootingParticles =preload("res://Particles/shootParticles.tscn")
+@onready var groundSlam = preload("res://ObjectScenes/slamRIng.tscn")
 @onready var gunParticleSpawn = $playerCam/gun/particleSpawnGun
 @onready var rayContainer = $playerCam/rayContainer
 @onready var gun = $playerCam/gun
@@ -49,6 +50,7 @@ var dashDir: Vector3 = Vector3.ZERO
 @onready var finishOrb = $"../FinishOrb"
 @onready var levelEnd = $levelEnd
 @onready var timer :Label = $HUD/timer
+@onready var slamFrom = $body/slamFrom
 var particleInstance
 
 #general movement
@@ -60,7 +62,7 @@ const JUMP_BUFFER_TIME = 0.12
 var upDashed = false;
 var knockbackTimer: float = 0.0
 const KNOCKBACK_LOCK_TIME = 0.15
-
+@export var slamVeloc = 25.0
 
 # wall jumping
 var wallNormal  = Vector3.ZERO
@@ -157,6 +159,8 @@ var currentGun : int = 0
 var shotGunCd = false
 #0 - rifle
 #1 - shotgun
+
+var slamming = false
 
 func _switchGuns():
 	if Input.is_action_just_pressed("gun1"):
@@ -488,21 +492,27 @@ func _physics_process(delta: float) -> void:
 		wallJumpCd -= delta
 		
 	if is_on_floor():
+		if slamming == true:
+			_spawnSlam()
 		coyoteTimer = COYOTE_TIME
+		slamming = false
 		dashing = false
 		upDashed = false
 	elif coyoteTimer > 0:
 		coyoteTimer -= delta
 		
-		
+	
 	if knockbackTimer <= 0:
-		slide = Input.is_action_pressed("slide") and is_on_floor()
+		slide = Input.is_action_pressed("slide")
 		if slide and not wasSliding:
-			animaPlayer.play("slide")
-			var currentDir = Vector3(velocity.x,0,velocity.z).normalized()
-			if currentDir.length() > 0.1:
-				velocity.x += currentDir.x * 6
-				velocity.z += currentDir.z * 6
+			if is_on_floor():
+				animaPlayer.play("slide")
+				var currentDir = Vector3(velocity.x,0,velocity.z).normalized()
+				if currentDir.length() > 0.1:
+					velocity.x += currentDir.x * 6
+					velocity.z += currentDir.z * 6
+			elif slamming == false:
+				slamming = true
 		wasSliding = slide
 		if !slide:
 			if animaPlayer.current_animation == "inSlide":
@@ -615,7 +625,8 @@ func _physics_process(delta: float) -> void:
 			var perp = transform.basis.x * 0.15 * side
 			_spawn_footprint(feet.global_position + perp)
 			_last_footprint_pos = global_position
-
+	if slamming:
+		velocity.y = -slamVeloc
 	move_and_slide()
 	_checkWall()
 
@@ -628,7 +639,10 @@ func _takeDamage(damage):
 	if health <= 0:
 		_die()
 
-
+func _spawnSlam():
+	var slam = groundSlam.instantiate()
+	get_parent().add_child(slam)
+	slam.global_position = feet.global_position
 
 #func here so i can jump here fast
 func wallJump():pass

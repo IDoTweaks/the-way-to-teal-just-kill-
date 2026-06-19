@@ -64,6 +64,8 @@ albedo_color = Color(0.21568628, 0.5686275, 1, 1)
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_8heul"]
 
+[sub_resource type="BoxMesh" id="BoxMesh_rfol3"]
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_m8bbn"]
 
 [sub_resource type="ORMMaterial3D" id="ORMMaterial3D_iixog"]
@@ -745,6 +747,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
 material_override = SubResource("StandardMaterial3D_m8bbn")
 mesh = SubResource("CapsuleMesh_8heul")
 
+[node name="slamFrom" type="MeshInstance3D" parent="body" unique_id=539033796]
+transform = Transform3D(0.095, 0, 0, 0, 0.095, 0, 0, 0, 0.095, 0, 1.2028999, 0)
+visible = false
+mesh = SubResource("BoxMesh_rfol3")
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=29317526]
 shape = SubResource("CapsuleShape3D_m8bbn")
 
@@ -778,7 +785,7 @@ visible = false
 mesh = SubResource("BoxMesh_e3k8h")
 
 [node name="gun" parent="playerCam" unique_id=1487719564 instance=ExtResource("2_iixog")]
-transform = Transform3D(-0.088497795, 0.012279476, 0.010833219, 0.013905769, 0.08779759, 0.014079109, -0.0086471755, 0.015517934, -0.0882294, 0.388, -0.31, -0.652)
+transform = Transform3D(-0.088497795, 0.012279477, 0.010833219, 0.013905769, 0.0877976, 0.014079109, -0.0086471755, 0.015517935, -0.0882294, 0.388, -0.31, -0.652)
 
 [node name="particleSpawnGun" type="MeshInstance3D" parent="playerCam/gun" unique_id=1268103117]
 transform = Transform3D(0.4209742, 1.8626451e-09, 2.6077032e-08, 2.2817403e-08, 0.5239, 4.4703484e-08, 2.2351742e-08, -1.4901161e-08, 0.42500958, 0.0027680397, 3.6811652, 7.116807)
