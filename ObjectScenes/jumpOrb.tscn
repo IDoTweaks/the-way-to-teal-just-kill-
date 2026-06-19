@@ -6,18 +6,18 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_d2j6h"]
 render_priority = 0
 shader = ExtResource("2_ry63l")
-shader_parameter/core_color = Color(0.03, 0.18, 0.13, 1)
-shader_parameter/mid_color = Color(0.11, 0.62, 0.46, 1)
-shader_parameter/rim_color = Color(0.3, 1, 0.75, 1)
+shader_parameter/core_color = Color(0.03137255, 0.18039216, 0.7058824, 1)
+shader_parameter/mid_color = Color(0.10980392, 0.36078432, 0.45882353, 1)
+shader_parameter/rim_color = Color(0.3019608, 0.34117648, 0.7490196, 1)
 shader_parameter/wisp_color = Color(0.15, 0.65, 1, 1)
 shader_parameter/arrow_color = Color(0.7, 1, 1, 1)
 shader_parameter/swirl_speed = 0.6
-shader_parameter/rise_speed = 2.5
-shader_parameter/pulse_speed = 1.5
+shader_parameter/rise_speed = 6.0
+shader_parameter/pulse_speed = 4.50000021375
 shader_parameter/pulse_strength = 0.25
-shader_parameter/band_count = 5.0
-shader_parameter/chevron_count = 7.0
-shader_parameter/chevron_strength = 0.6
+shader_parameter/band_count = 6.0
+shader_parameter/chevron_count = 8.0
+shader_parameter/chevron_strength = 1.0
 shader_parameter/rim_power = 2.5
 shader_parameter/noise_scale = 6.0
 shader_parameter/distort_strength = 0.08
@@ -31,6 +31,10 @@ material = SubResource("ShaderMaterial_d2j6h")
 script = ExtResource("1_vhy25")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2036454828]
+mesh = SubResource("SphereMesh_oybyt")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=1242968073]
+transform = Transform3D(-0.9983956, 0, 0.056623112, 0, 1, 0, -0.056623112, 0, -0.9983956, 0, 0, 0)
 mesh = SubResource("SphereMesh_oybyt")
 
 [node name="jump area" type="Area3D" parent="." unique_id=2138442051]

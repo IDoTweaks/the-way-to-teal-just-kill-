@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://bo37d1e2o4rkn"]
 
 [ext_resource type="Script" uid="uid://clqvnyjvmm0rk" path="res://Scripts/finish_orb.gd" id="1_d2j6h"]
-[ext_resource type="Shader" uid="uid://dvtrpkg23hsor" path="res://shaders/finishOrb.gdshader" id="1_hma1g"]
+[ext_resource type="Shader" uid="uid://crxvd868ep56u" path="res://shaders/finishOrbReal.gdshader" id="2_d2j6h"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_d2j6h"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_oybyt"]
 render_priority = 0
-shader = ExtResource("1_hma1g")
+shader = ExtResource("2_d2j6h")
 shader_parameter/core_color = Color(0.03, 0.18, 0.13, 1)
 shader_parameter/mid_color = Color(0.11, 0.62, 0.46, 1)
 shader_parameter/rim_color = Color(0.3, 1, 0.75, 1)
@@ -19,7 +19,7 @@ shader_parameter/noise_scale = 6.0
 shader_parameter/distort_strength = 0.08
 
 [sub_resource type="SphereMesh" id="SphereMesh_oybyt"]
-material = SubResource("ShaderMaterial_d2j6h")
+material = SubResource("ShaderMaterial_oybyt")
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_dlgab"]
 
