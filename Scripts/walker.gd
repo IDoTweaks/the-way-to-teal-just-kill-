@@ -12,7 +12,7 @@ const JUMP_VELOCITY = 4.5
 @onready var explosionParticles = preload("res://Particles/enemyExplode.tscn")
 var particleInstance
 @export var navAgent : NavigationAgent3D
-@export var damage = 10
+@export var damage = 5
 @export var accelaration = 10
 var target
 var mode : String = "idle"
@@ -46,10 +46,10 @@ func _die():
 
 func _physics_process(delta: float) -> void:
 	if mode == "attack" and canAttack and target != null:
-		#animPlayer.play("attack")
+		animPlayer.play("attack")
 		canAttack = false
 		attackTimer.start()
-		target._takeDamage(10)
+		target._takeDamage(damage)
 	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta

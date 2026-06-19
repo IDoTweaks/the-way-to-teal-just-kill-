@@ -640,7 +640,7 @@ visible = false
 mesh = SubResource("BoxMesh_e3k8h")
 
 [node name="gun" parent="playerCam" unique_id=1487719564 instance=ExtResource("2_iixog")]
-transform = Transform3D(-0.088497795, 0.012279474, 0.010833218, 0.013905769, 0.087797575, 0.014079108, -0.0086471755, 0.015517931, -0.0882294, 0.388, -0.31, -0.652)
+transform = Transform3D(-0.088497795, 0.012279475, 0.010833219, 0.013905769, 0.08779758, 0.014079109, -0.0086471755, 0.015517932, -0.0882294, 0.388, -0.31, -0.652)
 
 [node name="particleSpawnGun" type="MeshInstance3D" parent="playerCam/gun" unique_id=1268103117]
 transform = Transform3D(0.4209742, 1.8626451e-09, 2.6077032e-08, 2.2817403e-08, 0.5239, 4.4703484e-08, 2.2351742e-08, -1.4901161e-08, 0.42500958, 0.0027680397, 3.6811652, 7.116807)
@@ -721,5 +721,15 @@ theme_override_font_sizes/font_size = 64
 text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="HUD" unique_id=1281401555]
+modulate = Color(0, 0.6288486, 0.62884855, 1)
+offset_top = 1030.0
+offset_right = 626.0
+offset_bottom = 1073.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 7
+step = 1.0
+value = 100.0
 
 [connection signal="timeout" from="shotGunCd" to="." method="_on_shot_gun_cd_timeout"]

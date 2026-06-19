@@ -609,11 +609,12 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	_checkWall()
 
-
+func _updateHud():
+	$HUD/ProgressBar.value = health
 
 func _takeDamage(damage):
 	health -= damage
-	print("taken", damage)
+	_updateHud()
 
 
 

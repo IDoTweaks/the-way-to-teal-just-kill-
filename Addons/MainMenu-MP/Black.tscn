@@ -209,20 +209,20 @@ vertical_alignment = 1
 layout_mode = 2
 selected = 0
 item_count = 4
-popup/item_0/text = "1920x1080"
+popup/item_0/text = "1920x1080(currently disabled)"
 popup/item_0/id = 0
-popup/item_1/text = "1600x900"
+popup/item_1/text = "1600x900(currently disabled)"
 popup/item_1/id = 1
-popup/item_2/text = "1280x720"
+popup/item_2/text = "1280x720(currently disabled)"
 popup/item_2/id = 2
-popup/item_3/text = "1152x648"
+popup/item_3/text = "1152x648(currently disabled)"
 popup/item_3/id = 3
 
 [node name="fsOptionButt2" type="OptionButton" parent="UI/MainContainer/Settings" unique_id=112190865]
 layout_mode = 2
 selected = 0
 item_count = 3
-popup/item_0/text = "windowed"
+popup/item_0/text = "windowed(currently disabled)"
 popup/item_0/id = 0
 popup/item_1/text = "borderless"
 popup/item_1/id = 1

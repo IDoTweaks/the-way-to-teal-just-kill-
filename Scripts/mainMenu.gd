@@ -4,7 +4,8 @@ extends Control
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS,true)
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -30,17 +31,21 @@ func _on_res_option_butt_item_selected(index: int) -> void:
 			#DisplayServer.WINDOW_MODE_FULLSCREEN
 			#DisplayServer.WINDOW_FLAG_BORDERLESS
 		elif index == 1:
-			DisplayServer.window_set_size(Vector2i(1600,900))
+			pass
+			#DisplayServer.window_set_size(Vector2i(1600,900))
 		elif index == 2:
-			DisplayServer.window_set_size(Vector2i(1280,720))
+			pass
+			#DisplayServer.window_set_size(Vector2i(1280,720))
 		elif index == 3:
-			DisplayServer.window_set_size(Vector2i(1152,648))
+			pass
+			#DisplayServer.window_set_size(Vector2i(1152,648))
 
 
 func _on_fs_option_butt_2_item_selected(index: int) -> void:
 	if index == 0:
-		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS,false)
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		pass
+		#DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS,false)
+		#DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 	elif index == 1:
 		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS,true)
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
