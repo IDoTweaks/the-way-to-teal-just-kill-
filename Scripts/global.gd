@@ -9,6 +9,7 @@ var positionSave : Array[Vector3] = []
 var rotationSave : Array[Vector3] = []
 var camPositionSave : Array[Vector3] = []
 var camRotationSave : Array[Vector3] = []
+var weaponSave : Array[int] = []
 var maxScore = -1;
 
 

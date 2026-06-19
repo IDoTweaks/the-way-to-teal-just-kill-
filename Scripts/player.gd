@@ -20,7 +20,7 @@ var camPositionSaves : Array[Vector3]
 var camPosI : int
 var camRotationSaves : Array[Vector3]
 var camRotI : int
-
+var weaponSaves : Array[int]
 
 #sliding
 var wasSliding: bool = false
@@ -201,6 +201,7 @@ func _finishLevel():
 		Global.camPositionSave = camPositionSaves.duplicate()
 		Global.camRotationSave = camRotationSaves.duplicate()
 		Global.maxScore = finalScore
+		Global.weaponSave = weaponSaves.duplicate()
 	levelEnd._setScore(finalScore)
 	levelEnd._setGrade(grade)
 	levelEnd.visible = true
@@ -475,6 +476,7 @@ func _physics_process(delta: float) -> void:
 	camPosI+=1
 	camRotationSaves.insert(camRotI,playerCam.global_rotation)
 	camRotI+=1
+	weaponSaves.append(currentGun)
 	
 	if knockbackTimer > 0:
 		knockbackTimer -= delta
