@@ -9,6 +9,9 @@ const JUMP_VELOCITY = 4.5
 @export var scoreWorth = 5000
 @export var health = 100
 @onready var body =$body
+@onready var dmgTxt = preload("res://ObjectScenes/damageText.tscn")
+@onready var textSpawn = $body/textSpawn
+
 @onready var explosionParticles = preload("res://Particles/enemyExplode.tscn")
 var particleInstance
 @export var navAgent : NavigationAgent3D
@@ -19,6 +22,8 @@ var mode : String = "idle"
 var gotShot = false
 var shouldMove = false
 var canAttack : bool = true
+var textActive = false
+var txt
 
 func _makeTarg(targ):
 	gotShot = true
@@ -30,6 +35,11 @@ func _ready() -> void:
 
 func _damage(dmg):
 	health -= dmg
+	if !textActive:
+		_spawnDmgTxt(dmg)
+		
+	else:
+		_updateDmgTxt(dmg)
 	if health >= 0:
 		body._updateMat(health / 100.0)
 	else:
@@ -67,6 +77,9 @@ func _physics_process(delta: float) -> void:
 	#if shouldMove:
 	move_and_slide()
 
+func _process(delta: float) -> void:
+	if txt == null:
+		textActive = false
 
 func _on_attack_body_entered(body: Node3D) -> void:
 	if not gotShot:
@@ -81,6 +94,19 @@ func _on_attack_body_exited(body: Node3D) -> void:
 		if body.has_method("player"):
 			mode = "chase"
 
+func _updateDmgTxt(moreDamage:int):
+	if txt != null:
+		txt.damage += moreDamage
+		txt.global_position = textSpawn.global_position
+		txt._resetScale()
+
+func _spawnDmgTxt(damage:int):
+	txt = dmgTxt.instantiate()
+	get_parent().add_child(txt)
+	txt.damage = damage
+	txt.global_position = textSpawn.global_position
+	textActive = true
+	txt.lookat = target
 
 func _on_chase_body_entered(body: Node3D) -> void:
 	if not gotShot:

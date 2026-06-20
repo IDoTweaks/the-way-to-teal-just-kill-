@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://dk3goi3xqquyj"]
+
+[ext_resource type="Script" uid="uid://d4hil5p3shwtn" path="res://Scripts/damage_text.gd" id="1_0o48f"]
+
+[node name="DamageText" type="Node3D" unique_id=422341003]
+script = ExtResource("1_0o48f")
+
+[node name="Label3D" type="Label3D" parent="." unique_id=1732858928]
+modulate = Color(0, 0.5307124, 0.5307124, 1)
+text = "1000"

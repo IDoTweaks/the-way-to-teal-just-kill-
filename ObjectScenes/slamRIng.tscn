@@ -1,9 +1,15 @@
 [gd_scene format=3 uid="uid://bgkx0xs1jkl68"]
 
 [ext_resource type="Script" uid="uid://dyoh03k6ajb3b" path="res://Scripts/slam_ring.gd" id="1_oxr8f"]
+[ext_resource type="Shader" uid="uid://djaygwqbq6fsa" path="res://shaders/slamRIng.gdshader" id="2_d1itl"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_474j8"]
-albedo_color = Color(0, 0.69411767, 1, 1)
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xlbes"]
+render_priority = 0
+shader = ExtResource("2_d1itl")
+shader_parameter/outline_thickness = 0.03
+shader_parameter/speed = 2.0
+shader_parameter/noise_scale = 4.0
+shader_parameter/alpha = 1.0
 
 [sub_resource type="TorusMesh" id="TorusMesh_oxr8f"]
 
@@ -15,7 +21,7 @@ script = ExtResource("1_oxr8f")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1567460096]
 transform = Transform3D(1, 0, 0, 0, 1.1477995, 0, 0, 0, 1, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_474j8")
+material_override = SubResource("ShaderMaterial_xlbes")
 transparency = 0.75
 mesh = SubResource("TorusMesh_oxr8f")
 

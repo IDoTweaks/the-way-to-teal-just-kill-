@@ -20,6 +20,8 @@ albedo_color = Color(0.17641911, 0.17641908, 0.17641908, 1)
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_bbfly"]
 
+[sub_resource type="BoxMesh" id="BoxMesh_p5c4o"]
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_cwb1f"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_p5c4o"]
@@ -153,6 +155,11 @@ mesh = SubResource("CapsuleMesh_bbfly")
 transform = Transform3D(-1.7484554e-08, -0.39999998, 0, 0.39999998, -1.7484554e-08, 0, 0, 0, 0.4, 0.3, 0, 0.34734395)
 material_override = SubResource("StandardMaterial3D_58yt4")
 mesh = SubResource("CapsuleMesh_bbfly")
+
+[node name="textSpawn" type="MeshInstance3D" parent="body" unique_id=995045994]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, -1.4990325e-08, 1.1007339, -0.34293866)
+visible = false
+mesh = SubResource("BoxMesh_p5c4o")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=162224433]
 shape = SubResource("CapsuleShape3D_cwb1f")
