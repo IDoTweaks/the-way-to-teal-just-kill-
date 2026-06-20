@@ -63,6 +63,7 @@ var upDashed = false;
 var knockbackTimer: float = 0.0
 const KNOCKBACK_LOCK_TIME = 0.15
 @export var slamVeloc = 25.0
+var airTime :float = 0.0
 
 # wall jumping
 var wallNormal  = Vector3.ZERO
@@ -498,6 +499,7 @@ func _physics_process(delta: float) -> void:
 		slamming = false
 		dashing = false
 		upDashed = false
+		airTime = 0.0
 	elif coyoteTimer > 0:
 		coyoteTimer -= delta
 		
@@ -555,6 +557,7 @@ func _physics_process(delta: float) -> void:
 		velocity.y *= 0.45
 		
 	if not is_on_floor():
+		airTime += delta
 		velocity += get_gravity() * delta
 	if knockbackTimer <= 0:
 		if not slide:
@@ -633,6 +636,7 @@ func _physics_process(delta: float) -> void:
 func _updateHud():
 	$HUD/ProgressBar.value = health
 
+
 func _takeDamage(damage):
 	health -= damage
 	_updateHud()
@@ -643,6 +647,14 @@ func _spawnSlam():
 	var slam = groundSlam.instantiate()
 	get_parent().add_child(slam)
 	slam.global_position = feet.global_position
+	if airTime >= 1.0:
+		pass
+	elif airTime >= 0.75:
+		slam.damage -= (slam.damage / 100.0) * 25
+	elif airTime >= 0.5:
+		slam.damage -= (slam.damage / 100.0) * 50
+	else:
+		slam.damage = 1
 
 #func here so i can jump here fast
 func wallJump():pass
@@ -652,7 +664,7 @@ func _checkWall():
 		canWallJump = false
 		return
 	
-	if abs(velocity.x) + abs(velocity.y) > 1:
+	if abs(velocity.x) + abs(velocity.z) > 1:
 		var veloc = Vector3(velocity.x,0,velocity.z)
 		#var future = self.global_position + veloc
 		for i in get_slide_collision_count():

@@ -1,6 +1,6 @@
 extends Node3D
 
-@export var growRate = 2.5
+@export var growRate = 5.0
 @export var maxSize = 5.0
 var damage = 0
 @onready var text = $Label3D

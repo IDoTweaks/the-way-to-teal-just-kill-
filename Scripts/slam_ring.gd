@@ -2,7 +2,7 @@ extends Node3D
 
 @export var expansionRate : float = 0.1
 @export var maxExpansion : float = 10.0
-@export var damage : int = 15
+@export var damage : float = 15.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

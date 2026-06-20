@@ -22,6 +22,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if i < max:
 		global_position = postions[i]
+		global_position.y -= 0.25
 		global_rotation = rotations[i]
 		cam.global_position = camPositions[i]
 		cam.global_rotation = camRotations[i]

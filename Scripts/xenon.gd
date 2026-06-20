@@ -1,21 +1,22 @@
 extends CharacterBody3D
-
 func _enemy():pass
-const SPEED = 7.5
+const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
 @onready var attackTimer = $attackCd
 @onready var animPlayer = $AnimationPlayer
-
 @export var scoreWorth = 5000
-@export var health = 100
+@export var health = 50
 @onready var body =$body
 @onready var dmgTxt = preload("res://ObjectScenes/damageText.tscn")
 @onready var textSpawn = $body/textSpawn
-
+@export var sightDist :float = 30.0
+@export var player : CharacterBody3D
+@export var wallLayer : int
+@onready var bullet = preload("res://ObjectScenes/greenBullet.tscn")
 @onready var explosionParticles = preload("res://Particles/enemyExplode.tscn")
 var particleInstance
 @export var navAgent : NavigationAgent3D
-@export var damage = 5
+@export var damage = 20
 @export var accelaration = 10
 var target
 var mode : String = "idle"
@@ -24,18 +25,14 @@ var shouldMove = false
 var canAttack : bool = true
 var textActive = false
 var txt
-
 func _makeTarg(targ):
 	gotShot = true
 	target = targ
-
 func _ready() -> void:
 	body._updateMat(1)
 	await get_tree().physics_frame
-
 func _takeDamage(dmg):
 	_damage(dmg)
-
 func _damage(dmg):
 	health -= dmg
 	if !textActive:
@@ -55,15 +52,29 @@ func _die():
 	get_parent().add_child(particleInstance)
 	particleInstance.emitting = true
 	queue_free()
+func _canSeePlayer():
+	if player == null:
+		return false
+	if global_position.distance_to(player.global_position) > sightDist:
+		return false
+	return _hasLineOfSIght(player)
+	
+	
+func _hasLineOfSIght(targer : CharacterBody3D):
+	var spaceState := get_world_3d().direct_space_state #hahaha := looks like a dick
+	var query := PhysicsRayQueryParameters3D.create(global_position,target.global_position)#im starting to like this := thing
+	query.exclude = [self]
+	query.collision_mask = wallLayer
+	var result := spaceState.intersect_ray(query)
+	return result.is_empty()
 
+func _shootAt(targetPos : Vector3):
+	var myBullet = bullet.instantiate()
+	myBullet.dest = targetPos
+	get_parent().add_child(myBullet)
+	myBullet.global_position = textSpawn.global_position
 
 func _physics_process(delta: float) -> void:
-	if mode == "attack" and canAttack and target != null:
-		animPlayer.play("attack")
-		canAttack = false
-		attackTimer.start()
-		target._takeDamage(damage)
-	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 		
@@ -77,32 +88,24 @@ func _physics_process(delta: float) -> void:
 			if !hit:
 				velocity.x = 0
 				velocity.z = 0
+	if _canSeePlayer():
+		_shootAt(player.global_position)
+	
+	
+	
 	#if shouldMove:
 	move_and_slide()
-
 func _process(delta: float) -> void:
 	if txt == null:
 		textActive = false
-
-func _on_attack_body_entered(body: Node3D) -> void:
-	if not gotShot:
-		if body.has_method("player"):
-			mode = "attack"
-		if target == null:
-			target = body
-
-
-func _on_attack_body_exited(body: Node3D) -> void:
 	if not gotShot:
 		if body.has_method("player"):
 			mode = "chase"
-
 func _updateDmgTxt(moreDamage:int):
 	if txt != null:
 		txt.damage += moreDamage
 		txt.global_position = textSpawn.global_position
 		txt._resetScale()
-
 func _spawnDmgTxt(damage:int):
 	txt = dmgTxt.instantiate()
 	get_parent().add_child(txt)
@@ -110,13 +113,10 @@ func _spawnDmgTxt(damage:int):
 	txt.global_position = textSpawn.global_position
 	textActive = true
 	txt.lookat = target
-
 func _on_chase_body_entered(body: Node3D) -> void:
 	if not gotShot:
 		if body.has_method("player"):
 			target = body
 			mode = "chase"
-
-
 func _on_attack_cd_timeout() -> void:
 	canAttack = true

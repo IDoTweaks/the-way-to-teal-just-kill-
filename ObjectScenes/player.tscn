@@ -785,7 +785,7 @@ visible = false
 mesh = SubResource("BoxMesh_e3k8h")
 
 [node name="gun" parent="playerCam" unique_id=1487719564 instance=ExtResource("2_iixog")]
-transform = Transform3D(-0.088497795, 0.012279477, 0.010833219, 0.013905769, 0.0877976, 0.014079109, -0.0086471755, 0.015517935, -0.0882294, 0.388, -0.31, -0.652)
+transform = Transform3D(-0.088497795, 0.012279478, 0.010833219, 0.013905769, 0.087797605, 0.014079109, -0.0086471755, 0.015517937, -0.0882294, 0.388, -0.31, -0.652)
 
 [node name="particleSpawnGun" type="MeshInstance3D" parent="playerCam/gun" unique_id=1268103117]
 transform = Transform3D(0.4209742, 1.8626451e-09, 2.6077032e-08, 2.2817403e-08, 0.5239, 4.4703484e-08, 2.2351742e-08, -1.4901161e-08, 0.42500958, 0.0027680397, 3.6811652, 7.116807)
