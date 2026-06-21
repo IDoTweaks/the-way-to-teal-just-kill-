@@ -18,6 +18,7 @@ itch.io:https://idotweaks.itch.io/the-way-to-tealjust-kill
 -  borderless/fullscreen
 - full windows support
 - full linux support
+- untested mac support
 - partial web support
 - not so advanced scoring and grading system
 - a ghost of your best run 
