@@ -36,6 +36,11 @@ itch.io:https://idotweaks.itch.io/the-way-to-tealjust-kill
 - 1/2 - switch weapons
 - r - restart the current level
 
+## credits
+models - sadly i dont remember who made each model but i can tell you they are from sketchfab(sorry about that)
+ai - thank you for debugging + making shaders + scripts to generate decals
+everything else - me(da goat)
+
 ## Gameplay
 
 https://github.com/user-attachments/assets/6ca4da88-f106-40a6-bc78-2b67bfa29dfc
