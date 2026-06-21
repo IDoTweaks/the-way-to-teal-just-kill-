@@ -139,8 +139,9 @@ _data = {
 &"attack": SubResource("Animation_0ogls")
 }
 
-[node name="Enemy" type="CharacterBody3D" unique_id=1301325712]
+[node name="Enemy" type="CharacterBody3D" unique_id=1301325712 node_paths=PackedStringArray("navAgent")]
 script = ExtResource("1_71j8v")
+navAgent = NodePath("NavigationAgent3D")
 
 [node name="body" type="MeshInstance3D" parent="." unique_id=4754022]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
@@ -179,7 +180,7 @@ shape = SubResource("CapsuleShape3D_cwb1f")
 [node name="chase" type="Area3D" parent="." unique_id=1226484706]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="chase" unique_id=1144846124]
-transform = Transform3D(22.53, 0, 0, 0, 4.506, 0, 0, 0, 22.53, 0, 0.8557129, 0)
+transform = Transform3D(40.43, 0, 0, 0, 8.086, 0, 0, 0, 40.43, 0, 0.8557129, 0)
 shape = SubResource("BoxShape3D_p5c4o")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1271920877]
@@ -188,7 +189,6 @@ shape = SubResource("BoxShape3D_p5c4o")
 libraries/ = SubResource("AnimationLibrary_nv1fp")
 
 [node name="attackCd" type="Timer" parent="." unique_id=289675594]
-wait_time = 0.5
 
 [connection signal="body_entered" from="attack" to="." method="_on_attack_body_entered"]
 [connection signal="body_exited" from="attack" to="." method="_on_attack_body_exited"]

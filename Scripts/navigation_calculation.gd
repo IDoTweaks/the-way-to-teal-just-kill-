@@ -35,29 +35,47 @@ func _process(delta: float) -> void:
 	var count = 0
 	for entity in navObjects:
 		if entity != null:
-			if tickAssigned[count] == currentTick:
-				var target = entity.target
-				if target != null:
-					var navAgent = entity.navAgent
-					var mode = entity.mode
-					var gotShot = entity.gotShot
-					var SPEED = entity.SPEED
-					var accelaration = entity.accelaration
-					var velocity = entity.velocity
-					if mode == "chase" or gotShot:
-						navAgent.target_position = Vector3(target.global_position.x,target.global_position.y,target.global_position.z)
-						var dir = (navAgent.get_next_path_position() - entity.global_position).normalized()
-						print(entity.name, navAgent.get_next_path_position())
-						entity.velocity = velocity.lerp(dir * SPEED, tickDelta * accelaration)
-						entity.look_at(Vector3(target.global_position.x,entity.global_position.y,target.global_position.z),Vector3.UP,true)
-						entity.shouldMove = true
-					elif mode == "attack":
-						navAgent.target_position = Vector3(target.global_position.x,target.global_position.y,target.global_position.z)
-						var dir = (navAgent.get_next_path_position() - entity.global_position).normalized()
-						print(entity.name, navAgent.get_next_path_position())
-						entity.velocity = velocity.lerp(dir * SPEED, tickDelta * accelaration)
-						entity.look_at(Vector3(target.global_position.x,entity.global_position.y,target.global_position.z),Vector3.UP,true)
-						entity.shouldMove = true
+			if entity.has_method("_walker"):
+				if tickAssigned[count] == currentTick:
+					var target = entity.target
+					if target != null:
+						var navAgent = entity.navAgent
+						var mode = entity.mode
+						var gotShot = entity.gotShot
+						var SPEED = entity.SPEED
+						var accelaration = entity.accelaration
+						var velocity = entity.velocity
+						if mode == "chase" or gotShot:
+							navAgent.target_position = Vector3(target.global_position.x,target.global_position.y,target.global_position.z)
+							var dir = (navAgent.get_next_path_position() - entity.global_position).normalized()
+							print(entity.name, navAgent.get_next_path_position())
+							entity.velocity = velocity.lerp(dir * SPEED, tickDelta * accelaration)
+							entity.look_at(Vector3(target.global_position.x,entity.global_position.y,target.global_position.z),Vector3.UP,true)
+							entity.shouldMove = true
+						elif mode == "attack":
+							navAgent.target_position = Vector3(target.global_position.x,target.global_position.y,target.global_position.z)
+							var dir = (navAgent.get_next_path_position() - entity.global_position).normalized()
+							print(entity.name, navAgent.get_next_path_position())
+							entity.velocity = velocity.lerp(dir * SPEED, tickDelta * accelaration)
+							entity.look_at(Vector3(target.global_position.x,entity.global_position.y,target.global_position.z),Vector3.UP,true)
+							entity.shouldMove = true
+			elif entity.has_method("_xenon"):
+				if tickAssigned[count] == currentTick:
+					var target = entity.target
+					if target != null:
+						var navAgent = entity.navAgent
+						var mode = entity.mode
+						var gotShot = entity.gotShot
+						var SPEED = entity.SPEED
+						var accelaration = entity.accelaration
+						var velocity = entity.velocity
+						if mode == "chase" or gotShot:
+							navAgent.target_position = Vector3(target.global_position.x,target.global_position.y,target.global_position.z)
+							var dir = (navAgent.get_next_path_position() - entity.global_position).normalized()
+							print(entity.name, navAgent.get_next_path_position())
+							entity.velocity = velocity.lerp(dir * SPEED, tickDelta * accelaration)
+							entity.look_at(Vector3(target.global_position.x,entity.global_position.y,target.global_position.z),Vector3.UP,true)
+							entity.shouldMove = true
 		count+=1
 	currentTick +=1
 	if currentTick >= 20:

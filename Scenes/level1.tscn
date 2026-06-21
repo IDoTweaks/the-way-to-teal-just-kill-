@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://d8bt3lb3ds60" path="res://ObjectScenes/navigationCalculation.tscn" id="4_lyd6k"]
 [ext_resource type="PackedScene" uid="uid://cna3205ggf26a" path="res://ObjectScenes/playerGhost.tscn" id="9_jgkgd"]
 [ext_resource type="PackedScene" uid="uid://du4s8p1pljnlb" path="res://ObjectScenes/jumpOrb.tscn" id="10_bs12r"]
+[ext_resource type="PackedScene" uid="uid://ctoceg007wby5" path="res://ObjectScenes/Xenon.tscn" id="11_rqhku"]
 
 [sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_c5erv"]
 data = PackedVector3Array(-7.5, -0.5, -6.5, -7.5, 7.5, -6.5, -7.5, -0.5, 6.5, -7, 0, -5.5, -7, 0, 5.5, -7, 7, -5.5, -7.5, -0.5, -6.5, -7.5, -0.5, 6.5, 6.5, -0.5, -6.5, -7, 0, -5.5, 6, 0, -5.5, -7, 0, 5.5, -7.5, -0.5, -6.5, 6.5, -0.5, -6.5, -7.5, 7.5, -6.5, -7, 0, -5.5, -7, 7, -5.5, 6, 0, -5.5, -7.5, -0.5, 6.5, -7.5, 7.5, -6.5, -7.5, 7.5, 6.5, -7, 0, 5.5, -7, 7, 5.5, -7, 7, -5.5, -7, 0, 5.5, 6, 7, 5.5, -7, 7, 5.5, -7.5, -0.5, 6.5, -7.5, 7.5, 6.5, 6.5, 7.5, 6.5, -7.5, 7.5, -6.5, 6.5, 7.5, 6.5, -7.5, 7.5, 6.5, -7, 7, -5.5, -7, 7, 5.5, 6, 7, 5.5, -7, 0, 5.5, 6, 0, -5.5, 6, 0, -1.5, 6.5, -0.5, -6.5, 6.5, -0.5, 6.5, 6.5, 0, -1.5, 6, 0, -1.5, 6.5, 0, -1.5, 6.5, 0, 1.5, 6, 0, -1.5, 6, 4, -1.5, 6.5, 0, -1.5, 6, 0, -5.5, 6, 7, -5.5, 6, 0, -1.5, 6.5, -0.5, -6.5, 6.5, 0, -1.5, 6.5, 7.5, -6.5, 6, 4, -1.5, 6.5, 4, -1.5, 6.5, 0, -1.5, -7.5, -0.5, 6.5, 6.5, -0.5, 6.5, 6.5, -0.5, -6.5, -7, 0, 5.5, 6, 0, -1.5, 6, 0, 1.5, -7, 0, 5.5, 6, 0, 1.5, 6, 0, 5.5, -7, 0, 5.5, 6, 0, 5.5, 6, 7, 5.5, -7.5, -0.5, 6.5, 6.5, 7.5, 6.5, 6.5, -0.5, 6.5, 6, 0, -1.5, 6.5, 0, 1.5, 6, 0, 1.5, 6.5, -0.5, 6.5, 6.5, 0, 1.5, 6.5, 0, -1.5, 6, 0, 1.5, 6.5, 0, 1.5, 6.5, 4, 1.5, 6, 0, 1.5, 6, 4, 1.5, 6, 0, 5.5, 6.5, -0.5, 6.5, 6.5, 4, 1.5, 6.5, 0, 1.5, 6, 0, 1.5, 6.5, 4, 1.5, 6, 4, 1.5, -7.5, 7.5, -6.5, 6.5, -0.5, -6.5, 6.5, 7.5, -6.5, -7, 7, -5.5, 6, 7, -5.5, 6, 0, -5.5, -7, 7, -5.5, 6, 7, 5.5, 6, 7, -5.5, -7.5, 7.5, -6.5, 6.5, 7.5, -6.5, 6.5, 7.5, 6.5, 6, 0, -1.5, 6, 7, -5.5, 6, 4, -1.5, 6.5, 7.5, -6.5, 6.5, 0, -1.5, 6.5, 4, -1.5, 6, 4, -1.5, 6, 4, 1.5, 6.5, 4, -1.5, 6, 4, -1.5, 6, 7, -5.5, 6, 7, 5.5, 6.5, 7.5, -6.5, 6.5, 4, -1.5, 6.5, 7.5, 6.5, 6, 4, 1.5, 6.5, 4, 1.5, 6.5, 4, -1.5, 6, 4, -1.5, 6, 7, 5.5, 6, 4, 1.5, 6.5, 7.5, 6.5, 6.5, 4, -1.5, 6.5, 4, 1.5, 6, 0, 5.5, 6, 4, 1.5, 6, 7, 5.5, 6.5, -0.5, 6.5, 6.5, 7.5, 6.5, 6.5, 4, 1.5)
@@ -27,8 +28,8 @@ uv1_triplanar = true
 grow_amount = -16.0
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_lyd6k"]
-vertices = PackedVector3Array(20.35927, 10.505354, -6, 20.35927, 10.505354, 13, 24.60927, 10.505354, 13, 24.60927, 10.505354, -6, 7.85927, 5.005354, -1.75, 7.85927, 5.005354, 3, 13.85927, 5.005354, 3, 13.85927, 5.005354, -1.75)
-polygons = [PackedInt32Array(3, 2, 0), PackedInt32Array(0, 2, 1), PackedInt32Array(7, 6, 4), PackedInt32Array(4, 6, 5)]
+vertices = PackedVector3Array(20.25, 10.5, -6, 20.25, 10.5, -3, 24.5, 10.5, -3, 24.5, 10.5, -6, 7, 32, -2, 7, 32, 3, 24, 32, 3, 24, 32, -2, 7, 0.5, -1.25, 7, 0.5, 2.5, 23.5, 0.5, 2.5, 23.5, 0.5, -1.25, 7.75, 5, -1.25, 7.75, 5, 2.5, 13.75, 5, 2.5, 13.75, 5, -1.25, 20.25, 10.5, -1.25, 20.25, 10.5, 2.5, 23.5, 10.5, 2.5, 23.5, 10.5, -1.25, 20.25, 10.5, 4.25, 20.25, 10.5, 13, 24.5, 10.5, 13, 24.5, 10.5, 4.25)
+polygons = [PackedInt32Array(3, 2, 0), PackedInt32Array(0, 2, 1), PackedInt32Array(7, 6, 4), PackedInt32Array(4, 6, 5), PackedInt32Array(11, 10, 8), PackedInt32Array(8, 10, 9), PackedInt32Array(15, 14, 12), PackedInt32Array(12, 14, 13), PackedInt32Array(19, 18, 16), PackedInt32Array(16, 18, 17), PackedInt32Array(23, 22, 20), PackedInt32Array(20, 22, 21)]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lyd6k"]
 albedo_color = Color(0, 1, 0, 1)
@@ -57,6 +58,7 @@ script = ExtResource("1_4iphx")
 shape = SubResource("ConcavePolygonShape3D_c5erv")
 
 [node name="room1" type="CSGCombiner3D" parent="StaticBody3D" unique_id=1178151060]
+layers = 16
 material_override = SubResource("StandardMaterial3D_4hvuo")
 
 [node name="CSGBox3D" type="CSGBox3D" parent="StaticBody3D/room1" unique_id=205891173]
@@ -73,6 +75,7 @@ operation = 2
 size = Vector3(1, 4, 3)
 
 [node name="hallWay" type="CSGCombiner3D" parent="StaticBody3D" unique_id=1071516361]
+layers = 16
 material_override = SubResource("StandardMaterial3D_4iphx")
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="StaticBody3D/hallWay" unique_id=613731708]
@@ -230,8 +233,18 @@ transform = Transform3D(-0.9659258, 0, 0.25881913, 0, 1, 0, -0.25881913, 0, -0.9
 [node name="Enemy4" parent="." unique_id=992362596 instance=ExtResource("3_c5erv")]
 transform = Transform3D(-0.9659258, 0, -0.25881898, 0, 1, 0, 0.25881898, 0, -0.9659258, 22.698757, 10.76591, 12.85681)
 
+[node name="Enemy5" parent="." unique_id=1859495613 node_paths=PackedStringArray("player") instance=ExtResource("11_rqhku")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.38661, 11.332772, -5.20191)
+player = NodePath("../Player")
+wallLayer = 16
+
+[node name="Enemy6" parent="." unique_id=145985188 node_paths=PackedStringArray("player") instance=ExtResource("11_rqhku")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.38661, 11.332772, 10.221958)
+player = NodePath("../Player")
+wallLayer = 16
+
 [node name="NavigationCalculation" parent="." unique_id=1289349344 node_paths=PackedStringArray("navObjects") instance=ExtResource("4_lyd6k")]
-navObjects = [null, NodePath("../Enemy2"), NodePath("../Enemy3"), NodePath("../Enemy4"), NodePath("../Enemy")]
+navObjects = [NodePath("../Enemy6"), NodePath("../Enemy2"), NodePath("../Enemy3"), NodePath("../Enemy4"), NodePath("../Enemy"), NodePath("../Enemy5")]
 
 [node name="FinishOrb" parent="." unique_id=1930821478 node_paths=PackedStringArray("player") instance=ExtResource("4_2a60c")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.798532, 10.544792, -6.048655)

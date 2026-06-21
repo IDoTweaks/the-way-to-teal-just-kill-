@@ -1,4 +1,6 @@
+
 extends CharacterBody3D
+func _xenon():pass
 func _enemy():pass
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
@@ -11,9 +13,10 @@ const JUMP_VELOCITY = 4.5
 @onready var textSpawn = $body/textSpawn
 @export var sightDist :float = 30.0
 @export var player : CharacterBody3D
-@export var wallLayer : int
+@export_flags_3d_physics var wallLayer : int
 @onready var bullet = preload("res://ObjectScenes/greenBullet.tscn")
 @onready var explosionParticles = preload("res://Particles/enemyExplode.tscn")
+@onready var bulletSpawn =$body/wand/bulletSpawn
 var particleInstance
 @export var navAgent : NavigationAgent3D
 @export var damage = 20
@@ -41,7 +44,7 @@ func _damage(dmg):
 	else:
 		_updateDmgTxt(dmg)
 	if health >= 0:
-		body._updateMat(health / 100.0)
+		body._updateMat(health / 50.0)
 	else:
 		_die()
 		
@@ -57,23 +60,32 @@ func _canSeePlayer():
 		return false
 	if global_position.distance_to(player.global_position) > sightDist:
 		return false
-	return _hasLineOfSIght(player)
+	var tmp = _hasLineOfSIght(player)
+	if tmp:
+		mode = "attack"
+	else:
+		mode = "chase"
+	return tmp
 	
-	
-func _hasLineOfSIght(targer : CharacterBody3D):
+func _hasLineOfSIght(target : CharacterBody3D):
 	var spaceState := get_world_3d().direct_space_state #hahaha := looks like a dick
 	var query := PhysicsRayQueryParameters3D.create(global_position,target.global_position)#im starting to like this := thing
 	query.exclude = [self]
 	query.collision_mask = wallLayer
 	var result := spaceState.intersect_ray(query)
 	return result.is_empty()
-
+ 
 func _shootAt(targetPos : Vector3):
-	var myBullet = bullet.instantiate()
-	myBullet.dest = targetPos
-	get_parent().add_child(myBullet)
-	myBullet.global_position = textSpawn.global_position
-
+	if bulletSpawn == null:
+		return
+	if canAttack:
+		var myBullet = bullet.instantiate()
+		myBullet.dest = targetPos
+		get_parent().add_child(myBullet)
+		myBullet.global_position = bulletSpawn.global_position
+		canAttack = false
+		attackTimer.start()
+ 
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity += get_gravity() * delta
@@ -89,10 +101,13 @@ func _physics_process(delta: float) -> void:
 				velocity.x = 0
 				velocity.z = 0
 	if _canSeePlayer():
-		_shootAt(player.global_position)
+		if canAttack:
+			_shootAt(player.global_position)
+			canAttack = false
+			attackTimer.start()
 	
 	
-	
+
 	#if shouldMove:
 	move_and_slide()
 func _process(delta: float) -> void:

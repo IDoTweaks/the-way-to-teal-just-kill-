@@ -1,5 +1,5 @@
 extends CharacterBody3D
-
+func _walker():pass
 func _enemy():pass
 const SPEED = 7.5
 const JUMP_VELOCITY = 4.5
