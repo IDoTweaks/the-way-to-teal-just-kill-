@@ -37,9 +37,9 @@ itch.io:https://idotweaks.itch.io/the-way-to-tealjust-kill
 - r - restart the current level
 
 ## credits
-models - sadly i dont remember who made each model but i can tell you they are from sketchfab(sorry about that)
-ai - thank you for debugging + making shaders + scripts to generate decals
-everything else - me(da goat)
+- models - sadly i dont remember who made each model but i can tell you they are from sketchfab(sorry about that)
+- ai - thank you for debugging + making shaders + scripts to generate decals
+- everything else - me(da goat)
 
 ## Gameplay
 
