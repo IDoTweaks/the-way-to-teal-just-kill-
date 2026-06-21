@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://ep187n5c5y83"
 path.s3tc="res://.godot/imported/t38.png-9f393e0460fafe2d0f8d9f5636934142.s3tc.ctex"
+path.etc2="res://.godot/imported/t38.png-9f393e0460fafe2d0f8d9f5636934142.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://Textures/AquilariusRetroTextures/t38.png"
-dest_files=["res://.godot/imported/t38.png-9f393e0460fafe2d0f8d9f5636934142.s3tc.ctex"]
+dest_files=["res://.godot/imported/t38.png-9f393e0460fafe2d0f8d9f5636934142.s3tc.ctex", "res://.godot/imported/t38.png-9f393e0460fafe2d0f8d9f5636934142.etc2.ctex"]
 
 [params]
 

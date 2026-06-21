@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://b0mnns2r30xib"
 path.s3tc="res://.godot/imported/model_2.png-49e538be88cef646a164d9d28fb748e8.s3tc.ctex"
+path.etc2="res://.godot/imported/model_2.png-49e538be88cef646a164d9d28fb748e8.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://Models/tylized-poison-serpent-staff-game-ready/source/model_2.png"
-dest_files=["res://.godot/imported/model_2.png-49e538be88cef646a164d9d28fb748e8.s3tc.ctex"]
+dest_files=["res://.godot/imported/model_2.png-49e538be88cef646a164d9d28fb748e8.s3tc.ctex", "res://.godot/imported/model_2.png-49e538be88cef646a164d9d28fb748e8.etc2.ctex"]
 
 [params]
 
