@@ -532,17 +532,20 @@ func _physics_process(delta: float) -> void:
 		if Input.is_action_just_pressed("dash") and dashCdTimer <= 0:
 			animaPlayer.play("dash")
 			var input_dir := Input.get_vector("left", "right", "forward", "backward")
+			var camForw = -playerCam.global_transform.basis.z
+			var camRight = playerCam.global_transform.basis.x
+			var fullDir: Vector3
 			if input_dir.length() > 0.1:
-				dashDir = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+				fullDir = (camRight * input_dir.x - camForw * input_dir.y).normalized()
 			else:
-				dashDir = -transform.basis.z
+				fullDir = camForw.normalized()
+			dashDir = Vector3(fullDir.x,0,fullDir.z).normalized()
 			dashCdTimer = dashCooldown
-			var vericalNerf = 1
-			if velocity.y != 0 and !upDashed:
-					velocity.y = (Vector2(abs(velocity.x),abs(velocity.z)).length() / 2) * vericalNerf
+			if !upDashed:
+					velocity.y = fullDir.y * dashBoost
 					upDashed = true
-			velocity.x = dashDir.x * dashBoost
-			velocity.z = dashDir.z * dashBoost
+			velocity.x = fullDir.x * dashBoost
+			velocity.z = fullDir.z * dashBoost
 			#since the y velocity will always be much smaller we can use velocity x and z to determine how much jump we need
 			#and since we dont want spiderman here lets nerf it
 		if is_on_floor():

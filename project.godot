@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="the way to teal(just kill)"
-run/main_scene="uid://j8hvxp3rsema"
+run/main_scene="uid://671irfg6vdax"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 

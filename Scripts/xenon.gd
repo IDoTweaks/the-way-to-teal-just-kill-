@@ -21,6 +21,7 @@ var particleInstance
 @export var navAgent : NavigationAgent3D
 @export var damage = 20
 @export var accelaration = 10
+@export var lifeTime : float = 0.0
 var target
 var mode : String = "idle"
 var gotShot = false
@@ -81,6 +82,8 @@ func _shootAt(targetPos : Vector3):
 	if canAttack:
 		var myBullet = bullet.instantiate()
 		myBullet.dest = targetPos
+		if lifeTime != 0.0:
+			myBullet.lifeTime = lifeTime
 		get_parent().add_child(myBullet)
 		myBullet.global_position = bulletSpawn.global_position
 		canAttack = false

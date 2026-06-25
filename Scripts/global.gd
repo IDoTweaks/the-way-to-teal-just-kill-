@@ -29,7 +29,6 @@ func _localLoad():
 		maxScore = config.get_value("ghost", "maxScore", -1)
 		weaponSave = config.get_value("ghost", "weaponSave", weaponSave)
 
-
 func _localSave():
 	var config = ConfigFile.new()
 	config.set_value("player", "grades", grades)
