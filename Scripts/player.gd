@@ -5,6 +5,8 @@ const SENS = 0.005;
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
 const MAXCAMSHAKE = 0.03
+var shakeAmount : float = 0.0
+var shakeDecay : float = 8.0
 @export var health = 100
 var time = 0.0;
 var count = true
@@ -210,6 +212,7 @@ func _finishLevel():
 	levelEnd._setScore(finalScore)
 	levelEnd._setGrade(grade)
 	levelEnd.visible = true
+	Global._localSave()
 
 func _calcGrade(num, maxVal):
 	if maxVal <= 0:
@@ -339,12 +342,13 @@ func _shootAnim():
 			animaPlayer.stop()
 func _shoot():
 	if currentGun == 0:
+		_addShake(.01)
 		playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
 		if gunRay.is_colliding():
 			var target = gunRay.get_collider()
-			if target.has_method("_makeTarg"):
+			if target and target.has_method("_makeTarg"):
 				target._makeTarg(self)
-			if target.has_method("_damage"):
+			if target and target.has_method("_damage"):
 				target._damage(damage)
 			var hit_pos = gunRay.get_collision_point()
 			var hit_normal = gunRay.get_collision_normal()
@@ -355,6 +359,7 @@ func _shoot():
 			_draw_laser_line(gunParticleSpawn.global_position, end_point, 0.5)
 	elif currentGun == 1:
 		if !shotGunCd:
+			_addShake(.04)
 			playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
 			shotGunCd = true
 			shotGunCdTimer.start()
@@ -366,9 +371,9 @@ func _shoot():
 				particleInstance.emitting = true
 				if ray.is_colliding():
 					var target = ray.get_collider()
-					if target.has_method("_damage"):
+					if target and target.has_method("_damage"):
 						target._damage(shotGunDmg)
-					if target.has_method("_makeTarg"):
+					if target and target.has_method("_makeTarg"):
 						target._makeTarg(self)
 					var hit_pos = ray.get_collision_point()
 					var hit_normal = ray.get_collision_normal()
@@ -431,6 +436,10 @@ func _process(delta: float) -> void:
 		timer.text = str(int(time))
 	#call input functions
 	_shootAnim()
+	
+	if shakeAmount > 0:
+		playerCam.position += Vector3(randf_range(-shakeAmount,shakeAmount),randf_range(-shakeAmount,shakeAmount),0)
+		shakeAmount = move_toward(shakeAmount,0,shakeDecay * delta)
 	#NOTE-use only when unhandles input isnt good enough
 	
 func _unhandled_input(event: InputEvent) -> void:
@@ -639,12 +648,14 @@ func _updateHud():
 
 func _takeDamage(damage):
 	if count:
+		_addShake(.06)
 		health -= damage
 		_updateHud()
 		if health <= 0:
 			_die()
 
 func _spawnSlam():
+	_addShake(.08)
 	var slam = groundSlam.instantiate()
 	get_parent().add_child(slam)
 	slam.global_position = feet.global_position
@@ -659,6 +670,9 @@ func _spawnSlam():
 
 #func here so i can jump here fast
 func wallJump():pass
+
+func _addShake(amount : float):
+	shakeAmount = max(shakeAmount, amount)
 
 func _checkWall():
 	if is_on_floor():
