@@ -28,13 +28,11 @@ func _physics_process(delta: float) -> void:
 	velocity.x = dir.x * speed
 	var collision = move_and_collide(velocity * delta)
 	if collision:
+		var body = collision.get_collider()
+		if body.has_method("_takeDamage") and !body.has_method("_xenon"):
+			body._takeDamage(damage)
+			queue_free()
 		_bounce(collision)
  
 func _bounce(collision : KinematicCollision3D):
 	dir = dir.bounce(collision.get_normal())
-
-
-func _on_area_3d_body_entered(body: Node3D) -> void:
-	if body.has_method("_takeDamage") and !body.has_method("_xenon"):
-		body._takeDamage(damage)
-		queue_free()

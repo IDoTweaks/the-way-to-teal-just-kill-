@@ -638,10 +638,11 @@ func _updateHud():
 
 
 func _takeDamage(damage):
-	health -= damage
-	_updateHud()
-	if health <= 0:
-		_die()
+	if count:
+		health -= damage
+		_updateHud()
+		if health <= 0:
+			_die()
 
 func _spawnSlam():
 	var slam = groundSlam.instantiate()
