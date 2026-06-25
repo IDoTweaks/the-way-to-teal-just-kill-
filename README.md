@@ -18,6 +18,7 @@ itch.io:https://idotweaks.itch.io/the-way-to-tealjust-kill
 -  borderless/fullscreen
 - full windows support
 - full linux support
+- untested mac support
 - partial web support
 - not so advanced scoring and grading system
 - a ghost of your best run 
@@ -34,6 +35,11 @@ itch.io:https://idotweaks.itch.io/the-way-to-tealjust-kill
 - shift - dash (when in the air your dash also adds vertical movement that is determined by your horizontal velocity)
 - 1/2 - switch weapons
 - r - restart the current level
+
+## credits
+- models - sadly i dont remember who made each model but i can tell you they are from sketchfab(sorry about that)
+- ai - thank you for debugging + making shaders + scripts to generate decals
+- everything else - me(da goat)
 
 ## Gameplay
 
