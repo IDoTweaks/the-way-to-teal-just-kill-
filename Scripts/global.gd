@@ -102,7 +102,6 @@ func _ready() -> void:
 	levels.append(mainMenu)
 	levels.append(level1)
 	levels.append(level2)
-	levels.append(bossArena)
 	_localLoad()
 	_loadSettings()
 
