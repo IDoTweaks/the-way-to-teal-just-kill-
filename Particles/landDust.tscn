@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://dlanddust0001"]
+
+[ext_resource type="Script" uid="uid://bc6ahec3jfp1w" path="res://Scripts/shoot_particles.gd" id="1"]
+
+[sub_resource type="Gradient" id="Gradient_1"]
+offsets = PackedFloat32Array(0, 0.3, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.5, 0.95, 0.85, 1, 0.5, 0.95, 0.85, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_1"]
+gradient = SubResource("Gradient_1")
+
+[sub_resource type="Curve" id="Curve_1"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_1"]
+curve = SubResource("Curve_1")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+transparency = 1
+shading_mode = 0
+blend_mode = 1
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.5, 0.95, 0.85, 1)
+emission_enabled = true
+emission = Color(0.5, 0.95, 0.85, 1)
+emission_energy_multiplier = 3.5
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_1"]
+emission_shape = 1
+emission_sphere_radius = 0.3
+direction = Vector3(0, 0.3, 0)
+spread = 90.0
+flatness = 0.8
+initial_velocity_min = 2.0
+initial_velocity_max = 4.0
+radial_accel_min = 3.0
+radial_accel_max = 6.0
+gravity = Vector3(0, -4, 0)
+damping_min = 1.0
+damping_max = 3.0
+scale_min = 0.5
+scale_max = 1.1
+scale_curve = SubResource("CurveTexture_1")
+color_ramp = SubResource("GradientTexture1D_1")
+
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+size = Vector3(0.08, 0.08, 0.08)
+
+[node name="LandDust" type="GPUParticles3D"]
+material_override = SubResource("StandardMaterial3D_1")
+emitting = false
+amount = 26
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_1")
+draw_pass_1 = SubResource("BoxMesh_1")
+script = ExtResource("1")
+
+[connection signal="finished" from="." to="." method="_on_finished"]

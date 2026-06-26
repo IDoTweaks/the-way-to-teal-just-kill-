@@ -48,6 +48,9 @@ var dashDir: Vector3 = Vector3.ZERO
 @onready var dashParticles = preload("res://Particles/dashTrail.tscn")
 @onready var wallJumpParticles = preload("res://Particles/wallJumpBurst.tscn")
 @onready var hurtParticles = preload("res://Particles/playerHurt.tscn")
+@onready var jumpParticles = preload("res://Particles/jumpPuff.tscn")
+@onready var landParticles = preload("res://Particles/landDust.tscn")
+@onready var finishParticles = preload("res://Particles/finishBurst.tscn")
 @onready var groundSlam = preload("res://ObjectScenes/slamRIng.tscn")
 @onready var gunParticleSpawn = $playerCam/gun/particleSpawnGun
 @onready var rayContainer = $playerCam/rayContainer
@@ -237,11 +240,14 @@ func _die():
 	count = false
 	$GameOver.visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	Audio.play("lose")
 	
 	
 
 func _finishLevel():
 	count = false
+	Audio.play("win")
+	_spawnParticleAt(finishParticles, global_position)
 	var perfectTime = $"..".perfectTime
 	var earnedScore = maxScore - _calcMaxScore()
 	var finalScore = earnedScore
@@ -393,6 +399,7 @@ func _shoot():
 	if currentGun == 0:
 		_addShake(.01)
 		_addStyle("rifle", 5)
+		Audio.play("rifle", 1.0, -5.0)
 		playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
 		if gunRay.is_colliding():
 			var target = gunRay.get_collider()
@@ -412,6 +419,7 @@ func _shoot():
 		if !shotGunCd:
 			_addShake(.04)
 			_addStyle("shotgun", 11)
+			Audio.play("shotgun", 1.0, -2.0)
 			playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
 			shotGunCd = true
 			shotGunCdTimer.start()
@@ -558,6 +566,8 @@ func _physics_process(delta: float) -> void:
 	if is_on_floor():
 		if slamming == true:
 			_spawnSlam()
+		if airTime > 0.35:
+			_spawnParticleAt(landParticles, feet.global_position)
 		coyoteTimer = COYOTE_TIME
 		slamming = false
 		dashing = false
@@ -587,6 +597,7 @@ func _physics_process(delta: float) -> void:
 	
 		if Input.is_action_just_pressed("dash") and dashCdTimer <= 0:
 			_addStyle("dash", 9)
+			Audio.play("dash", 1.0, -3.0)
 			animaPlayer.play("dash")
 			_spawnParticleAt(dashParticles, global_position)
 			var input_dir := Input.get_vector("left", "right", "forward", "backward")
@@ -609,6 +620,7 @@ func _physics_process(delta: float) -> void:
 	if knockbackTimer <= 0:
 		if jumpBuffer > 0 and canWallJump and !is_on_floor() and wallJumpCd <= 0:
 			_addStyle("walljump", 13)
+			Audio.play("walljump", 1.0, -3.0)
 			_spawnParticleAt(wallJumpParticles, global_position)
 			var bounced = velocity.bounce(wallNormal)
 			velocity.x = bounced.x * .4 + wallNormal.x *WALL_JUMP_BOOST
@@ -622,6 +634,8 @@ func _physics_process(delta: float) -> void:
 			coyoteTimer = 0.0
 			jumpBuffer = 0.0
 			velocity.y = JUMP_VELOCITY
+			Audio.play("jump", 1.0, -7.0)
+			_spawnParticleAt(jumpParticles, feet.global_position)
 		
 	if not is_on_floor() and Input.is_action_just_released("jump") and velocity.y > 0:
 		velocity.y *= 0.45
@@ -634,6 +648,8 @@ func _physics_process(delta: float) -> void:
 			if Input.is_action_just_pressed("jump") and coyoteTimer > 0:
 				coyoteTimer = 0.0
 				velocity.y = JUMP_VELOCITY
+				Audio.play("jump", 1.0, -7.0)
+				_spawnParticleAt(jumpParticles, feet.global_position)
 
 			var input_dir := Input.get_vector("left", "right", "forward", "backward")
 			var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
@@ -697,6 +713,7 @@ func _physics_process(delta: float) -> void:
 			var side = (_footprint_pool.size() % 2) * 2 - 1
 			var perp = transform.basis.x * 0.15 * side
 			_spawn_footprint(feet.global_position + perp)
+			Audio.footstep()
 			_last_footprint_pos = global_position
 	if slamming:
 		velocity.y = -slamVeloc
@@ -712,6 +729,7 @@ func _takeDamage(damage):
 	if count:
 		_addShake(.06)
 		_spawnParticleAt(hurtParticles, global_position)
+		Audio.play("player_hurt")
 		health -= damage
 		_updateHud()
 		if health <= 0:
@@ -720,6 +738,7 @@ func _takeDamage(damage):
 func _spawnSlam():
 	_addShake(.08)
 	_addStyle("slam", 28)
+	Audio.play("slam", 1.0, 0.0)
 	var slam = groundSlam.instantiate()
 	get_parent().add_child(slam)
 	slam.global_position = feet.global_position

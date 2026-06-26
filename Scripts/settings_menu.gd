@@ -1,65 +1,72 @@
 extends Control
-
-# Shared settings menu used by BOTH the main menu and the in-game pause menu.
-# Self contained: applies volume / display / resolution itself and just yells
-# "closed" when you hit back so whoever opened it can hide it.
-
 signal closed
 
 @onready var volumeSlider : HSlider = $Center/Panel/Margin/VBox/VolumeSlider
+@onready var musicSlider : HSlider = $Center/Panel/Margin/VBox/MusicSlider
+@onready var sfxSlider : HSlider = $Center/Panel/Margin/VBox/SfxSlider
 @onready var displayOption : OptionButton = $Center/Panel/Margin/VBox/DisplayOption
 @onready var resOption : OptionButton = $Center/Panel/Margin/VBox/ResOption
 @onready var backBtn : Button = $Center/Panel/Margin/VBox/BackBtn
 
-const RESOLUTIONS : Array[Vector2i] = [
-	Vector2i(1920, 1080),
-	Vector2i(1600, 900),
-	Vector2i(1280, 720),
-	Vector2i(1152, 648),
-]
+const BUS_MASTER := 0
+const BUS_MUSIC := 1
+const BUS_SFX := 2
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	volumeSlider.min_value = 0.0
-	volumeSlider.max_value = 1.0
-	volumeSlider.step = 0.01
-	volumeSlider.value = db_to_linear(AudioServer.get_bus_volume_db(0))
+	for s in [volumeSlider, musicSlider, sfxSlider]:
+		s.min_value = 0.0
+		s.max_value = 1.0
+		s.step = 0.01
+	_syncVolumes()
 	volumeSlider.value_changed.connect(_on_volume_changed)
+	musicSlider.value_changed.connect(_on_music_changed)
+	sfxSlider.value_changed.connect(_on_sfx_changed)
 	displayOption.item_selected.connect(_on_display_selected)
 	resOption.item_selected.connect(_on_res_selected)
 	backBtn.pressed.connect(_on_back_pressed)
-	_syncResEnabled()
+	_syncDisplay()
 
 func open() -> void:
-	volumeSlider.value = db_to_linear(AudioServer.get_bus_volume_db(0))
-	_syncResEnabled()
+	_syncVolumes()
+	_syncDisplay()
 	show()
 
+func _syncVolumes() -> void:
+	volumeSlider.set_value_no_signal(Global.masterVol)
+	musicSlider.set_value_no_signal(Global.musicVol)
+	sfxSlider.set_value_no_signal(Global.sfxVol)
+
+func _syncDisplay() -> void:
+	displayOption.selected = clamp(Global.displayMode, 0, displayOption.item_count - 1)
+	resOption.selected = clamp(Global.resIndex, 0, resOption.item_count - 1)
+	_syncResEnabled()
+
 func _on_volume_changed(value : float) -> void:
-	AudioServer.set_bus_volume_db(0, linear_to_db(value))
-	AudioServer.set_bus_mute(0, value <= 0.001)
+	Global.masterVol = value
+	Global._applyVol(BUS_MASTER, value)
+	Global._saveSettings()
+
+func _on_music_changed(value : float) -> void:
+	Global.musicVol = value
+	Global._applyVol(BUS_MUSIC, value)
+	Global._saveSettings()
+
+func _on_sfx_changed(value : float) -> void:
+	Global.sfxVol = value
+	Global._applyVol(BUS_SFX, value)
+	Global._saveSettings()
 
 func _on_display_selected(index : int) -> void:
-	match index:
-		0:
-			DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
-			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-		1:
-			DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
-			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-		2:
-			DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
-			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
+	Global.displayMode = index
+	Global._applyDisplay()
+	Global._saveSettings()
 	_syncResEnabled()
 
 func _on_res_selected(index : int) -> void:
-	if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
-		return
-	if index >= 0 and index < RESOLUTIONS.size():
-		var size = RESOLUTIONS[index]
-		DisplayServer.window_set_size(size)
-		var screen = DisplayServer.screen_get_size()
-		DisplayServer.window_set_position((screen - size) / 2)
+	Global.resIndex = index
+	Global._applyDisplay()
+	Global._saveSettings()
 
 func _syncResEnabled() -> void:
 	resOption.disabled = DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED

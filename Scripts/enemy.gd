@@ -13,13 +13,15 @@ func _ready() -> void:
 
 func _damage(dmg):
 	health -= dmg
+	Audio.play("enemy_hit", 1.0, -4.0)
 	if health >= 0:
 		body._updateMat(health / 100)
 	else:
 		_die()
-		
+
 func _die():
 	body._updateMat(0)
+	Audio.play("enemy_death")
 	particleInstance = explosionParticles.instantiate()
 	particleInstance.position = global_position
 	get_parent().add_child(particleInstance)

@@ -1,8 +1,5 @@
 extends CanvasLayer
 
-# Self contained pause menu. Lives in the gameplay levels, freezes the whole
-# tree when open, and shares the settings menu with the main menu.
-
 var isPaused : bool = false
 
 @onready var root : Control = $Root
@@ -10,7 +7,6 @@ var isPaused : bool = false
 @onready var settings = $Root/SettingsMenu
 
 func _ready() -> void:
-	# the only node allowed to keep running while everything else is frozen
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	root.visible = false
 	settings.visible = false

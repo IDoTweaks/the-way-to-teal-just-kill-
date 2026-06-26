@@ -1,31 +1,31 @@
-[gd_resource type="Theme" load_steps=4 format=3 uid="uid://bfunkytheme01"]
+[gd_resource type="Theme" format=3 uid="uid://bfunkytheme01"]
+
+[sub_resource type="StyleBoxFlat" id="hover"]
+content_margin_left = 42.0
+content_margin_top = 13.0
+content_margin_right = 20.0
+content_margin_bottom = 13.0
+bg_color = Color(0.1, 0.8, 0.78, 1)
+border_width_left = 8
+border_color = Color(0.12, 1, 0.55, 1)
 
 [sub_resource type="StyleBoxFlat" id="normal"]
-bg_color = Color(0.04, 0.1, 0.12, 0.92)
-border_width_left = 8
-border_color = Color(0.1, 0.78, 0.88, 1)
 content_margin_left = 28.0
 content_margin_top = 13.0
 content_margin_right = 20.0
 content_margin_bottom = 13.0
-
-[sub_resource type="StyleBoxFlat" id="hover"]
-bg_color = Color(0.1, 0.8, 0.78, 1)
+bg_color = Color(0.04, 0.1, 0.12, 0.92)
 border_width_left = 8
-border_color = Color(0.12, 1, 0.55, 1)
+border_color = Color(0.1, 0.78, 0.88, 1)
+
+[sub_resource type="StyleBoxFlat" id="pressed"]
 content_margin_left = 42.0
 content_margin_top = 13.0
 content_margin_right = 20.0
 content_margin_bottom = 13.0
-
-[sub_resource type="StyleBoxFlat" id="pressed"]
 bg_color = Color(0.12, 1, 0.6, 1)
 border_width_left = 8
 border_color = Color(0.9, 1, 0.98, 1)
-content_margin_left = 42.0
-content_margin_top = 13.0
-content_margin_right = 20.0
-content_margin_bottom = 13.0
 
 [resource]
 Button/colors/font_color = Color(0.82, 0.97, 1, 1)

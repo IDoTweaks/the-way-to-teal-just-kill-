@@ -16,6 +16,63 @@ var ghostScore : Dictionary = {}
 var grades : Array[int] = []
 var times : Array = []
 
+var masterVol := 1.0
+var musicVol := 1.0
+var sfxVol := 1.0
+var displayMode := 1
+var resIndex := 0
+
+const SETTINGS_RES : Array[Vector2i] = [
+	Vector2i(1920, 1080),
+	Vector2i(1600, 900),
+	Vector2i(1280, 720),
+	Vector2i(1152, 648),
+]
+
+func _loadSettings():
+	var config = ConfigFile.new()
+	if config.load("user://settings.cfg") == OK:
+		masterVol = config.get_value("audio", "master", masterVol)
+		musicVol = config.get_value("audio", "music", musicVol)
+		sfxVol = config.get_value("audio", "sfx", sfxVol)
+		displayMode = config.get_value("display", "mode", displayMode)
+		resIndex = config.get_value("display", "res", resIndex)
+	_applySettings()
+
+func _saveSettings():
+	var config = ConfigFile.new()
+	config.set_value("audio", "master", masterVol)
+	config.set_value("audio", "music", musicVol)
+	config.set_value("audio", "sfx", sfxVol)
+	config.set_value("display", "mode", displayMode)
+	config.set_value("display", "res", resIndex)
+	config.save("user://settings.cfg")
+
+func _applySettings():
+	_applyVol(0, masterVol)
+	_applyVol(1, musicVol)
+	_applyVol(2, sfxVol)
+	_applyDisplay()
+
+func _applyVol(bus : int, value : float):
+	AudioServer.set_bus_volume_db(bus, linear_to_db(max(value, 0.0001)))
+	AudioServer.set_bus_mute(bus, value <= 0.001)
+
+func _applyDisplay():
+	match displayMode:
+		0:
+			DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+			var sz = SETTINGS_RES[clamp(resIndex, 0, SETTINGS_RES.size() - 1)]
+			DisplayServer.window_set_size(sz)
+			DisplayServer.window_set_position((DisplayServer.screen_get_size() - sz) / 2)
+		1:
+			DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		2:
+			DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
+
 func _localLoad():
 	var config = ConfigFile.new()
 	var err = config.load("user://save.cfg")
@@ -47,6 +104,7 @@ func _ready() -> void:
 	levels.append(level2)
 	levels.append(bossArena)
 	_localLoad()
+	_loadSettings()
 
 func _addRun(score, time):
 	grades.append(score)
@@ -69,6 +127,7 @@ func _hasNextLevel(level):
 
 func _goToLevel(idx):
 	currentLevel = idx
+	Audio.music_for_level(idx)
 	get_tree().change_scene_to_packed(levels[idx])
 
 func _process(delta: float) -> void:

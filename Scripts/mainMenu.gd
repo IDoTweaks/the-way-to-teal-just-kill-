@@ -7,9 +7,7 @@ var settingsOpen:bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS,true)
-	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-	# the shared settings menu yells "closed" when you hit BACK
+	Audio.music_for_level(0)
 	settingsCont.closed.connect(_on_settings_closed)
 
 

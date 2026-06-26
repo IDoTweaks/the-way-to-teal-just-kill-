@@ -16,6 +16,7 @@ const JUMP_VELOCITY = 4.5
 @export_flags_3d_physics var wallLayer : int
 @onready var bullet = preload("res://ObjectScenes/greenBullet.tscn")
 @onready var explosionParticles = preload("res://Particles/enemyExplode.tscn")
+@onready var muzzleParticles = preload("res://Particles/enemyMuzzle.tscn")
 @onready var bulletSpawn =$body/wand/bulletSpawn
 var particleInstance
 @export var navAgent : NavigationAgent3D
@@ -40,18 +41,20 @@ func _takeDamage(dmg):
 	_damage(dmg)
 func _damage(dmg):
 	health -= dmg
+	Audio.play("enemy_hit", 1.0, -4.0)
 	if !textActive:
 		_spawnDmgTxt(dmg)
-		
+
 	else:
 		_updateDmgTxt(dmg)
 	if health >= 0:
 		body._updateMat(health / 50.0)
 	else:
 		_die()
-		
+
 func _die():
 	body._updateMat(0)
+	Audio.play("enemy_death")
 	particleInstance = explosionParticles.instantiate()
 	particleInstance.position = global_position
 	get_parent().add_child(particleInstance)
@@ -87,6 +90,10 @@ func _shootAt(targetPos : Vector3):
 			myBullet.lifeTime = lifeTime
 		get_parent().add_child(myBullet)
 		myBullet.global_position = bulletSpawn.global_position
+		var muzzle = muzzleParticles.instantiate()
+		get_parent().add_child(muzzle)
+		muzzle.global_position = bulletSpawn.global_position
+		muzzle.emitting = true
 		canAttack = false
 		attackTimer.start()
  

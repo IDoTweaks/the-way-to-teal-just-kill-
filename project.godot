@@ -18,6 +18,11 @@ config/icon="res://icon.svg"
 [autoload]
 
 Global="*uid://t2dgc0yarvoq"
+Audio="*res://Scripts/audio_manager.gd"
+
+[audio]
+
+buses/default_bus_layout="res://default_bus_layout.tres"
 
 [display]
 
