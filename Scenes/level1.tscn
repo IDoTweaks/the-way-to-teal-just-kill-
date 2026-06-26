@@ -222,16 +222,16 @@ transform = Transform3D(0.12933208, 0, -0.99160135, 0, 1, 0, 0.99160135, 0, 0.12
 shotGunDmg = 7.5
 
 [node name="Enemy" parent="." unique_id=1301325712 instance=ExtResource("3_c5erv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.849379, 5.382955, -1.5715952)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1, 0.5)
 
 [node name="Enemy2" parent="." unique_id=1885862654 instance=ExtResource("3_c5erv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.698757, 10.76591, -3.635006)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 1, 0.5)
 
 [node name="Enemy3" parent="." unique_id=1898540928 instance=ExtResource("3_c5erv")]
-transform = Transform3D(-0.9659258, 0, 0.25881913, 0, 1, 0, -0.25881913, 0, -0.9659258, 21.698757, 10.76591, 12.85681)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 10.76591, 8)
 
 [node name="Enemy4" parent="." unique_id=992362596 instance=ExtResource("3_c5erv")]
-transform = Transform3D(-0.9659258, 0, -0.25881898, 0, 1, 0, 0.25881898, 0, -0.9659258, 22.698757, 10.76591, 12.85681)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.5, 10.76591, 11.5)
 
 [node name="Enemy5" parent="." unique_id=1859495613 node_paths=PackedStringArray("player") instance=ExtResource("11_rqhku")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.38661, 11.332772, -5.20191)
@@ -239,7 +239,7 @@ player = NodePath("../Player")
 wallLayer = 16
 
 [node name="Enemy6" parent="." unique_id=145985188 node_paths=PackedStringArray("player") instance=ExtResource("11_rqhku")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.38661, 11.332772, 10.221958)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.85, 5.38, 0.5)
 player = NodePath("../Player")
 wallLayer = 16
 

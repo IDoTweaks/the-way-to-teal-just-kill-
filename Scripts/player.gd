@@ -244,18 +244,20 @@ func _finishLevel():
 		var penaltyPercent = maxPenalty * (1.0 - exp(-overTime / tau))
 		finalScore -= int(finalScore * penaltyPercent)
 	finalScore = clamp(finalScore, 0, maxScore)
+	var scorePercent = float(finalScore) / maxScore if maxScore > 0 else 0.0
 	var avgStyle = styleTimeAccum / max(time, 1.0)
-	var styleMultiplier = 1.0 + (avgStyle / 100.0) * 0.5
-	finalScore = int(finalScore * styleMultiplier)
-	var grade = _calcGrade(finalScore, maxScore)
-	if finalScore > Global.maxScore:
+	var stylePercent = clamp(avgStyle / 100.0, 0.0, 1.0)
+	var gradeRating = scorePercent * 0.7 + stylePercent * 0.3
+	var grade = _calcGrade(gradeRating * 100.0, 100.0)
+	var displayScore = int(finalScore * (1.0 + stylePercent * 0.5))
+	if displayScore > Global.maxScore:
 		Global.positionSave = positionSaves.duplicate()
 		Global.rotationSave = rotationSaves.duplicate()
 		Global.camPositionSave = camPositionSaves.duplicate()
 		Global.camRotationSave = camRotationSaves.duplicate()
-		Global.maxScore = finalScore
+		Global.maxScore = displayScore
 		Global.weaponSave = weaponSaves.duplicate()
-	levelEnd._setScore(finalScore)
+	levelEnd._setScore(displayScore)
 	levelEnd._setGrade(grade)
 	levelEnd.visible = true
 	Global._localSave()
