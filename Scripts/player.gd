@@ -207,6 +207,7 @@ var shotGunCd = false
 #1 - shotgun
 
 var slamming = false
+var slamStartHeight : float = 0.0
 
 func _switchGuns():
 	if Input.is_action_just_pressed("gun1"):
@@ -579,6 +580,7 @@ func _physics_process(delta: float) -> void:
 					velocity.z += currentDir.z * 6
 			elif slamming == false:
 				slamming = true
+				slamStartHeight = global_position.y
 		wasSliding = slide
 		if !slide:
 			if animaPlayer.current_animation == "inSlide":
@@ -721,14 +723,8 @@ func _spawnSlam():
 	var slam = groundSlam.instantiate()
 	get_parent().add_child(slam)
 	slam.global_position = feet.global_position
-	if airTime >= 1.0:
-		pass
-	elif airTime >= 0.75:
-		slam.damage -= (slam.damage / 100.0) * 25
-	elif airTime >= 0.5:
-		slam.damage -= (slam.damage / 100.0) * 50
-	else:
-		slam.damage = 1
+	var fallHeight = slamStartHeight - global_position.y
+	slam.damage = clamp(fallHeight * 3.0, 1.0, 60.0)
 
 #func here so i can jump here fast
 func wallJump():pass
