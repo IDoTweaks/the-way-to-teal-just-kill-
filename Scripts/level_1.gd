@@ -1,13 +1,12 @@
 extends Node3D
+@export var levelIndex : int = 1
 var perfectTime = 10.0
-var reload = preload("res://Scenes/level1.tscn")
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	Global.currentLevel = levelIndex
 
 func _reload():
-	get_tree().change_scene_to_packed(reload)
+	Global._goToLevel(Global.currentLevel)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("restart"):

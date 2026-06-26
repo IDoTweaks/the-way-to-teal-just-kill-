@@ -29,6 +29,10 @@ window/subwindows/embed_subwindows=false
 
 enabled=PackedStringArray("res://addons/fgi/plugin.cfg", "res://addons/godot_super-wakatime/plugin.cfg")
 
+[gui]
+
+theme/custom_font="res://Fonts/Orbitron.tres"
+
 [input]
 
 forward={
@@ -100,10 +104,6 @@ restart={
 [physics]
 
 3d/physics_engine="Jolt Physics"
-
-[gui]
-
-theme/custom_font="res://Fonts/Orbitron.tres"
 
 [rendering]
 

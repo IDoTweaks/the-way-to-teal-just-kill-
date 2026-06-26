@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://320gg8k78oqf"]
+[gd_scene format=3 uid="uid://dq8n2k4xshgb1"]
 
 [ext_resource type="Script" uid="uid://bc6ahec3jfp1w" path="res://Scripts/shoot_particles.gd" id="1"]
 
@@ -25,25 +25,26 @@ curve = SubResource("Curve_1")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_1"]
 emission_shape = 1
-emission_sphere_radius = 0.05
-spread = 120.0
-initial_velocity_min = 1.5
-initial_velocity_max = 3.5
-gravity = Vector3(0, -1, 0)
+emission_sphere_radius = 0.1
+spread = 180.0
+initial_velocity_min = 2.5
+initial_velocity_max = 5.5
+gravity = Vector3(0, -2, 0)
 damping_min = 1.0
-damping_max = 2.0
-scale_min = 0.5
+damping_max = 3.0
+scale_min = 0.6
+scale_max = 1.2
 scale_curve = SubResource("CurveTexture_1")
 color_ramp = SubResource("GradientTexture1D_1")
 
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
-size = Vector3(0.06, 0.06, 0.06)
+size = Vector3(0.07, 0.07, 0.07)
 
-[node name="ShootParticles" type="GPUParticles3D" unique_id=190235784]
+[node name="ShotgunBlast" type="GPUParticles3D" unique_id=1664134817]
 material_override = SubResource("StandardMaterial3D_1")
 emitting = false
-amount = 14
-lifetime = 0.35
+amount = 30
+lifetime = 0.4
 one_shot = true
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_1")

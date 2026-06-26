@@ -33,6 +33,7 @@ func _makeTarg(targ):
 	gotShot = true
 	target = targ
 func _ready() -> void:
+	add_to_group("enemies")
 	body._updateMat(1)
 	await get_tree().physics_frame
 func _takeDamage(dmg):

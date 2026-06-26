@@ -3,7 +3,9 @@ var score = 0;
 var targScore = 0
 var upEach :float = 0
 var gradeFill : float = 0.0
+var currentLevel = 1
 @onready var scoreShow = $UI/MainContainer/ScoreShow
+@onready var nextBtn = $UI/MainContainer/MenuButtons/nextBtn
 @onready var gradeShow = $UI/MainContainer/gradeShow
 @onready var gradeFire = $UI/MainContainer/GradeFire
 @onready var ui = $UI
@@ -18,6 +20,13 @@ func _setGrade(newGrade: String):
 	gradeShow.text = newGrade
 	gradeShow.modulate = _gradeColor(newGrade)
 	gradeFill = _gradeFill(newGrade)
+
+func _setLevel(lvl):
+	currentLevel = lvl
+	if Global._hasNextLevel(lvl):
+		nextBtn.text = "NEXT LEVEL"
+	else:
+		nextBtn.text = "MENU"
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -77,4 +86,11 @@ func _on_quit_btn_button_down() -> void:
 
 
 func _on_retry_button_down() -> void:
-	get_tree().change_scene_to_packed(Global.levels[1])
+	Global._goToLevel(currentLevel)
+
+
+func _on_next_button_down() -> void:
+	if Global._hasNextLevel(currentLevel):
+		Global._goToLevel(currentLevel + 1)
+	else:
+		Global._goToLevel(0)

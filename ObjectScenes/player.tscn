@@ -909,6 +909,19 @@ text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="enemyCounter" type="Label" parent="HUD" unique_id=771400001]
+material = ExtResource("12_funky")
+offset_left = 32.0
+offset_top = 26.0
+offset_right = 460.0
+offset_bottom = 92.0
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.0, 0.0, 1)
+theme_override_constants/outline_size = 7
+theme_override_font_sizes/font_size = 44
+text = "ENEMIES 0"
+vertical_alignment = 1
+
 [node name="healthBar" type="ColorRect" parent="HUD" unique_id=1281401555]
 material = SubResource("ShaderMaterial_hp")
 offset_left = 40.0

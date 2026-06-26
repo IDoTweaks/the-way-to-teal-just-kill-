@@ -42,6 +42,12 @@ var dashDir: Vector3 = Vector3.ZERO
 @onready var animaPlayer = $AnimationPlayer
 @onready var gunRay = $playerCam/RayCast3D
 @onready var shootingParticles =preload("res://Particles/shootParticles.tscn")
+@onready var shotgunBlast = preload("res://Particles/shotgunBlast.tscn")
+@onready var bulletImpactParticles = preload("res://Particles/bulletImpact.tscn")
+@onready var slamParticles = preload("res://Particles/slamImpact.tscn")
+@onready var dashParticles = preload("res://Particles/dashTrail.tscn")
+@onready var wallJumpParticles = preload("res://Particles/wallJumpBurst.tscn")
+@onready var hurtParticles = preload("res://Particles/playerHurt.tscn")
 @onready var groundSlam = preload("res://ObjectScenes/slamRIng.tscn")
 @onready var gunParticleSpawn = $playerCam/gun/particleSpawnGun
 @onready var rayContainer = $playerCam/rayContainer
@@ -52,6 +58,7 @@ var dashDir: Vector3 = Vector3.ZERO
 @onready var finishOrb = $"../FinishOrb"
 @onready var levelEnd = $levelEnd
 @onready var timer :Label = $HUD/timer
+@onready var enemyCounter :Label = $HUD/enemyCounter
 @onready var slamFrom = $body/slamFrom
 var particleInstance
 
@@ -251,17 +258,13 @@ func _finishLevel():
 	var gradeRating = scorePercent * 0.7 + stylePercent * 0.3
 	var grade = _calcGrade(gradeRating * 100.0, 100.0)
 	var displayScore = int(finalScore * (1.0 + stylePercent * 0.5))
-	if displayScore > Global.maxScore:
-		Global.positionSave = positionSaves.duplicate()
-		Global.rotationSave = rotationSaves.duplicate()
-		Global.camPositionSave = camPositionSaves.duplicate()
-		Global.camRotationSave = camRotationSaves.duplicate()
-		Global.maxScore = displayScore
-		Global.weaponSave = weaponSaves.duplicate()
+	var lvl = Global.currentLevel
+	if displayScore > Global._ghostScore(lvl):
+		Global._saveGhost(lvl, positionSaves.duplicate(), rotationSaves.duplicate(), camPositionSaves.duplicate(), camRotationSaves.duplicate(), weaponSaves.duplicate(), displayScore)
 	levelEnd._setScore(displayScore)
 	levelEnd._setGrade(grade)
+	levelEnd._setLevel(lvl)
 	levelEnd.visible = true
-	Global._localSave()
 
 func _calcGrade(num, maxVal):
 	if maxVal <= 0:
@@ -381,10 +384,7 @@ func _shootAnim():
 				shotGun.visible = true
 				gun.visible = false
 				animaPlayer.play("shotGunShoot")
-				particleInstance = shootingParticles.instantiate()
-				particleInstance.position = gunParticleSpawn.global_position
-				get_parent().add_child(particleInstance)
-				particleInstance.emitting = true
+				_spawnParticleAt(shotgunBlast, gunParticleSpawn.global_position)
 	else:
 		playerCam.position = Vector3();
 		if animaPlayer.current_animation == "shootingAnim":
@@ -403,6 +403,7 @@ func _shoot():
 			var hit_pos = gunRay.get_collision_point()
 			var hit_normal = gunRay.get_collision_normal()
 			_spawn_bullet_hole(hit_pos, hit_normal)
+			_spawnParticleAt(bulletImpactParticles, hit_pos + hit_normal * 0.05)
 			_draw_laser_line(gunParticleSpawn.global_position, gunRay.get_collision_point(), 0.25)
 		else:
 			var end_point = gunRay.to_global(gunRay.target_position)
@@ -416,10 +417,6 @@ func _shoot():
 			shotGunCdTimer.start()
 			rayContainer.randomizeRays()
 			for ray in rayContainer.get_children():
-				particleInstance = shootingParticles.instantiate()
-				particleInstance.position = gunParticleSpawn.global_position
-				get_parent().add_child(particleInstance)
-				particleInstance.emitting = true
 				if ray.is_colliding():
 					var target = ray.get_collider()
 					if target and target.has_method("_damage"):
@@ -429,6 +426,7 @@ func _shoot():
 					var hit_pos = ray.get_collision_point()
 					var hit_normal = ray.get_collision_normal()
 					_spawn_bullet_hole(hit_pos, hit_normal)
+					_spawnParticleAt(bulletImpactParticles, hit_pos + hit_normal * 0.05)
 					_draw_laser_line(gunParticleSpawn.global_position, ray.get_collision_point(), 0.25)
 				else:
 					var end_point = ray.to_global(ray.target_position)
@@ -488,6 +486,7 @@ func _process(delta: float) -> void:
 		timer.text = str(int(time))
 		styleMeter = clamp(styleMeter - styleDecay * delta, 0.0, 100.0)
 		styleTimeAccum += styleMeter * delta
+	enemyCounter.text = "ENEMIES %d" % get_tree().get_nodes_in_group("enemies").size()
 	_updateStyleHud()
 	#call input functions
 	_shootAnim()
@@ -589,6 +588,7 @@ func _physics_process(delta: float) -> void:
 		if Input.is_action_just_pressed("dash") and dashCdTimer <= 0:
 			_addStyle("dash", 9)
 			animaPlayer.play("dash")
+			_spawnParticleAt(dashParticles, global_position)
 			var input_dir := Input.get_vector("left", "right", "forward", "backward")
 			var camForw = -playerCam.global_transform.basis.z
 			var camRight = playerCam.global_transform.basis.x
@@ -599,18 +599,17 @@ func _physics_process(delta: float) -> void:
 				fullDir = camForw.normalized()
 			dashDir = Vector3(fullDir.x,0,fullDir.z).normalized()
 			dashCdTimer = dashCooldown
-			if !upDashed:
-					velocity.y = fullDir.y * dashBoost
-					upDashed = true
+			if velocity.y < 0:
+				velocity.y = 0
+			velocity.y += fullDir.y * dashBoost
 			velocity.x = fullDir.x * dashBoost
 			velocity.z = fullDir.z * dashBoost
-			#since the y velocity will always be much smaller we can use velocity x and z to determine how much jump we need
-			#and since we dont want spiderman here lets nerf it
 		if is_on_floor():
 			velocity += get_gravity()* delta;
 	if knockbackTimer <= 0:
 		if jumpBuffer > 0 and canWallJump and !is_on_floor() and wallJumpCd <= 0:
 			_addStyle("walljump", 13)
+			_spawnParticleAt(wallJumpParticles, global_position)
 			var bounced = velocity.bounce(wallNormal)
 			velocity.x = bounced.x * .4 + wallNormal.x *WALL_JUMP_BOOST
 			velocity.z = bounced.z * .4 + wallNormal.z *WALL_JUMP_BOOST
@@ -712,6 +711,7 @@ func _updateHud():
 func _takeDamage(damage):
 	if count:
 		_addShake(.06)
+		_spawnParticleAt(hurtParticles, global_position)
 		health -= damage
 		_updateHud()
 		if health <= 0:
@@ -723,6 +723,7 @@ func _spawnSlam():
 	var slam = groundSlam.instantiate()
 	get_parent().add_child(slam)
 	slam.global_position = feet.global_position
+	_spawnParticleAt(slamParticles, feet.global_position)
 	var fallHeight = slamStartHeight - global_position.y
 	slam.damage = clamp(fallHeight * 3.0, 1.0, 60.0)
 
@@ -731,6 +732,12 @@ func wallJump():pass
 
 func _addShake(amount : float):
 	shakeAmount = max(shakeAmount, amount)
+
+func _spawnParticleAt(scene, pos : Vector3):
+	var p = scene.instantiate()
+	get_parent().add_child(p)
+	p.global_position = pos
+	p.emitting = true
 
 func _checkWall():
 	if is_on_floor():

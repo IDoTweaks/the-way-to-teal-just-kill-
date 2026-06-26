@@ -210,15 +210,23 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -280.0
+offset_left = -380.0
 offset_top = -160.0
-offset_right = 280.0
+offset_right = 380.0
 offset_bottom = -80.0
 grow_horizontal = 2
 grow_vertical = 0
 theme = SubResource("Theme_1")
-theme_override_constants/separation = 40
+theme_override_constants/separation = 28
 alignment = 1
+
+[node name="nextBtn" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=771500001]
+custom_minimum_size = Vector2(210, 64)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 1, 0.55, 1)
+theme_override_colors/font_hover_color = Color(0.5, 1, 0.8, 1)
+theme_override_font_sizes/font_size = 28
+text = "NEXT LEVEL"
 
 [node name="retry" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=1785955525]
 custom_minimum_size = Vector2(210, 64)
@@ -236,5 +244,6 @@ theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 28
 text = "QUIT"
 
+[connection signal="button_down" from="UI/MainContainer/MenuButtons/nextBtn" to="." method="_on_next_button_down"]
 [connection signal="button_down" from="UI/MainContainer/MenuButtons/retry" to="." method="_on_retry_button_down"]
 [connection signal="button_down" from="UI/MainContainer/MenuButtons/QuitBtn" to="." method="_on_quit_btn_button_down"]

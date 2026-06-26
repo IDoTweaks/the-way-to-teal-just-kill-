@@ -5,11 +5,11 @@ const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
 @onready var cam = $playerCam
 
-var postions = Global.positionSave
-var rotations = Global.rotationSave
-var camPositions = Global.camPositionSave
-var camRotations = Global.camRotationSave
-var weapons = Global.weaponSave
+var postions = []
+var rotations = []
+var camPositions = []
+var camRotations = []
+var weapons = []
 var i :int = 0
 var max = 0
 
@@ -17,6 +17,15 @@ var max = 0
 @onready var shotGun = $playerCam/shotGun
 
 func _ready() -> void:
+	var lvl = Global.currentLevel
+	var root = get_parent()
+	if "levelIndex" in root:
+		lvl = root.levelIndex
+	postions = Global.ghostPos.get(lvl, [])
+	rotations = Global.ghostRot.get(lvl, [])
+	camPositions = Global.ghostCamPos.get(lvl, [])
+	camRotations = Global.ghostCamRot.get(lvl, [])
+	weapons = Global.ghostWeapon.get(lvl, [])
 	max = postions.size()
 
 func _physics_process(delta: float) -> void:
@@ -33,6 +42,5 @@ func _physics_process(delta: float) -> void:
 			gun.visible = false
 			shotGun.visible = true
 		i+=1
-		print("moved")
 	else:
 		visible =false

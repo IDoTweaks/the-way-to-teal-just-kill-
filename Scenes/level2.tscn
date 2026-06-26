@@ -36,6 +36,7 @@ fog_density = 0.005
 
 [node name="MainScene" type="Node3D" unique_id=59475580]
 script = ExtResource("1_mmf1u")
+levelIndex = 2
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1544043293]
 
@@ -140,6 +141,43 @@ size = Vector3(7, 1, 4)
 [node name="CSGBakedCollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1919892820]
 shape = SubResource("ConcavePolygonShape3D_vn2uo")
 
+[node name="arena2" type="CSGCombiner3D" parent="." unique_id=771300001]
+layers = 16
+material_override = SubResource("StandardMaterial3D_ng020")
+use_collision = true
+
+[node name="T2a" type="CSGBox3D" parent="arena2" unique_id=771300002]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, 3, -6)
+size = Vector3(14, 1, 14)
+
+[node name="T2b" type="CSGBox3D" parent="arena2" unique_id=771300003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 5, 6)
+size = Vector3(14, 1, 14)
+
+[node name="T2c" type="CSGBox3D" parent="arena2" unique_id=771300004]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 6, -4)
+size = Vector3(14, 1, 14)
+
+[node name="T2d" type="CSGBox3D" parent="arena2" unique_id=771300005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 7, 8)
+size = Vector3(12, 1, 12)
+
+[node name="T3a" type="CSGBox3D" parent="arena2" unique_id=771300006]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 10, -6)
+size = Vector3(12, 1, 12)
+
+[node name="T3b" type="CSGBox3D" parent="arena2" unique_id=771300007]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 11, 6)
+size = Vector3(12, 1, 12)
+
+[node name="T3c" type="CSGBox3D" parent="arena2" unique_id=771300008]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, 12, -4)
+size = Vector3(12, 1, 12)
+
+[node name="T3finish" type="CSGBox3D" parent="arena2" unique_id=771300009]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62, 13, 4)
+size = Vector3(16, 1, 16)
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1742044166]
 environment = SubResource("Environment_52fb6")
 
@@ -152,13 +190,14 @@ dashBoost = 22.0
 shotGunDmg = 7.5
 
 [node name="NavigationCalculation" parent="." unique_id=1289349344 node_paths=PackedStringArray("navObjects") instance=ExtResource("8_051s1")]
-navObjects = [NodePath("Enemy"), NodePath("Enemy2"), NodePath("Enemy3"), NodePath("Enemy4"), NodePath("Enemy5"), NodePath("Enemy6")]
+navObjects = [NodePath("Enemy"), NodePath("Enemy2"), NodePath("Enemy3"), NodePath("Enemy4"), NodePath("Enemy5"), NodePath("Enemy6"), NodePath("Enemy7"), NodePath("Enemy8"), NodePath("Enemy9"), NodePath("Enemy10"), NodePath("Enemy11")]
 
 [node name="Enemy" parent="NavigationCalculation" unique_id=1301325712 node_paths=PackedStringArray("player") instance=ExtResource("7_5flq6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 1, 14)
 sightDist = 50.0
 player = NodePath("../../Player")
 wallLayer = 16
+damage = 5
 lifeTime = 25.0
 
 [node name="Enemy2" parent="NavigationCalculation" unique_id=1851672345 node_paths=PackedStringArray("player") instance=ExtResource("7_5flq6")]
@@ -166,6 +205,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 1, -22)
 sightDist = 50.0
 player = NodePath("../../Player")
 wallLayer = 16
+damage = 5
 lifeTime = 25.0
 
 [node name="Enemy3" parent="NavigationCalculation" unique_id=2016514520 node_paths=PackedStringArray("player") instance=ExtResource("7_5flq6")]
@@ -173,6 +213,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 1, 14)
 sightDist = 50.0
 player = NodePath("../../Player")
 wallLayer = 16
+damage = 5
 lifeTime = 25.0
 
 [node name="Enemy4" parent="NavigationCalculation" unique_id=748689091 node_paths=PackedStringArray("player") instance=ExtResource("7_5flq6")]
@@ -180,6 +221,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 1, -22)
 sightDist = 50.0
 player = NodePath("../../Player")
 wallLayer = 16
+damage = 5
 lifeTime = 25.0
 
 [node name="Enemy5" parent="NavigationCalculation" unique_id=1771644260 node_paths=PackedStringArray("player") instance=ExtResource("7_5flq6")]
@@ -187,6 +229,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51, 1, 14)
 sightDist = 50.0
 player = NodePath("../../Player")
 wallLayer = 16
+damage = 5
 lifeTime = 25.0
 
 [node name="Enemy6" parent="NavigationCalculation" unique_id=1091420330 node_paths=PackedStringArray("player") instance=ExtResource("7_5flq6")]
@@ -194,10 +237,51 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 1, -22)
 sightDist = 50.0
 player = NodePath("../../Player")
 wallLayer = 16
+damage = 5
+lifeTime = 25.0
+
+[node name="Enemy7" parent="NavigationCalculation" unique_id=771300020 node_paths=PackedStringArray("player") instance=ExtResource("7_5flq6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 6, 6)
+sightDist = 50.0
+player = NodePath("../../Player")
+wallLayer = 16
+damage = 5
+lifeTime = 25.0
+
+[node name="Enemy8" parent="NavigationCalculation" unique_id=771300021 node_paths=PackedStringArray("player") instance=ExtResource("7_5flq6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 8, 8)
+sightDist = 50.0
+player = NodePath("../../Player")
+wallLayer = 16
+damage = 5
+lifeTime = 25.0
+
+[node name="Enemy9" parent="NavigationCalculation" unique_id=771300022 node_paths=PackedStringArray("player") instance=ExtResource("7_5flq6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 11, -6)
+sightDist = 50.0
+player = NodePath("../../Player")
+wallLayer = 16
+damage = 5
+lifeTime = 25.0
+
+[node name="Enemy10" parent="NavigationCalculation" unique_id=771300023 node_paths=PackedStringArray("player") instance=ExtResource("7_5flq6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, 13, -4)
+sightDist = 50.0
+player = NodePath("../../Player")
+wallLayer = 16
+damage = 5
+lifeTime = 25.0
+
+[node name="Enemy11" parent="NavigationCalculation" unique_id=771300024 node_paths=PackedStringArray("player") instance=ExtResource("7_5flq6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, 14, 8)
+sightDist = 50.0
+player = NodePath("../../Player")
+wallLayer = 16
+damage = 5
 lifeTime = 25.0
 
 [node name="FinishOrb" parent="." unique_id=1930821478 node_paths=PackedStringArray("player") instance=ExtResource("9_in4v8")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.798532, 10.544792, -6.048655)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62, 14, 4)
 toLevel = 2
 player = NodePath("../Player")
 
@@ -252,6 +336,26 @@ cooldown = 0.1
 [node name="JumpOrb6" parent="." unique_id=1878435385 instance=ExtResource("11_5qi50")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.20137, 1.7405822, 0.41292906)
 jumpForce = 10.0
+cooldown = 0.1
+
+[node name="JumpOrb11" parent="." unique_id=771300040 instance=ExtResource("11_5qi50")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58, 0.74, -18)
+jumpForce = 18.0
+cooldown = 0.1
+
+[node name="JumpOrb12" parent="." unique_id=771300041 instance=ExtResource("11_5qi50")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 5.74, 6)
+jumpForce = 16.0
+cooldown = 0.1
+
+[node name="JumpOrb13" parent="." unique_id=771300042 instance=ExtResource("11_5qi50")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 7.74, 8)
+jumpForce = 17.0
+cooldown = 0.1
+
+[node name="JumpOrb14" parent="." unique_id=771300043 instance=ExtResource("11_5qi50")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 11.74, 6)
+jumpForce = 15.0
 cooldown = 0.1
 
 [node name="Acid" parent="." unique_id=341612263 instance=ExtResource("12_1apgh")]

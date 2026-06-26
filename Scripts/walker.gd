@@ -30,6 +30,7 @@ func _makeTarg(targ):
 	target = targ
 
 func _ready() -> void:
+	add_to_group("enemies")
 	body._updateMat(1)
 	await get_tree().physics_frame
 

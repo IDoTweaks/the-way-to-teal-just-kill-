@@ -7,6 +7,7 @@ extends CharacterBody3D
 @export var lifeTime : float = 2.0
 var dir = Vector3.ZERO
 var launched = false
+@onready var impactParticles = preload("res://Particles/enemyBulletImpact.tscn")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -30,10 +31,17 @@ func _physics_process(delta: float) -> void:
 	if collision:
 		var body = collision.get_collider()
 		if body.has_method("_takeDamage") and !body.has_method("_xenon"):
+			_spawnImpact()
 			body._takeDamage(damage)
 			queue_free()
 		elif !body.has_method("_xenon"):
 			_bounce(collision)
+
+func _spawnImpact():
+	var p = impactParticles.instantiate()
+	get_parent().add_child(p)
+	p.global_position = global_position
+	p.emitting = true
  
 func _bounce(collision : KinematicCollision3D):
 	dir = dir.bounce(collision.get_normal())

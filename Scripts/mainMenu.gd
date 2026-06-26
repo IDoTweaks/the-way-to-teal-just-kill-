@@ -13,7 +13,7 @@ func _process(delta: float) -> void:
 	pass
 
 func _on_join_game_btn_button_down() -> void:
-	get_tree().change_scene_to_file(stage1)
+	Global._goToLevel(1)
 
 
 func _on_quit_btn_button_down() -> void:
