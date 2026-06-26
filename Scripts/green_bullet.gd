@@ -32,7 +32,8 @@ func _physics_process(delta: float) -> void:
 		if body.has_method("_takeDamage") and !body.has_method("_xenon"):
 			body._takeDamage(damage)
 			queue_free()
-		_bounce(collision)
+		elif !body.has_method("_xenon"):
+			_bounce(collision)
  
 func _bounce(collision : KinematicCollision3D):
 	dir = dir.bounce(collision.get_normal())

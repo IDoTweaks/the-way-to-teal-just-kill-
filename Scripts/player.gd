@@ -67,6 +67,16 @@ const KNOCKBACK_LOCK_TIME = 0.15
 @export var slamVeloc = 25.0
 var airTime :float = 0.0
 
+# style system
+var styleMeter : float = 0.0
+var styleDecay : float = 18.0
+var lastStyleAction : String = ""
+var styleTimeAccum : float = 0.0
+@onready var styleLabel : Label = $HUD/StyleMeterUI/styleRankLabel
+@onready var styleBar : ProgressBar = $HUD/StyleMeterUI/styleBar
+@onready var styleFire : ColorRect = $HUD/StyleMeterUI/Fire
+@onready var healthBar : ColorRect = $HUD/healthBar
+
 # wall jumping
 var wallNormal  = Vector3.ZERO
 var canWallJump = false
@@ -82,6 +92,39 @@ const WALL_JUMP_COOLDOWN= 0
 var _last_footprint_pos: Vector3 = Vector3.ZERO
 var _footprint_pool: Array[Node] = []
 var _footprint_tex: ImageTexture
+
+func _addStyle(action: String, amount: float):
+	var pts = amount if lastStyleAction != action else amount * 0.35
+	lastStyleAction = action
+	styleMeter = clamp(styleMeter + pts, 0.0, 100.0)
+
+func _getStyleRank() -> String:
+	if styleMeter >= 97.0: return "SSS"
+	if styleMeter >= 85.0: return "SS"
+	if styleMeter >= 70.0: return "S"
+	if styleMeter >= 55.0: return "A"
+	if styleMeter >= 40.0: return "B"
+	if styleMeter >= 22.0: return "C"
+	return "D"
+
+func _updateStyleHud():
+	var rank = _getStyleRank()
+	styleLabel.text = rank
+	styleBar.value = styleMeter
+	match rank:
+		"D":  styleLabel.modulate = Color(0.55, 0.55, 0.55)
+		"C":  styleLabel.modulate = Color(1.0, 1.0, 1.0)
+		"B":  styleLabel.modulate = Color(1.0, 0.9, 0.15)
+		"A":  styleLabel.modulate = Color(1.0, 0.5, 0.1)
+		"S":  styleLabel.modulate = Color(1.0, 0.2, 0.2)
+		"SS": styleLabel.modulate = Color(0.75, 0.2, 1.0)
+		"SSS": styleLabel.modulate = Color(1.0, 0.85, 0.0)
+	var fill = styleMeter / 100.0
+	if styleFire.material:
+		styleFire.material.set_shader_parameter("fill", fill)
+	styleLabel.pivot_offset = styleLabel.size / 2.0
+	var throb = 1.0 + 0.12 * fill * (sin(Time.get_ticks_msec() * 0.012) * 0.5 + 0.5)
+	styleLabel.scale = Vector2(throb, throb)
 
 func _make_teal_texture() -> ImageTexture:
 	var img = Image.create(64, 64, false, Image.FORMAT_RGBA8)
@@ -201,6 +244,9 @@ func _finishLevel():
 		var penaltyPercent = maxPenalty * (1.0 - exp(-overTime / tau))
 		finalScore -= int(finalScore * penaltyPercent)
 	finalScore = clamp(finalScore, 0, maxScore)
+	var avgStyle = styleTimeAccum / max(time, 1.0)
+	var styleMultiplier = 1.0 + (avgStyle / 100.0) * 0.5
+	finalScore = int(finalScore * styleMultiplier)
 	var grade = _calcGrade(finalScore, maxScore)
 	if finalScore > Global.maxScore:
 		Global.positionSave = positionSaves.duplicate()
@@ -343,6 +389,7 @@ func _shootAnim():
 func _shoot():
 	if currentGun == 0:
 		_addShake(.01)
+		_addStyle("rifle", 5)
 		playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
 		if gunRay.is_colliding():
 			var target = gunRay.get_collider()
@@ -360,6 +407,7 @@ func _shoot():
 	elif currentGun == 1:
 		if !shotGunCd:
 			_addShake(.04)
+			_addStyle("shotgun", 11)
 			playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
 			shotGunCd = true
 			shotGunCdTimer.start()
@@ -428,12 +476,16 @@ func _ready() -> void:
 	print("bullet tex: ", _bullet_tex)
 	if _bullet_tex:
 		print("bullet tex image: ", _bullet_tex.get_image())
+	_updateHud()
 	
 	
 func _process(delta: float) -> void:
 	if count:
 		time +=  delta
 		timer.text = str(int(time))
+		styleMeter = clamp(styleMeter - styleDecay * delta, 0.0, 100.0)
+		styleTimeAccum += styleMeter * delta
+	_updateStyleHud()
 	#call input functions
 	_shootAnim()
 	
@@ -516,6 +568,7 @@ func _physics_process(delta: float) -> void:
 	if knockbackTimer <= 0:
 		slide = Input.is_action_pressed("slide")
 		if slide and not wasSliding:
+			_addStyle("slide", 6)
 			if is_on_floor():
 				animaPlayer.play("slide")
 				var currentDir = Vector3(velocity.x,0,velocity.z).normalized()
@@ -530,6 +583,7 @@ func _physics_process(delta: float) -> void:
 				animaPlayer.stop()
 	
 		if Input.is_action_just_pressed("dash") and dashCdTimer <= 0:
+			_addStyle("dash", 9)
 			animaPlayer.play("dash")
 			var input_dir := Input.get_vector("left", "right", "forward", "backward")
 			var camForw = -playerCam.global_transform.basis.z
@@ -552,6 +606,7 @@ func _physics_process(delta: float) -> void:
 			velocity += get_gravity()* delta;
 	if knockbackTimer <= 0:
 		if jumpBuffer > 0 and canWallJump and !is_on_floor() and wallJumpCd <= 0:
+			_addStyle("walljump", 13)
 			var bounced = velocity.bounce(wallNormal)
 			velocity.x = bounced.x * .4 + wallNormal.x *WALL_JUMP_BOOST
 			velocity.z = bounced.z * .4 + wallNormal.z *WALL_JUMP_BOOST
@@ -646,7 +701,8 @@ func _physics_process(delta: float) -> void:
 	_checkWall()
 
 func _updateHud():
-	$HUD/ProgressBar.value = health
+	if healthBar.material:
+		healthBar.material.set_shader_parameter("health", clamp(health / 100.0, 0.0, 1.0))
 
 
 func _takeDamage(damage):
@@ -659,6 +715,7 @@ func _takeDamage(damage):
 
 func _spawnSlam():
 	_addShake(.08)
+	_addStyle("slam", 28)
 	var slam = groundSlam.instantiate()
 	get_parent().add_child(slam)
 	slam.global_position = feet.global_position

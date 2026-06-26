@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dk3goi3xqquyj"]
 
 [ext_resource type="Script" uid="uid://d4hil5p3shwtn" path="res://Scripts/damage_text.gd" id="1_0o48f"]
+[ext_resource type="FontVariation" path="res://Fonts/Orbitron.tres" id="2_orb"]
 
 [node name="DamageText" type="Node3D" unique_id=422341003]
 script = ExtResource("1_0o48f")
@@ -8,3 +9,7 @@ script = ExtResource("1_0o48f")
 [node name="Label3D" type="Label3D" parent="." unique_id=1732858928]
 modulate = Color(0, 0.5307124, 0.5307124, 1)
 text = "1000"
+font = ExtResource("2_orb")
+font_size = 64
+outline_size = 14
+outline_modulate = Color(0.02, 0.06, 0.04, 1)

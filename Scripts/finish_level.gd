@@ -2,7 +2,10 @@ extends Control
 var score = 0;
 var targScore = 0
 var upEach :float = 0
-@onready var scoreShow = $UI/MainContainer/title/ScoreShow
+var gradeFill : float = 0.0
+@onready var scoreShow = $UI/MainContainer/ScoreShow
+@onready var gradeShow = $UI/MainContainer/gradeShow
+@onready var gradeFire = $UI/MainContainer/GradeFire
 @onready var ui = $UI
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -12,7 +15,9 @@ func _setScore(newScore:int):
 	targScore = newScore
 	upEach = newScore / 2.5
 func _setGrade(newGrade: String):
-	$UI/MainContainer/title/gradeShow.text = "GRADE: %s" % newGrade
+	gradeShow.text = newGrade
+	gradeShow.modulate = _gradeColor(newGrade)
+	gradeFill = _gradeFill(newGrade)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -21,11 +26,41 @@ func _process(delta: float) -> void:
 	else:
 		ui.visible = true
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		print(ui.visible)
 		_forceVisible(ui)
 	if targScore > score:
 		score += upEach * delta
-		scoreShow.text = "SCORE: \n%d" % int(score)
+		scoreShow.text = "SCORE\n%d" % int(score)
+	if gradeFire.material:
+		gradeFire.material.set_shader_parameter("fill", gradeFill)
+	gradeShow.pivot_offset = gradeShow.size / 2.0
+	var throb = 1.0 + 0.08 * gradeFill * (sin(Time.get_ticks_msec() * 0.006) * 0.5 + 0.5)
+	gradeShow.scale = Vector2(throb, throb)
+
+func _gradeFill(grade : String) -> float:
+	if grade.begins_with("S"):
+		return 1.0
+	if grade.begins_with("A"):
+		return 0.8
+	if grade.begins_with("B"):
+		return 0.6
+	if grade.begins_with("C"):
+		return 0.45
+	if grade.begins_with("D"):
+		return 0.3
+	return 0.18
+
+func _gradeColor(grade : String) -> Color:
+	if grade.begins_with("S"):
+		return Color(1.0, 0.85, 0.1)
+	if grade.begins_with("A"):
+		return Color(0.15, 1.0, 0.45)
+	if grade.begins_with("B"):
+		return Color(0.2, 0.65, 1.0)
+	if grade.begins_with("C"):
+		return Color(0.0, 0.8, 0.7)
+	if grade.begins_with("D"):
+		return Color(0.6, 0.6, 0.6)
+	return Color(1.0, 0.2, 0.2)
 
 func _forceVisible(entity):
 	if entity.get_children().size() > 0:
@@ -34,7 +69,7 @@ func _forceVisible(entity):
 			_forceVisible(child)
 	if entity is CanvasItem:
 		entity.visible = true
-	
+
 
 
 func _on_quit_btn_button_down() -> void:

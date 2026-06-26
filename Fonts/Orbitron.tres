@@ -1,0 +1,9 @@
+[gd_resource type="FontVariation" load_steps=2 format=3]
+
+[ext_resource type="FontFile" uid="uid://c2s5w6nsobmeh" path="res://Fonts/Orbitron.ttf" id="1_orb"]
+
+[resource]
+base_font = ExtResource("1_orb")
+variation_opentype = {
+"wght": 700
+}

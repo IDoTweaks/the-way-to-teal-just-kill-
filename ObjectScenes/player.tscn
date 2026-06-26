@@ -8,41 +8,57 @@
 [ext_resource type="Script" uid="uid://be2ahx4n0x8mp" path="res://Scripts/ray_container.gd" id="5_ij4ia"]
 [ext_resource type="PackedScene" uid="uid://cmf4i5g6obn3y" path="res://ObjectScenes/finishLevel.tscn" id="7_lvdpo"]
 [ext_resource type="Script" uid="uid://us4lk8xgjfay" path="res://Scripts/game_over.gd" id="8_rfol3"]
+[ext_resource type="Shader" path="res://shaders/styleFire.gdshader" id="9_fire"]
+[ext_resource type="Shader" path="res://shaders/healthBar.gdshader" id="10_hp"]
+[ext_resource type="Shader" path="res://shaders/uiEnergy.gdshader" id="11_energy"]
+[ext_resource type="ShaderMaterial" path="res://shaders/funkyText.tres" id="12_funky"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rfol3"]
-resource_name = "purple_button_hover"
-bg_color = Color(0.5, 0.3, 0.7, 1)
+resource_name = "blue_button_hover"
+bg_color = Color(0.07, 0.15, 0.28, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.7, 0.5, 0.9, 1)
+border_color = Color(0.25, 0.62, 1.0, 1)
+content_margin_left = 24.0
+content_margin_top = 12.0
+content_margin_right = 24.0
+content_margin_bottom = 12.0
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rt1b1"]
-resource_name = "purple_button_normal"
-bg_color = Color(0.4, 0.2, 0.6, 1)
+resource_name = "blue_button_normal"
+bg_color = Color(0.04, 0.08, 0.16, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.6, 0.4, 0.8, 1)
+border_color = Color(0.12, 0.42, 0.82, 1)
+content_margin_left = 24.0
+content_margin_top = 12.0
+content_margin_right = 24.0
+content_margin_bottom = 12.0
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hspm8"]
-resource_name = "purple_button_pressed"
-bg_color = Color(0.6, 0.4, 0.8, 1)
+resource_name = "blue_button_pressed"
+bg_color = Color(0.05, 0.10, 0.20, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.8, 0.6, 1, 1)
+border_color = Color(0.08, 0.88, 0.42, 1)
+content_margin_left = 24.0
+content_margin_top = 12.0
+content_margin_right = 24.0
+content_margin_bottom = 12.0
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
@@ -648,6 +664,27 @@ _data = {
 &"slide": SubResource("Animation_tut37")
 }
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fire"]
+shader = ExtResource("9_fire")
+shader_parameter/fill = 0.0
+shader_parameter/ember = Color(0.0, 0.45, 0.42, 1.0)
+shader_parameter/flame = Color(0.0, 0.85, 0.7, 1.0)
+shader_parameter/hot = Color(0.55, 1.0, 0.92, 1.0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hp"]
+shader = ExtResource("10_hp")
+shader_parameter/health = 1.0
+shader_parameter/full_col = Color(0.15, 0.5, 1.0, 1.0)
+shader_parameter/hurt_col = Color(0.0, 1.0, 0.45, 1.0)
+shader_parameter/back_col = Color(0.02, 0.05, 0.12, 0.85)
+shader_parameter/skew = 0.14
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_energy"]
+shader = ExtResource("11_energy")
+shader_parameter/deep = Color(0.02, 0.05, 0.12, 1.0)
+shader_parameter/glow_blue = Color(0.04, 0.25, 0.6, 1.0)
+shader_parameter/glow_green = Color(0.0, 0.45, 0.3, 1.0)
+
 [node name="Player2" type="CharacterBody3D" unique_id=659499291]
 script = ExtResource("1_m8bbn")
 downForceDevide = 1.0
@@ -668,24 +705,24 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Title" type="Label" parent="GameOver/MainContainer" unique_id=1728092983]
-self_modulate = Color(4.042983e-06, 0.6874465, 0.6920509, 1)
+material = ExtResource("12_funky")
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -150.0
-offset_top = -250.0
-offset_right = 150.0
-offset_bottom = -200.0
+offset_left = -500.0
+offset_top = -300.0
+offset_right = 500.0
+offset_bottom = -140.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.8, 0.6, 1, 1)
+theme_override_colors/font_color = Color(1.0, 0.2, 0.2, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.0, 0.0, 1)
 theme_override_constants/outline_size = 34
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 80
 text = "YOU FUCKING DIED
 GAME OVER"
 horizontal_alignment = 1
@@ -698,42 +735,46 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -100.0
-offset_top = -120.0
-offset_right = 100.0
-offset_bottom = 120.0
+offset_left = -160.0
+offset_top = -40.0
+offset_right = 160.0
+offset_bottom = 220.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = SubResource("Theme_rt1b1")
+theme_override_constants/separation = 16
 
 [node name="retry" type="Button" parent="GameOver/MainContainer/MenuButtons" unique_id=79681632]
-self_modulate = Color(4.042983e-06, 0.6874465, 0.6920509, 1)
+custom_minimum_size = Vector2(300, 58)
 z_index = 7
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "RETRY
-"
+theme_override_colors/font_color = Color(0.85, 0.95, 1.0, 1)
+theme_override_colors/font_hover_color = Color(1.0, 1.0, 1.0, 1)
+theme_override_font_sizes/font_size = 28
+text = "RETRY"
 
 [node name="VSeparator" type="VSeparator" parent="GameOver/MainContainer/MenuButtons" unique_id=1002454785]
-self_modulate = Color(4.042983e-06, 0.6874465, 0.6920509, 1)
+self_modulate = Color(0.05, 0.88, 0.42, 1)
 layout_mode = 2
 
 [node name="SettingsBtn" type="Button" parent="GameOver/MainContainer/MenuButtons" unique_id=1682905405]
 visible = false
-self_modulate = Color(4.042983e-06, 0.6874465, 0.6920509, 1)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85, 0.95, 1.0, 1)
+theme_override_font_sizes/font_size = 28
 text = "SETTINGS"
 
 [node name="QuitBtn" type="Button" parent="GameOver/MainContainer/MenuButtons" unique_id=206990400]
-self_modulate = Color(4.042983e-06, 0.6874465, 0.6920509, 1)
+custom_minimum_size = Vector2(300, 58)
 z_index = 7
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85, 0.95, 1.0, 1)
+theme_override_colors/font_hover_color = Color(1.0, 1.0, 1.0, 1)
+theme_override_font_sizes/font_size = 28
 text = "QUIT"
 
 [node name="TextureRect" type="TextureRect" parent="GameOver" unique_id=859501969]
-modulate = Color(0.50980395, 1, 1, 1)
+material = SubResource("ShaderMaterial_energy")
 z_index = -1
 offset_left = -492.0
 offset_top = -602.0
@@ -855,27 +896,61 @@ visible = false
 [node name="HUD" type="CanvasLayer" parent="." unique_id=351614418]
 
 [node name="timer" type="Label" parent="HUD" unique_id=1972703702]
+material = ExtResource("12_funky")
 offset_left = 816.0
 offset_top = 3.0
 offset_right = 1099.0
 offset_bottom = 91.0
-theme_override_colors/font_color = Color(0, 0.45104724, 0.3438277, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/font_color = Color(0.05, 0.88, 0.42, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.06, 0.04, 1)
 theme_override_constants/outline_size = 7
 theme_override_font_sizes/font_size = 64
 text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="HUD" unique_id=1281401555]
-modulate = Color(0, 0.6288486, 0.62884855, 1)
-offset_top = 1030.0
-offset_right = 626.0
-offset_bottom = 1073.0
+[node name="healthBar" type="ColorRect" parent="HUD" unique_id=1281401555]
+material = SubResource("ShaderMaterial_hp")
+offset_left = 40.0
+offset_top = 992.0
+offset_right = 600.0
+offset_bottom = 1060.0
+mouse_filter = 2
+
+[node name="StyleMeterUI" type="Control" parent="HUD" unique_id=999111111]
+offset_left = 1600.0
+offset_top = 815.0
+offset_right = 1900.0
+offset_bottom = 1075.0
+
+[node name="Fire" type="ColorRect" parent="HUD/StyleMeterUI" unique_id=999444444]
+material = SubResource("ShaderMaterial_fire")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="styleRankLabel" type="Label" parent="HUD/StyleMeterUI" unique_id=999222222]
+material = ExtResource("12_funky")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_colors/font_color = Color(0.55, 0.55, 0.55, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 7
-step = 1.0
-value = 100.0
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 90
+text = "D"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="styleBar" type="ProgressBar" parent="HUD/StyleMeterUI" unique_id=999333333]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -16.0
+show_percentage = false
+step = 0.1
+value = 0.0
 
 [connection signal="button_down" from="GameOver/MainContainer/MenuButtons/retry" to="." method="_on_retry_button_down"]
 [connection signal="button_down" from="GameOver/MainContainer/MenuButtons/retry" to="GameOver" method="_on_retry_button_down"]
