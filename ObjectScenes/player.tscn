@@ -12,6 +12,7 @@
 [ext_resource type="Shader" path="res://shaders/healthBar.gdshader" id="10_hp"]
 [ext_resource type="Shader" path="res://shaders/uiEnergy.gdshader" id="11_energy"]
 [ext_resource type="ShaderMaterial" path="res://shaders/funkyText.tres" id="12_funky"]
+[ext_resource type="Theme" uid="uid://bfunkytheme01" path="res://UI/funkyTheme.tres" id="13_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rfol3"]
 resource_name = "blue_button_hover"
@@ -741,7 +742,7 @@ offset_right = 160.0
 offset_bottom = 220.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = SubResource("Theme_rt1b1")
+theme = ExtResource("13_theme")
 theme_override_constants/separation = 16
 
 [node name="retry" type="Button" parent="GameOver/MainContainer/MenuButtons" unique_id=79681632]

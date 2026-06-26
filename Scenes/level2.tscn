@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://671irfg6vdax"]
 
 [ext_resource type="Script" uid="uid://2pcnmn74i67n" path="res://Scripts/level_1.gd" id="1_mmf1u"]
+[ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="pause_lvl2"]
 [ext_resource type="Texture2D" uid="uid://ep187n5c5y83" path="res://Textures/AquilariusRetroTextures/t38.png" id="2_vn460"]
 [ext_resource type="Texture2D" uid="uid://b5rofp7b01qpc" path="res://Textures/AquilariusRetroTextures/t13.png" id="3_r8hce"]
 [ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="5_yj6rp"]
@@ -394,3 +395,5 @@ mesh = SubResource("BoxMesh_mtqcm")
 transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 4.215534, 0, 0)
 transparency = 1.0
 mesh = SubResource("BoxMesh_mtqcm")
+
+[node name="PauseMenu" parent="." instance=ExtResource("pause_lvl2")]

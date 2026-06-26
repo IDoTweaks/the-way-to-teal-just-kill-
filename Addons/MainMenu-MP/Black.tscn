@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://r68xyadwcdin" path="res://Scripts/mainMenu.gd" id="1_k7s4i"]
 [ext_resource type="Shader" path="res://shaders/uiEnergy.gdshader" id="2_energy"]
 [ext_resource type="ShaderMaterial" path="res://shaders/funkyText.tres" id="3_funky"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/settingsMenu.tscn" id="4_setmenu"]
+[ext_resource type="Theme" uid="uid://bfunkytheme01" path="res://UI/funkyTheme.tres" id="5_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
 resource_name = "blue_button_hover"
@@ -78,6 +80,7 @@ script = ExtResource("1_k7s4i")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1268340044]
 material = SubResource("ShaderMaterial_energy")
+modulate = Color(1, 1, 1, 0.62)
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -153,7 +156,7 @@ offset_right = -440.0
 offset_bottom = 320.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = SubResource("Theme_1")
+theme = ExtResource("5_theme")
 theme_override_constants/separation = 16
 
 [node name="JoinGameBtn" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=66041543]
@@ -186,71 +189,8 @@ theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 28
 text = "QUIT"
 
-[node name="Settings" type="VBoxContainer" parent="UI/MainContainer" unique_id=468676707]
+[node name="Settings" parent="UI/MainContainer" instance=ExtResource("4_setmenu")]
 visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 260.0
-offset_top = -150.0
-offset_right = 660.0
-offset_bottom = 250.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = SubResource("Theme_1")
-theme_override_constants/separation = 12
-
-[node name="vlText" type="Label" parent="UI/MainContainer/Settings" unique_id=469044709]
-material = ExtResource("3_funky")
-layout_mode = 2
-theme_override_colors/font_color = Color(0.05, 0.88, 0.42, 1)
-theme_override_colors/font_outline_color = Color(0.02, 0.06, 0.04, 0.9)
-theme_override_constants/outline_size = 10
-theme_override_font_sizes/font_size = 34
-text = "VOLUME"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="volumeSlider" type="HSlider" parent="UI/MainContainer/Settings" unique_id=1617484612]
-layout_mode = 2
-
-[node name="vlText2" type="Label" parent="UI/MainContainer/Settings" unique_id=1090479122]
-material = ExtResource("3_funky")
-layout_mode = 2
-theme_override_colors/font_color = Color(0.05, 0.88, 0.42, 1)
-theme_override_colors/font_outline_color = Color(0.02, 0.06, 0.04, 0.9)
-theme_override_constants/outline_size = 10
-theme_override_font_sizes/font_size = 34
-text = "RESOLUTION"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ResOptionButt" type="OptionButton" parent="UI/MainContainer/Settings" unique_id=118613445]
-layout_mode = 2
-selected = 0
-item_count = 4
-popup/item_0/text = "1920x1080(currently disabled)"
-popup/item_0/id = 0
-popup/item_1/text = "1600x900(currently disabled)"
-popup/item_1/id = 1
-popup/item_2/text = "1280x720(currently disabled)"
-popup/item_2/id = 2
-popup/item_3/text = "1152x648(currently disabled)"
-popup/item_3/id = 3
-
-[node name="fsOptionButt2" type="OptionButton" parent="UI/MainContainer/Settings" unique_id=112190865]
-layout_mode = 2
-selected = 0
-item_count = 3
-popup/item_0/text = "windowed(currently disabled)"
-popup/item_0/id = 0
-popup/item_1/text = "borderless"
-popup/item_1/id = 1
-popup/item_2/text = "fullscreen"
-popup/item_2/id = 2
 
 [node name="AmbientLight" type="ColorRect" parent="." unique_id=1833103425]
 layout_mode = 1
@@ -269,6 +209,3 @@ color = Color(0, 0, 0, 0.3)
 [connection signal="button_down" from="UI/MainContainer/MenuButtons/JoinGameBtn" to="." method="_on_join_game_btn_button_down"]
 [connection signal="button_down" from="UI/MainContainer/MenuButtons/SettingsBtn" to="." method="_on_settings_btn_button_down"]
 [connection signal="button_down" from="UI/MainContainer/MenuButtons/QuitBtn" to="." method="_on_quit_btn_button_down"]
-[connection signal="value_changed" from="UI/MainContainer/Settings/volumeSlider" to="." method="_on_volume_slider_value_changed"]
-[connection signal="item_selected" from="UI/MainContainer/Settings/ResOptionButt" to="." method="_on_res_option_butt_item_selected"]
-[connection signal="item_selected" from="UI/MainContainer/Settings/fsOptionButt2" to="." method="_on_fs_option_butt_2_item_selected"]

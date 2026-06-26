@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://oftku5x50jul"]
 
 [ext_resource type="Script" uid="uid://2pcnmn74i67n" path="res://Scripts/level_1.gd" id="1_4iphx"]
+[ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="pause_lvl1"]
 [ext_resource type="Material" uid="uid://dagdbpsvta3ue" path="res://shaders/new_standard_material_3d.tres" id="1_c5erv"]
 [ext_resource type="Texture2D" uid="uid://ep187n5c5y83" path="res://Textures/AquilariusRetroTextures/t38.png" id="1_didp7"]
 [ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="1_vly50"]
@@ -260,3 +261,5 @@ cooldown = 0.1
 
 [node name="JumpOrb2" parent="." unique_id=754474650 instance=ExtResource("10_bs12r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.775013, 6.0973196, 0.41292906)
+
+[node name="PauseMenu" parent="." instance=ExtResource("pause_lvl1")]

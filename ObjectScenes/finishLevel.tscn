@@ -4,6 +4,7 @@
 [ext_resource type="Shader" uid="uid://bihmuurth0hxf" path="res://shaders/uiEnergy.gdshader" id="2_energy"]
 [ext_resource type="Shader" uid="uid://c3ykk7lod3i32" path="res://shaders/styleFire.gdshader" id="3_fire"]
 [ext_resource type="ShaderMaterial" path="res://shaders/funkyText.tres" id="4_funky"]
+[ext_resource type="Theme" uid="uid://bfunkytheme01" path="res://UI/funkyTheme.tres" id="5_theme"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_energy"]
 shader = ExtResource("2_energy")
@@ -86,6 +87,7 @@ script = ExtResource("1_c24de")
 
 [node name="Background" type="ColorRect" parent="." unique_id=170738047]
 material = SubResource("ShaderMaterial_energy")
+modulate = Color(1, 1, 1, 0.6)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -216,7 +218,7 @@ offset_right = 380.0
 offset_bottom = -80.0
 grow_horizontal = 2
 grow_vertical = 0
-theme = SubResource("Theme_1")
+theme = ExtResource("5_theme")
 theme_override_constants/separation = 28
 alignment = 1
 

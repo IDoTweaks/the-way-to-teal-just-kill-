@@ -1,0 +1,148 @@
+[gd_scene load_steps=5 format=3 uid="uid://bbr7awrcekmkp"]
+
+[ext_resource type="Script" path="res://Scripts/settings_menu.gd" id="1_set"]
+[ext_resource type="ShaderMaterial" path="res://shaders/funkyText.tres" id="2_funky"]
+[ext_resource type="Material" uid="uid://bmenuenergy01" path="res://UI/menuEnergy.tres" id="3_energy"]
+[ext_resource type="Theme" uid="uid://bfunkytheme01" path="res://UI/funkyTheme.tres" id="4_theme"]
+
+[sub_resource type="StyleBoxFlat" id="Panel_sb"]
+bg_color = Color(0.03, 0.08, 0.1, 0.9)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.1, 0.8, 0.88, 1)
+shadow_color = Color(0.05, 0.7, 0.7, 0.22)
+shadow_size = 22
+
+[node name="SettingsMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_set")
+
+[node name="Dim" type="ColorRect" parent="."]
+material = ExtResource("3_energy")
+modulate = Color(1, 1, 1, 0.6)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 1)
+
+[node name="SlashTeal" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 320.0
+offset_top = 250.0
+offset_right = 1700.0
+offset_bottom = 272.0
+rotation = -0.1
+color = Color(0.1, 0.85, 0.85, 0.6)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("Panel_sb")
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 38
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 38
+theme_override_constants/margin_bottom = 30
+
+[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin"]
+custom_minimum_size = Vector2(480, 0)
+layout_mode = 2
+theme = ExtResource("4_theme")
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+material = ExtResource("2_funky")
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+rotation = -0.04
+theme_override_colors/font_color = Color(0.45, 0.9, 1, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.18, 0.2, 1)
+theme_override_constants/outline_size = 18
+theme_override_font_sizes/font_size = 62
+text = "SETTINGS"
+
+[node name="HSeparator" type="HSeparator" parent="Center/Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="VolLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 1, 0.5, 1)
+theme_override_font_sizes/font_size = 26
+text = "// MASTER VOLUME"
+
+[node name="VolumeSlider" type="HSlider" parent="Center/Panel/Margin/VBox"]
+modulate = Color(0.3, 0.95, 0.95, 1)
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+min_value = 0.0
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="DispLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 1, 0.5, 1)
+theme_override_font_sizes/font_size = 26
+text = "// DISPLAY MODE"
+
+[node name="DisplayOption" type="OptionButton" parent="Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+selected = 1
+item_count = 3
+popup/item_0/text = "WINDOWED"
+popup/item_0/id = 0
+popup/item_1/text = "BORDERLESS"
+popup/item_1/id = 1
+popup/item_2/text = "FULLSCREEN"
+popup/item_2/id = 2
+
+[node name="ResLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 1, 0.5, 1)
+theme_override_font_sizes/font_size = 26
+text = "// RESOLUTION"
+
+[node name="ResOption" type="OptionButton" parent="Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+disabled = true
+selected = 0
+item_count = 4
+popup/item_0/text = "1920 x 1080"
+popup/item_0/id = 0
+popup/item_1/text = "1600 x 900"
+popup/item_1/id = 1
+popup/item_2/text = "1280 x 720"
+popup/item_2/id = 2
+popup/item_3/text = "1152 x 648"
+popup/item_3/id = 3
+
+[node name="HSeparator2" type="HSeparator" parent="Center/Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="BackBtn" type="Button" parent="Center/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "◀ BACK"
+alignment = 0

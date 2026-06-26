@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="1_2qj3r"]
 [ext_resource type="PackedScene" uid="uid://ccle7gxe1ekv3" path="res://ObjectScenes/boss1.tscn" id="1_v4ypp"]
+[ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="pause_boss"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d4gj8"]
 albedo_color = Color(0, 1, 0, 1)
@@ -58,3 +59,5 @@ sides = 16
 
 [node name="CSGBakedCollisionShape3D" type="CollisionShape3D" parent="floor" unique_id=1949797234]
 shape = SubResource("ConcavePolygonShape3D_v4ypp")
+
+[node name="PauseMenu" parent="." instance=ExtResource("pause_boss")]
