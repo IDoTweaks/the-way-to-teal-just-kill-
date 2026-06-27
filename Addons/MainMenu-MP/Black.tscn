@@ -5,6 +5,7 @@
 [ext_resource type="ShaderMaterial" path="res://shaders/funkyText.tres" id="3_funky"]
 [ext_resource type="PackedScene" path="res://ObjectScenes/settingsMenu.tscn" id="4_setmenu"]
 [ext_resource type="Theme" uid="uid://bfunkytheme01" path="res://UI/funkyTheme.tres" id="5_theme"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/stageSelect.tscn" id="6_stage"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
 resource_name = "blue_button_hover"
@@ -166,7 +167,7 @@ theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
 theme_override_colors/font_focus_color = Color(0.01, 0.04, 0.04, 1)
 theme_override_colors/font_hover_color = Color(0.01, 0.04, 0.04, 1)
 theme_override_font_sizes/font_size = 28
-text = "START"
+text = "PLAY"
 
 [node name="VSeparator" type="VSeparator" parent="UI/MainContainer/MenuButtons" unique_id=1799183135]
 layout_mode = 2
@@ -190,6 +191,9 @@ theme_override_font_sizes/font_size = 28
 text = "QUIT"
 
 [node name="Settings" parent="UI/MainContainer" instance=ExtResource("4_setmenu")]
+visible = false
+
+[node name="StageSelect" parent="UI/MainContainer" instance=ExtResource("6_stage")]
 visible = false
 
 [node name="AmbientLight" type="ColorRect" parent="." unique_id=1833103425]

@@ -219,7 +219,7 @@ var sniperCdTimer : float = 0.0
 @export var hipfireSpread : float = 7.0
 @export var scopedFov : float = 28.0
 var scoped : bool = false
-var baseFov : float = 75.0
+var fovTween : Tween
 const SNIPER_REST_POS = Vector3(0.50524026, -0.12744474, -1.0080254)
 const GUN_REST_POS = Vector3(0.388, -0.31, -0.652)
 const GUN_REST_ROT = Vector3(-0.15707964, -3.2637658, 0.15707964)
@@ -258,12 +258,18 @@ func _switchGuns():
 		currentGun = (currentGun + 2) % 3
 		_showGunModels()
 
+func _tweenFov(target):
+	if fovTween:
+		fovTween.kill()
+	fovTween = create_tween()
+	fovTween.tween_property(playerCam, "fov", target, 0.16).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
 func _updateSniperView():
 	var wantScope = currentGun == 2 and Input.is_action_pressed("scope")
 	if wantScope != scoped:
 		scoped = wantScope
 		scopeOverlay.visible = scoped
-		playerCam.fov = scopedFov if scoped else baseFov
+		_tweenFov(scopedFov if scoped else Global.fov)
 		if scoped:
 			sniperGun.visible = false
 			leftArm.visible = false
@@ -272,6 +278,8 @@ func _updateSniperView():
 			leftArm.visible = true
 			rightArm.visible = true
 			sniperGun.visible = currentGun == 2
+	if not scoped and (fovTween == null or not fovTween.is_running()):
+		playerCam.fov = Global.fov
 	if currentGun == 2 and not scoped:
 		if animaPlayer.current_animation == "sniperShoot":
 			sniperGun.rotation = sniperRestRot
@@ -291,23 +299,18 @@ func _finishLevel():
 	count = false
 	Audio.play("win")
 	_spawnParticleAt(finishParticles, global_position)
-	var perfectTime = $"..".perfectTime
 	var earnedScore = maxScore - _calcMaxScore()
-	var finalScore = earnedScore
-	if time > perfectTime and perfectTime > 0:
-		var overTime = time - perfectTime
-		var maxPenalty = 0.85
-		var tau = perfectTime * 1.5
-		var penaltyPercent = maxPenalty * (1.0 - exp(-overTime / tau))
-		finalScore -= int(finalScore * penaltyPercent)
-	finalScore = clamp(finalScore, 0, maxScore)
+	var finalScore = clamp(earnedScore, 0, maxScore)
 	var scorePercent = float(finalScore) / maxScore if maxScore > 0 else 0.0
 	var avgStyle = styleTimeAccum / max(time, 1.0)
 	var stylePercent = clamp(avgStyle / 100.0, 0.0, 1.0)
-	var gradeRating = scorePercent * 0.7 + stylePercent * 0.3
+	var healthPercent = clamp(float(health) / 100.0, 0.0, 1.0)
+	var gradeRating = scorePercent * 0.5 + stylePercent * 0.3 + healthPercent * 0.2
 	var grade = _calcGrade(gradeRating * 100.0, 100.0)
 	var displayScore = int(finalScore * (1.0 + stylePercent * 0.5))
 	var lvl = Global.currentLevel
+	Global._completeLevel(lvl)
+	Global._recordTime(lvl, time)
 	if displayScore > Global._ghostScore(lvl):
 		Global._saveGhost(lvl, positionSaves.duplicate(), rotationSaves.duplicate(), camPositionSaves.duplicate(), camRotationSaves.duplicate(), weaponSaves.duplicate(), displayScore)
 	levelEnd._setScore(displayScore)
@@ -592,7 +595,8 @@ func _ready() -> void:
 	print("maxScore: ", maxScore)
 	finishOrb.open = true
 	finishOrb.canvas =$levelEnd
-	baseFov = playerCam.fov
+	playerCam.fov = Global.fov
+	Global._addTry(Global.currentLevel)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	_footprint_tex = _make_teal_texture()
 	_last_footprint_pos = global_position
@@ -857,7 +861,6 @@ func _takeDamage(damage):
 
 func _spawnSlam():
 	_addShake(.08)
-	_addStyle("slam", 28)
 	Audio.play("slam", 1.0, 0.0)
 	var slam = groundSlam.instantiate()
 	get_parent().add_child(slam)
@@ -865,6 +868,7 @@ func _spawnSlam():
 	_spawnParticleAt(slamParticles, feet.global_position)
 	var fallHeight = slamStartHeight - global_position.y
 	slam.damage = clamp(fallHeight * 3.0, 1.0, 60.0)
+	_addStyle("slam", clamp(fallHeight * 3.0, 0.0, 28.0))
 
 #func here so i can jump here fast
 func wallJump():pass

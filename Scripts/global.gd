@@ -5,6 +5,7 @@ extends Node
 @onready var bossArena = preload("res://Scenes/boss1Arena.tscn")
 @onready var levels : Array
 var currentLevel = 1
+var maxUnlocked = 1
 
 var ghostPos : Dictionary = {}
 var ghostRot : Dictionary = {}
@@ -15,6 +16,8 @@ var ghostScore : Dictionary = {}
 
 var grades : Array[int] = []
 var times : Array = []
+var bestTimes : Dictionary = {}
+var levelTries : Dictionary = {}
 
 var masterVol := 1.0
 var musicVol := 1.0
@@ -23,6 +26,7 @@ var displayMode := 1
 var resIndex := 0
 var sensitivity := 0.005
 var scopedSens := 0.0022
+var fov := 75.0
 
 const SETTINGS_RES : Array[Vector2i] = [
 	Vector2i(1920, 1080),
@@ -41,6 +45,7 @@ func _loadSettings():
 		resIndex = config.get_value("display", "res", resIndex)
 		sensitivity = config.get_value("controls", "sensitivity", sensitivity)
 		scopedSens = config.get_value("controls", "scopedSens", scopedSens)
+		fov = config.get_value("display", "fov", fov)
 	_applySettings()
 
 func _saveSettings():
@@ -52,7 +57,20 @@ func _saveSettings():
 	config.set_value("display", "res", resIndex)
 	config.set_value("controls", "sensitivity", sensitivity)
 	config.set_value("controls", "scopedSens", scopedSens)
+	config.set_value("display", "fov", fov)
 	config.save("user://settings.cfg")
+
+func _resetDefaults():
+	masterVol = 1.0
+	musicVol = 1.0
+	sfxVol = 1.0
+	displayMode = 1
+	resIndex = 0
+	sensitivity = 0.005
+	scopedSens = 0.0022
+	fov = 75.0
+	_applySettings()
+	_saveSettings()
 
 func _applySettings():
 	_applyVol(0, masterVol)
@@ -85,6 +103,9 @@ func _localLoad():
 	if err == OK:
 		grades = config.get_value("player", "grades", grades)
 		times = config.get_value("player", "times", times)
+		maxUnlocked = config.get_value("player", "maxUnlocked", maxUnlocked)
+		bestTimes = config.get_value("player", "bestTimes", bestTimes)
+		levelTries = config.get_value("player", "levelTries", levelTries)
 		ghostPos = config.get_value("ghost", "ghostPos", ghostPos)
 		ghostRot = config.get_value("ghost", "ghostRot", ghostRot)
 		ghostCamPos = config.get_value("ghost", "ghostCamPos", ghostCamPos)
@@ -96,6 +117,9 @@ func _localSave():
 	var config = ConfigFile.new()
 	config.set_value("player", "grades", grades)
 	config.set_value("player", "times", times)
+	config.set_value("player", "maxUnlocked", maxUnlocked)
+	config.set_value("player", "bestTimes", bestTimes)
+	config.set_value("player", "levelTries", levelTries)
 	config.set_value("ghost", "ghostPos", ghostPos)
 	config.set_value("ghost", "ghostRot", ghostRot)
 	config.set_value("ghost", "ghostCamPos", ghostCamPos)
@@ -129,6 +153,29 @@ func _ghostScore(level):
 
 func _hasNextLevel(level):
 	return level + 1 < levels.size()
+
+func _completeLevel(level):
+	if level + 1 > maxUnlocked:
+		maxUnlocked = level + 1
+		_localSave()
+
+func _isUnlocked(level):
+	return level <= maxUnlocked
+
+func _bestTime(level):
+	return bestTimes.get(level, -1.0)
+
+func _tries(level):
+	return levelTries.get(level, 0)
+
+func _addTry(level):
+	levelTries[level] = _tries(level) + 1
+	_localSave()
+
+func _recordTime(level, t):
+	if not bestTimes.has(level) or t < bestTimes[level]:
+		bestTimes[level] = t
+		_localSave()
 
 func _goToLevel(idx):
 	currentLevel = idx
