@@ -59,6 +59,8 @@ func _die():
 	if detonated:
 		return
 	detonated = true
+	if target and target.has_method("_onKill"):
+		target._onKill()
 	_boom(false)
 	queue_free()
 

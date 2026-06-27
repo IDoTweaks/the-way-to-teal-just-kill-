@@ -31,6 +31,7 @@ var txt
 var animTime : float = 0.0
 var baseBodyY : float = 0.0
 var baseBodyScale : Vector3 = Vector3.ONE
+var dead = false
 var chargeState : String = ""
 var chargeTimer : float = 0.0
 var dashDir : Vector3 = Vector3.ZERO
@@ -63,8 +64,13 @@ func _damage(dmg):
 		_die()
 
 func _die():
+	if dead:
+		return
+	dead = true
 	body._updateMat(0)
 	Audio.play("enemy_death")
+	if target and target.has_method("_onKill"):
+		target._onKill()
 	particleInstance = explosionParticles.instantiate()
 	particleInstance.position = global_position
 	get_parent().add_child(particleInstance)

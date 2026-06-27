@@ -82,9 +82,12 @@ var airTime :float = 0.0
 
 # style system
 var styleMeter : float = 0.0
-var styleDecay : float = 18.0
+var styleDecay : float = 9.0
 var lastStyleAction : String = ""
 var styleTimeAccum : float = 0.0
+@export var comboWindow : float = 2.5
+var lastKillTime : float = -999.0
+var comboCount : int = 0
 @onready var styleLabel : Label = $HUD/StyleMeterUI/styleRankLabel
 @onready var styleBar : ProgressBar = $HUD/StyleMeterUI/styleBar
 @onready var styleFire : ColorRect = $HUD/StyleMeterUI/Fire
@@ -110,6 +113,25 @@ func _addStyle(action: String, amount: float):
 	var pts = amount if lastStyleAction != action else amount * 0.35
 	lastStyleAction = action
 	styleMeter = clamp(styleMeter + pts, 0.0, 100.0)
+
+func _onKill():
+	var amount := 12.0
+	if not is_on_floor():
+		amount += 14.0
+	var hspeed = Vector2(velocity.x, velocity.z).length()
+	if hspeed > SPEED * 1.3:
+		amount += clamp((hspeed - SPEED) * 1.2, 0.0, 16.0)
+	if currentGun == 2:
+		amount += 16.0
+	var now = Time.get_ticks_msec() / 1000.0
+	if now - lastKillTime <= comboWindow:
+		comboCount += 1
+		amount += float(comboCount) * 10.0
+	else:
+		comboCount = 0
+	lastKillTime = now
+	styleMeter = clamp(styleMeter + amount, 0.0, 100.0)
+	lastStyleAction = "kill"
 
 func _getStyleRank() -> String:
 	if styleMeter >= 97.0: return "SSS"
@@ -251,12 +273,10 @@ func _switchGuns():
 	elif Input.is_action_just_pressed("gun3"):
 		currentGun = 2
 		_showGunModels()
-	elif Input.is_action_just_pressed("scrollUp"):
-		currentGun = (currentGun + 1) % 3
-		_showGunModels()
-	elif Input.is_action_just_pressed("scrollDwn"):
-		currentGun = (currentGun + 2) % 3
-		_showGunModels()
+
+func _cycleGun(dir: int):
+	currentGun = (currentGun + dir + 3) % 3
+	_showGunModels()
 
 func _tweenFov(target):
 	if fovTween:
@@ -451,7 +471,6 @@ func _shootAnim():
 func _shoot():
 	if currentGun == 0:
 		_addShake(.01)
-		_addStyle("rifle", 5)
 		Audio.play("rifle", 1.0, -5.0)
 		playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
 		if gunRay.is_colliding():
@@ -471,7 +490,6 @@ func _shoot():
 	elif currentGun == 1:
 		if !shotGunCd:
 			_addShake(.04)
-			_addStyle("shotgun", 11)
 			Audio.play("shotgun", 1.0, -2.0)
 			playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
 			shotGunCd = true
@@ -495,7 +513,6 @@ func _shoot():
 			_applyForce(shotgunForcePnt.global_position,10)
 	elif currentGun == 2:
 		if sniperCdTimer <= 0:
-			_addStyle("sniper", 22)
 			Audio.play("shotgun", 0.7, -1.0)
 			sniperCdTimer = sniperCooldown
 			_addShake(.05 if scoped else .13)
@@ -592,7 +609,6 @@ func _draw_laser_beam(from_pos: Vector3, to_pos: Vector3, duration: float = 0.35
 
 func _ready() -> void:
 	maxScore = _calcMaxScore()
-	print("maxScore: ", maxScore)
 	finishOrb.open = true
 	finishOrb.canvas =$levelEnd
 	playerCam.fov = Global.fov
@@ -624,6 +640,11 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	
 	_switchGuns()
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_cycleGun(1)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_cycleGun(-1)
 	#cam
 	if event is InputEventMouseMotion:
 		var sens = Global.scopedSens if scoped else Global.sensitivity

@@ -24,6 +24,7 @@ var shouldMove = false
 var canAttack : bool = true
 var textActive = false
 var txt
+var dead = false
 var animTime : float = 0.0
 var baseBodyY : float = 0.0
 
@@ -55,8 +56,13 @@ func _damage(dmg):
 		_die()
 
 func _die():
+	if dead:
+		return
+	dead = true
 	body._updateMat(0)
 	Audio.play("enemy_death")
+	if target and target.has_method("_onKill"):
+		target._onKill()
 	particleInstance = explosionParticles.instantiate()
 	particleInstance.position = global_position
 	get_parent().add_child(particleInstance)
