@@ -1,0 +1,384 @@
+[gd_scene format=3 uid="uid://cgjunoods41ou"]
+
+[ext_resource type="Script" uid="uid://43wruqf75x2k" path="res://Scripts/tutorial.gd" id="1_tut"]
+[ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="2_pl"]
+[ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="3_fin"]
+[ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" uid="uid://dh8322144axab" path="res://ObjectScenes/walker.tscn" id="5_walk"]
+[ext_resource type="FontVariation" path="res://Fonts/Orbitron.tres" id="6_orb"]
+
+[sub_resource type="StandardMaterial3D" id="mat_level"]
+albedo_color = Color(0.16, 0.26, 0.18, 1)
+
+[sub_resource type="Environment" id="env"]
+ssao_enabled = true
+fog_enabled = true
+fog_light_energy = 2.0
+fog_density = 0.003
+
+[sub_resource type="BoxShape3D" id="gateShape"]
+size = Vector3(1, 11, 19)
+
+[sub_resource type="StandardMaterial3D" id="mat_gate"]
+transparency = 1
+albedo_color = Color(0, 0.85, 0.78, 0.35)
+emission_enabled = true
+emission = Color(0, 0.85, 0.78, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="BoxMesh" id="gateMesh"]
+material = SubResource("mat_gate")
+size = Vector3(1, 11, 19)
+
+[sub_resource type="BoxShape3D" id="zoneShape"]
+size = Vector3(3, 8, 18)
+
+[sub_resource type="StyleBoxFlat" id="objBox"]
+bg_color = Color(0.015, 0.025, 0.03, 0.9)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0.85, 0.78, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="MainScene" type="Node3D" unique_id=114852139]
+script = ExtResource("1_tut")
+
+[node name="Level" type="CSGCombiner3D" parent="." unique_id=227979527]
+material_override = SubResource("mat_level")
+use_collision = true
+collision_layer = 17
+
+[node name="Floor" type="CSGBox3D" parent="Level" unique_id=532395951]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, -0.5, 0)
+size = Vector3(132, 1, 20)
+
+[node name="Ceiling" type="CSGBox3D" parent="Level" unique_id=1779593218]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, 11.5, 0)
+size = Vector3(132, 1, 20)
+
+[node name="WallNegZ" type="CSGBox3D" parent="Level" unique_id=2017858454]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, 5.5, -10)
+size = Vector3(132, 12, 1)
+
+[node name="WallPosZ" type="CSGBox3D" parent="Level" unique_id=669657350]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, 5.5, 10)
+size = Vector3(132, 12, 1)
+
+[node name="WallBack" type="CSGBox3D" parent="Level" unique_id=765714562]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 5.5, 0)
+size = Vector3(1, 12, 20)
+
+[node name="WallFront" type="CSGBox3D" parent="Level" unique_id=752026309]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 130, 5.5, 0)
+size = Vector3(1, 12, 20)
+
+[node name="Step1" type="CSGBox3D" parent="Level" unique_id=1450678896]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.75, 0)
+size = Vector3(4, 1.5, 8)
+
+[node name="Step2" type="CSGBox3D" parent="Level" unique_id=1289734726]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 1.5, 0)
+size = Vector3(4, 3, 8)
+
+[node name="Plat2a" type="CSGBox3D" parent="Level" unique_id=2134110812]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 1, 0)
+size = Vector3(6, 2, 8)
+
+[node name="Plat2b" type="CSGBox3D" parent="Level" unique_id=177967956]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 1, 0)
+size = Vector3(6, 2, 8)
+
+[node name="WallJ" type="CSGBox3D" parent="Level" unique_id=1210694859]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 4, 5)
+size = Vector3(1, 8, 8)
+
+[node name="HighLedge" type="CSGBox3D" parent="Level" unique_id=1174099782]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 4, -2)
+size = Vector3(6, 1, 6)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=271040567]
+environment = SubResource("env")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2049222249]
+transform = Transform3D(1, 0, 0, 0, -0.37609485, 0.9265812, 0, -0.9265812, -0.37609485, 0, 18.215263, 0)
+
+[node name="Player" parent="." unique_id=1083916896 instance=ExtResource("2_pl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2, 0)
+
+[node name="Gate4" type="StaticBody3D" parent="." unique_id=777303873]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70, 5.5, 0)
+collision_layer = 17
+
+[node name="col" type="CollisionShape3D" parent="Gate4" unique_id=1169763650]
+shape = SubResource("gateShape")
+
+[node name="mesh" type="MeshInstance3D" parent="Gate4" unique_id=1068449340]
+mesh = SubResource("gateMesh")
+
+[node name="Gate5" type="StaticBody3D" parent="." unique_id=958423154]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 86, 5.5, 0)
+collision_layer = 17
+
+[node name="col" type="CollisionShape3D" parent="Gate5" unique_id=312918689]
+shape = SubResource("gateShape")
+
+[node name="mesh" type="MeshInstance3D" parent="Gate5" unique_id=448976578]
+mesh = SubResource("gateMesh")
+
+[node name="Gate6" type="StaticBody3D" parent="." unique_id=1453308339]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 102, 5.5, 0)
+collision_layer = 17
+
+[node name="col" type="CollisionShape3D" parent="Gate6" unique_id=450993572]
+shape = SubResource("gateShape")
+
+[node name="mesh" type="MeshInstance3D" parent="Gate6" unique_id=340020965]
+mesh = SubResource("gateMesh")
+
+[node name="Gate7" type="StaticBody3D" parent="." unique_id=1362621993]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 118, 5.5, 0)
+collision_layer = 17
+
+[node name="col" type="CollisionShape3D" parent="Gate7" unique_id=462385111]
+shape = SubResource("gateShape")
+
+[node name="mesh" type="MeshInstance3D" parent="Gate7" unique_id=796242862]
+mesh = SubResource("gateMesh")
+
+[node name="P4_1" parent="." unique_id=280742981 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, 2, 3)
+
+[node name="P4_2" parent="." unique_id=551974362 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66, 2, -3)
+
+[node name="P5_1" parent="." unique_id=1372018732 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 2, 2)
+
+[node name="P5_2" parent="." unique_id=1657782478 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82, 2, -2)
+
+[node name="P5_3" parent="." unique_id=116990743 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84, 2, 0)
+
+[node name="P6_1" parent="." unique_id=770785533 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98, 2, 4)
+
+[node name="P6_2" parent="." unique_id=106471873 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 2, -4)
+
+[node name="P7_1" parent="." unique_id=1183018193 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 110, 2, 3)
+
+[node name="P7_2" parent="." unique_id=1886549413 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 112, 2, -3)
+
+[node name="P7_3" parent="." unique_id=1393792141 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114, 2, 3)
+
+[node name="P7_4" parent="." unique_id=1418886761 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 116, 2, -3)
+
+[node name="Zone1" type="Area3D" parent="." unique_id=894158864]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone1" unique_id=994671725]
+shape = SubResource("zoneShape")
+
+[node name="Zone2" type="Area3D" parent="." unique_id=618308423]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone2" unique_id=1803730565]
+shape = SubResource("zoneShape")
+
+[node name="Zone3" type="Area3D" parent="." unique_id=2036694006]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone3" unique_id=207550000]
+shape = SubResource("zoneShape")
+
+[node name="Zone4" type="Area3D" parent="." unique_id=1209235869]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58, 4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone4" unique_id=1304199304]
+shape = SubResource("zoneShape")
+
+[node name="Zone5" type="Area3D" parent="." unique_id=891642194]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 76, 4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone5" unique_id=617255597]
+shape = SubResource("zoneShape")
+
+[node name="Zone6" type="Area3D" parent="." unique_id=799151558]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 92, 4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone6" unique_id=454162323]
+shape = SubResource("zoneShape")
+
+[node name="Zone7" type="Area3D" parent="." unique_id=1021515214]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 106, 4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone7" unique_id=211517374]
+shape = SubResource("zoneShape")
+
+[node name="Signs" type="Node3D" parent="." unique_id=522699541]
+
+[node name="Sign1" type="Label3D" parent="Signs" unique_id=1500918140]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 3.4, 0)
+pixel_size = 0.018
+billboard = 1
+modulate = Color(0, 1, 0.85, 1)
+outline_modulate = Color(0, 0.1, 0.09, 1)
+text = "MOVE   W A S D
+JUMP   SPACE"
+font = ExtResource("6_orb")
+font_size = 80
+outline_size = 24
+
+[node name="Sign2" type="Label3D" parent="Signs" unique_id=1084059350]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 3.4, 0)
+pixel_size = 0.018
+billboard = 1
+modulate = Color(0, 1, 0.85, 1)
+outline_modulate = Color(0, 0.1, 0.09, 1)
+text = "SLIDE   SHIFT
+DASH   CTRL"
+font = ExtResource("6_orb")
+font_size = 80
+outline_size = 24
+
+[node name="Sign3" type="Label3D" parent="Signs" unique_id=1492235912]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 3.4, 0)
+pixel_size = 0.018
+billboard = 1
+modulate = Color(0, 1, 0.85, 1)
+outline_modulate = Color(0, 0.1, 0.09, 1)
+text = "WALL-JUMP into walls
+SLAM = SLIDE in the air"
+font = ExtResource("6_orb")
+font_size = 70
+outline_size = 24
+
+[node name="Sign4" type="Label3D" parent="Signs" unique_id=991128867]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, 3.4, 0)
+pixel_size = 0.018
+billboard = 1
+modulate = Color(0, 1, 0.85, 1)
+outline_modulate = Color(0, 0.1, 0.09, 1)
+text = "LEFT MOUSE = SHOOT
+clear the enemies"
+font = ExtResource("6_orb")
+font_size = 76
+outline_size = 24
+
+[node name="Sign5" type="Label3D" parent="Signs" unique_id=1317899682]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74, 3.4, 0)
+pixel_size = 0.018
+billboard = 1
+modulate = Color(0, 1, 0.85, 1)
+outline_modulate = Color(0, 0.1, 0.09, 1)
+text = "SCROLL = SWITCH GUNS
+SHOTGUN up close"
+font = ExtResource("6_orb")
+font_size = 70
+outline_size = 24
+
+[node name="Sign6" type="Label3D" parent="Signs" unique_id=137473331]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, 3.4, 0)
+pixel_size = 0.018
+billboard = 1
+modulate = Color(0, 1, 0.85, 1)
+outline_modulate = Color(0, 0.1, 0.09, 1)
+text = "SNIPER + RIGHT MOUSE
+scope to aim"
+font = ExtResource("6_orb")
+font_size = 70
+outline_size = 24
+
+[node name="Sign7" type="Label3D" parent="Signs" unique_id=1954424709]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 104, 3.4, 0)
+pixel_size = 0.018
+billboard = 1
+modulate = Color(0, 1, 0.85, 1)
+outline_modulate = Color(0, 0.1, 0.09, 1)
+text = "STYLE = fast, airborne,
+varied kills"
+font = ExtResource("6_orb")
+font_size = 66
+outline_size = 24
+
+[node name="SignExit" type="Label3D" parent="Signs" unique_id=686990147]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 122, 3.6, 0)
+pixel_size = 0.02
+billboard = 1
+modulate = Color(0, 1, 0.85, 1)
+outline_modulate = Color(0, 0.1, 0.09, 1)
+text = "THE WAY TO TEAL
+touch the orb!"
+font = ExtResource("6_orb")
+font_size = 80
+outline_size = 26
+
+[node name="FinishOrb" parent="." unique_id=1342762593 node_paths=PackedStringArray("player") instance=ExtResource("3_fin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 124, 2, 0)
+toLevel = 1
+tutorialExit = true
+player = NodePath("../Player")
+
+[node name="PauseMenu" parent="." unique_id=1897128334 instance=ExtResource("4_pause")]
+
+[node name="TutorialHud" type="CanvasLayer" parent="." unique_id=1524675385]
+
+[node name="ObjectiveBox" type="Panel" parent="TutorialHud" unique_id=814545122]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -620.0
+offset_top = -236.0
+offset_right = 620.0
+offset_bottom = -120.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("objBox")
+
+[node name="Label" type="Label" parent="TutorialHud/ObjectiveBox" unique_id=2014145455]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 10.0
+offset_right = -16.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
+theme_override_colors/font_outline_color = Color(0, 0.1, 0.09, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("6_orb")
+theme_override_font_sizes/font_size = 34
+text = "MOVE: W A S D      JUMP: SPACE"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="SkipHint" type="Label" parent="TutorialHud" unique_id=1970517363]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -52.0
+offset_right = 540.0
+offset_bottom = -22.0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.5, 0.7, 0.68, 0.85)
+theme_override_fonts/font = ExtResource("6_orb")
+theme_override_font_sizes/font_size = 20
+text = "BACKSPACE: skip tutorial      R: restart"

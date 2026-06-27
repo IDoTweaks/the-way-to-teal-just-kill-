@@ -1077,6 +1077,66 @@ offset_top = -16.0
 step = 0.1
 show_percentage = false
 
+[node name="WeaponIndicator" type="VBoxContainer" parent="HUD" unique_id=771500001]
+offset_left = 1648.0
+offset_top = 512.0
+offset_right = 1896.0
+offset_bottom = 780.0
+theme = ExtResource("13_theme")
+theme_override_constants/separation = 10
+mouse_filter = 2
+
+[node name="Slot0" type="Panel" parent="HUD/WeaponIndicator" unique_id=771500002]
+custom_minimum_size = Vector2(248, 60)
+layout_mode = 2
+mouse_filter = 2
+pivot_offset = Vector2(124, 30)
+
+[node name="Label" type="Label" parent="HUD/WeaponIndicator/Slot0" unique_id=771500003]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 28
+text = "1 RIFLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot1" type="Panel" parent="HUD/WeaponIndicator" unique_id=771500004]
+custom_minimum_size = Vector2(248, 60)
+layout_mode = 2
+mouse_filter = 2
+pivot_offset = Vector2(124, 30)
+
+[node name="Label" type="Label" parent="HUD/WeaponIndicator/Slot1" unique_id=771500005]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 28
+text = "2 SHOTGUN"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot2" type="Panel" parent="HUD/WeaponIndicator" unique_id=771500006]
+custom_minimum_size = Vector2(248, 60)
+layout_mode = 2
+mouse_filter = 2
+pivot_offset = Vector2(124, 30)
+
+[node name="Label" type="Label" parent="HUD/WeaponIndicator/Slot2" unique_id=771500007]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 28
+text = "3 SNIPER"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [connection signal="button_down" from="GameOver/MainContainer/MenuButtons/retry" to="." method="_on_retry_button_down"]
 [connection signal="button_down" from="GameOver/MainContainer/MenuButtons/retry" to="GameOver" method="_on_retry_button_down"]
 [connection signal="button_down" from="GameOver/MainContainer/MenuButtons/QuitBtn" to="GameOver" method="_on_quit_btn_button_down"]

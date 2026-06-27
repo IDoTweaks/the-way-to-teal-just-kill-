@@ -24,6 +24,8 @@ func _ready() -> void:
 	_baseTitle2Rot = title2.rotation
 	_baseTagRot = tagline.rotation
 	_baseBtnRot = menuButtons.rotation
+	if not Global.tutorialComplete:
+		Global._goToTutorial.call_deferred()
 
 func _process(delta: float) -> void:
 	_t += delta
@@ -36,6 +38,10 @@ func _process(delta: float) -> void:
 
 func _on_join_game_btn_button_down() -> void:
 	stageSelect.open()
+
+
+func _on_tutorial_btn_button_down() -> void:
+	Global._goToTutorial()
 
 
 func _on_stage_closed() -> void:

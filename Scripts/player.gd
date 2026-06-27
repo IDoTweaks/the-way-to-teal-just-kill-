@@ -92,6 +92,7 @@ var comboCount : int = 0
 @onready var styleBar : ProgressBar = $HUD/StyleMeterUI/styleBar
 @onready var styleFire : ColorRect = $HUD/StyleMeterUI/Fire
 @onready var healthBar : ColorRect = $HUD/healthBar
+@onready var weaponSlots = [$HUD/WeaponIndicator/Slot0, $HUD/WeaponIndicator/Slot1, $HUD/WeaponIndicator/Slot2]
 
 # wall jumping
 var wallNormal  = Vector3.ZERO
@@ -249,6 +250,7 @@ const GUN_REST_ROT = Vector3(-0.15707964, -3.2637658, 0.15707964)
 var _bullet_pool: Array[Node] = []
 var _bullet_tex: ImageTexture
 var currentGun : int = 0
+var unlockedGuns : int = 3
 var shotGunCd = false
 #0 - rifle
 #1 - shotgun
@@ -262,21 +264,44 @@ func _showGunModels():
 	shotGun.visible = currentGun == 1
 	sniperGun.visible = currentGun == 2
 	shotgunDemo.visible = false
+	_updateWeaponHud()
 
 func _switchGuns():
-	if Input.is_action_just_pressed("gun1"):
+	if Input.is_action_just_pressed("gun1") and unlockedGuns > 0:
 		currentGun = 0
 		_showGunModels()
-	elif Input.is_action_just_pressed("gun2"):
+	elif Input.is_action_just_pressed("gun2") and unlockedGuns > 1:
 		currentGun = 1
 		_showGunModels()
-	elif Input.is_action_just_pressed("gun3"):
+	elif Input.is_action_just_pressed("gun3") and unlockedGuns > 2:
 		currentGun = 2
 		_showGunModels()
 
 func _cycleGun(dir: int):
-	currentGun = (currentGun + dir + 3) % 3
+	currentGun = (currentGun + dir + unlockedGuns) % unlockedGuns
 	_showGunModels()
+
+func _setUnlockedGuns(n):
+	unlockedGuns = clamp(n, 1, 3)
+	currentGun = clamp(currentGun, 0, unlockedGuns - 1)
+	_showGunModels()
+
+func _updateWeaponHud():
+	if weaponSlots == null:
+		return
+	for i in weaponSlots.size():
+		var slot = weaponSlots[i]
+		if slot == null:
+			continue
+		if i >= unlockedGuns:
+			slot.modulate = Color(0.2, 0.24, 0.24, 0.4)
+			slot.scale = Vector2.ONE
+		elif i == currentGun:
+			slot.modulate = Color(0, 1, 0.85, 1)
+			slot.scale = Vector2(1.15, 1.15)
+		else:
+			slot.modulate = Color(0.55, 0.7, 0.68, 0.7)
+			slot.scale = Vector2.ONE
 
 func _tweenFov(target):
 	if fovTween:
@@ -618,6 +643,7 @@ func _ready() -> void:
 	_last_footprint_pos = global_position
 	_bullet_tex = _make_bullet_texture()
 	_updateHud()
+	_updateWeaponHud()
 	
 	
 func _process(delta: float) -> void:

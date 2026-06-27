@@ -5,10 +5,13 @@ extends Node
 @onready var level3 = preload("res://Scenes/level3.tscn")
 @onready var level4 = preload("res://Scenes/level4.tscn")
 @onready var level5 = preload("res://Scenes/level5.tscn")
+@onready var level6 = preload("res://Scenes/level6.tscn")
 @onready var bossArena = preload("res://Scenes/boss1Arena.tscn")
+@onready var tutorial = preload("res://Scenes/tutorial.tscn")
 @onready var levels : Array
 var currentLevel = 1
 var maxUnlocked = 1
+var tutorialComplete := false
 
 var ghostPos : Dictionary = {}
 var ghostRot : Dictionary = {}
@@ -107,6 +110,7 @@ func _localLoad():
 		grades = config.get_value("player", "grades", grades)
 		times = config.get_value("player", "times", times)
 		maxUnlocked = config.get_value("player", "maxUnlocked", maxUnlocked)
+		tutorialComplete = config.get_value("player", "tutorialComplete", tutorialComplete)
 		bestTimes = config.get_value("player", "bestTimes", bestTimes)
 		levelTries = config.get_value("player", "levelTries", levelTries)
 		ghostPos = config.get_value("ghost", "ghostPos", ghostPos)
@@ -121,6 +125,7 @@ func _localSave():
 	config.set_value("player", "grades", grades)
 	config.set_value("player", "times", times)
 	config.set_value("player", "maxUnlocked", maxUnlocked)
+	config.set_value("player", "tutorialComplete", tutorialComplete)
 	config.set_value("player", "bestTimes", bestTimes)
 	config.set_value("player", "levelTries", levelTries)
 	config.set_value("ghost", "ghostPos", ghostPos)
@@ -138,6 +143,7 @@ func _ready() -> void:
 	levels.append(level3)
 	levels.append(level4)
 	levels.append(level5)
+	levels.append(level6)
 	_localLoad()
 	_loadSettings()
 
@@ -187,6 +193,15 @@ func _goToLevel(idx):
 	currentLevel = idx
 	Audio.music_for_level(idx)
 	get_tree().change_scene_to_packed(levels[idx])
+
+func _goToTutorial():
+	Audio.music_for_level(0)
+	get_tree().change_scene_to_packed(tutorial)
+
+func _finishTutorial():
+	tutorialComplete = true
+	_localSave()
+	_goToLevel(1)
 
 func _process(delta: float) -> void:
 	pass

@@ -1,5 +1,6 @@
 extends Node3D
 @export var toLevel: int
+@export var tutorialExit: bool = false
 var canvas
 var open = false
 @export var player: CharacterBody3D
@@ -13,7 +14,10 @@ func _process(delta: float) -> void:
 func _on_finish_area_body_entered(body: Node3D) -> void:
 	if open and body.has_method("player"):
 		open = false
-		player._finishLevel()
+		if tutorialExit:
+			Global._finishTutorial()
+		else:
+			player._finishLevel()
 
 func _finishLevel():
 	var level = Global.levels[toLevel]
