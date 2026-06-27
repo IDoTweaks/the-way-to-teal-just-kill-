@@ -1,74 +1,17 @@
 [gd_scene format=3 uid="uid://cxradqn2o1i4b"]
 
 [ext_resource type="Script" uid="uid://r68xyadwcdin" path="res://Scripts/mainMenu.gd" id="1_k7s4i"]
-[ext_resource type="Shader" path="res://shaders/uiEnergy.gdshader" id="2_energy"]
-[ext_resource type="ShaderMaterial" path="res://shaders/funkyText.tres" id="3_funky"]
-[ext_resource type="PackedScene" path="res://ObjectScenes/settingsMenu.tscn" id="4_setmenu"]
+[ext_resource type="Shader" uid="uid://bihmuurth0hxf" path="res://shaders/uiEnergy.gdshader" id="2_energy"]
+[ext_resource type="Material" path="res://shaders/funkyText.tres" id="3_funky"]
+[ext_resource type="PackedScene" uid="uid://bbr7awrcekmkp" path="res://ObjectScenes/settingsMenu.tscn" id="4_setmenu"]
 [ext_resource type="Theme" uid="uid://bfunkytheme01" path="res://UI/funkyTheme.tres" id="5_theme"]
-[ext_resource type="PackedScene" path="res://ObjectScenes/stageSelect.tscn" id="6_stage"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
-resource_name = "blue_button_hover"
-bg_color = Color(0.07, 0.15, 0.28, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.25, 0.62, 1.0, 1)
-content_margin_left = 24.0
-content_margin_top = 12.0
-content_margin_right = 24.0
-content_margin_bottom = 12.0
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
-resource_name = "blue_button_normal"
-bg_color = Color(0.04, 0.08, 0.16, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.12, 0.42, 0.82, 1)
-content_margin_left = 24.0
-content_margin_top = 12.0
-content_margin_right = 24.0
-content_margin_bottom = 12.0
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3"]
-resource_name = "blue_button_pressed"
-bg_color = Color(0.05, 0.10, 0.20, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.08, 0.88, 0.42, 1)
-content_margin_left = 24.0
-content_margin_top = 12.0
-content_margin_right = 24.0
-content_margin_bottom = 12.0
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="Theme" id="Theme_1"]
-Button/styles/focus = SubResource("StyleBoxFlat_2")
-Button/styles/hover = SubResource("StyleBoxFlat_2")
-Button/styles/normal = SubResource("StyleBoxFlat_1")
-Button/styles/pressed = SubResource("StyleBoxFlat_3")
+[ext_resource type="PackedScene" uid="uid://c55s3ugfq3jyu" path="res://ObjectScenes/stageSelect.tscn" id="6_stage"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_energy"]
 shader = ExtResource("2_energy")
-shader_parameter/deep = Color(0.008, 0.02, 0.025, 1.0)
-shader_parameter/glow_blue = Color(0.0, 0.28, 0.3, 1.0)
-shader_parameter/glow_green = Color(0.0, 0.55, 0.5, 1.0)
+shader_parameter/deep = Color(0.008, 0.02, 0.025, 1)
+shader_parameter/glow_blue = Color(0, 0.28, 0.3, 1)
+shader_parameter/glow_green = Color(0, 0.55, 0.5, 1)
 
 [node name="MainMenu2" type="Control" unique_id=527281505]
 layout_mode = 3
@@ -80,8 +23,8 @@ grow_vertical = 2
 script = ExtResource("1_k7s4i")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1268340044]
+modulate = Color(1, 1, 1, 0.75)
 material = SubResource("ShaderMaterial_energy")
-modulate = Color(1, 1, 1, 0.82)
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -108,15 +51,23 @@ grow_vertical = 2
 [node name="Title" type="Label" parent="UI/MainContainer" unique_id=1373354903]
 material = ExtResource("3_funky")
 layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_top = 120.0
-offset_bottom = 240.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -840.0
+offset_top = -440.0
+offset_right = 480.0
+offset_bottom = -270.0
 grow_horizontal = 2
+grow_vertical = 2
+rotation = -0.09
+pivot_offset = Vector2(660, 85)
 theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
 theme_override_colors/font_outline_color = Color(0, 0.12, 0.11, 0.9)
-theme_override_constants/outline_size = 30
-theme_override_font_sizes/font_size = 92
+theme_override_constants/outline_size = 40
+theme_override_font_sizes/font_size = 128
 text = "THE WAY TO TEAL"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -129,19 +80,93 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 130.0
-offset_top = -390.0
-offset_right = 610.0
-offset_bottom = -310.0
+offset_left = 250.0
+offset_top = -300.0
+offset_right = 730.0
+offset_bottom = -220.0
 grow_horizontal = 2
 grow_vertical = 2
-rotation = 0.22340214
-theme_override_colors/font_color = Color(0, 0.9, 0.82, 1)
+rotation = 0.32
+pivot_offset = Vector2(240, 40)
+theme_override_colors/font_color = Color(0.1, 1, 0.5, 1)
 theme_override_colors/font_outline_color = Color(0.9, 1, 0.98, 0.5)
 theme_override_constants/outline_size = 26
-theme_override_font_sizes/font_size = 60
+theme_override_font_sizes/font_size = 78
 text = "(just kill:)"
 horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Tagline" type="Label" parent="UI/MainContainer" unique_id=1967707046]
+modulate = Color(0, 0.521919, 0.5219188, 1)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 60.0
+offset_top = 150.0
+offset_right = 720.0
+offset_bottom = 188.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 0.06
+pivot_offset = Vector2(330, 19)
+theme_override_colors/font_color = Color(0.1, 1, 0.5, 1)
+theme_override_font_sizes/font_size = 30
+text = "// MADE FOR STARDANCE BY:
+LOVE/LOVETHEGODOTDEVELOPER
+SWIFTFISHI/SWIFTFISHI3
+(WE ARE ALL THE SAME PERSON:)"
+horizontal_alignment = 1
+
+[node name="SlashTeal" type="ColorRect" parent="UI/MainContainer" unique_id=101944572]
+layout_mode = 0
+offset_left = -300.0
+offset_top = 250.0
+offset_right = 2200.0
+offset_bottom = 288.0
+rotation = -0.18
+mouse_filter = 2
+color = Color(0.1, 0.85, 0.85, 0.5)
+
+[node name="SlashGreen" type="ColorRect" parent="UI/MainContainer" unique_id=440777985]
+layout_mode = 0
+offset_left = -300.0
+offset_top = 560.0
+offset_right = 1900.0
+offset_bottom = 582.0
+rotation = -0.12
+mouse_filter = 2
+color = Color(0.1, 1, 0.5, 0.4)
+
+[node name="SlashTeal2" type="ColorRect" parent="UI/MainContainer" unique_id=892939287]
+layout_mode = 0
+offset_left = 400.0
+offset_top = -120.0
+offset_right = 2200.0
+offset_bottom = -98.0
+rotation = -0.22
+mouse_filter = 2
+color = Color(0.1, 0.85, 0.85, 0.35)
+
+[node name="Version" type="Label" parent="UI/MainContainer" unique_id=1242957840]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -380.0
+offset_top = -46.0
+offset_right = -18.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.5, 0.7, 0.68, 0.85)
+theme_override_font_sizes/font_size = 20
+text = "THE WAY TO TEAL // just kill"
+horizontal_alignment = 2
 vertical_alignment = 1
 
 [node name="MenuButtons" type="VBoxContainer" parent="UI/MainContainer" unique_id=404229236]
@@ -151,50 +176,54 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -760.0
-offset_top = -40.0
-offset_right = -440.0
-offset_bottom = 320.0
+offset_left = -740.0
+offset_top = -20.0
+offset_right = -380.0
+offset_bottom = 340.0
 grow_horizontal = 2
 grow_vertical = 2
+rotation = -0.07
+pivot_offset = Vector2(180, 180)
 theme = ExtResource("5_theme")
-theme_override_constants/separation = 16
+theme_override_constants/separation = 24
 
 [node name="JoinGameBtn" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=66041543]
-custom_minimum_size = Vector2(300, 58)
+custom_minimum_size = Vector2(380, 72)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
 theme_override_colors/font_focus_color = Color(0.01, 0.04, 0.04, 1)
 theme_override_colors/font_hover_color = Color(0.01, 0.04, 0.04, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 42
 text = "PLAY"
 
 [node name="VSeparator" type="VSeparator" parent="UI/MainContainer/MenuButtons" unique_id=1799183135]
 layout_mode = 2
 
 [node name="SettingsBtn" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=1666292464]
-custom_minimum_size = Vector2(300, 58)
+custom_minimum_size = Vector2(380, 72)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
 theme_override_colors/font_focus_color = Color(0.01, 0.04, 0.04, 1)
 theme_override_colors/font_hover_color = Color(0.01, 0.04, 0.04, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 42
 text = "SETTINGS"
 
 [node name="QuitBtn" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=810246644]
-custom_minimum_size = Vector2(300, 58)
+custom_minimum_size = Vector2(380, 72)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
 theme_override_colors/font_focus_color = Color(0.01, 0.04, 0.04, 1)
 theme_override_colors/font_hover_color = Color(0.01, 0.04, 0.04, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 42
 text = "QUIT"
 
-[node name="Settings" parent="UI/MainContainer" instance=ExtResource("4_setmenu")]
+[node name="Settings" parent="UI/MainContainer" unique_id=122515203 instance=ExtResource("4_setmenu")]
 visible = false
+layout_mode = 1
 
-[node name="StageSelect" parent="UI/MainContainer" instance=ExtResource("6_stage")]
+[node name="StageSelect" parent="UI/MainContainer" unique_id=1400840833 instance=ExtResource("6_stage")]
 visible = false
+layout_mode = 1
 
 [node name="AmbientLight" type="ColorRect" parent="." unique_id=1833103425]
 layout_mode = 1
