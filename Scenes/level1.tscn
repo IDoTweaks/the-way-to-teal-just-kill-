@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://oftku5x50jul"]
 
 [ext_resource type="Script" uid="uid://2pcnmn74i67n" path="res://Scripts/level_1.gd" id="1_4iphx"]
-[ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="pause_lvl1"]
 [ext_resource type="Material" uid="uid://dagdbpsvta3ue" path="res://shaders/new_standard_material_3d.tres" id="1_c5erv"]
 [ext_resource type="Texture2D" uid="uid://ep187n5c5y83" path="res://Textures/AquilariusRetroTextures/t38.png" id="1_didp7"]
 [ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="1_vly50"]
@@ -12,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://cna3205ggf26a" path="res://ObjectScenes/playerGhost.tscn" id="9_jgkgd"]
 [ext_resource type="PackedScene" uid="uid://du4s8p1pljnlb" path="res://ObjectScenes/jumpOrb.tscn" id="10_bs12r"]
 [ext_resource type="PackedScene" uid="uid://ctoceg007wby5" path="res://ObjectScenes/Xenon.tscn" id="11_rqhku"]
+[ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="pause_lvl1"]
 
 [sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_c5erv"]
 data = PackedVector3Array(-7.5, -0.5, -6.5, -7.5, 7.5, -6.5, -7.5, -0.5, 6.5, -7, 0, -5.5, -7, 0, 5.5, -7, 7, -5.5, -7.5, -0.5, -6.5, -7.5, -0.5, 6.5, 6.5, -0.5, -6.5, -7, 0, -5.5, 6, 0, -5.5, -7, 0, 5.5, -7.5, -0.5, -6.5, 6.5, -0.5, -6.5, -7.5, 7.5, -6.5, -7, 0, -5.5, -7, 7, -5.5, 6, 0, -5.5, -7.5, -0.5, 6.5, -7.5, 7.5, -6.5, -7.5, 7.5, 6.5, -7, 0, 5.5, -7, 7, 5.5, -7, 7, -5.5, -7, 0, 5.5, 6, 7, 5.5, -7, 7, 5.5, -7.5, -0.5, 6.5, -7.5, 7.5, 6.5, 6.5, 7.5, 6.5, -7.5, 7.5, -6.5, 6.5, 7.5, 6.5, -7.5, 7.5, 6.5, -7, 7, -5.5, -7, 7, 5.5, 6, 7, 5.5, -7, 0, 5.5, 6, 0, -5.5, 6, 0, -1.5, 6.5, -0.5, -6.5, 6.5, -0.5, 6.5, 6.5, 0, -1.5, 6, 0, -1.5, 6.5, 0, -1.5, 6.5, 0, 1.5, 6, 0, -1.5, 6, 4, -1.5, 6.5, 0, -1.5, 6, 0, -5.5, 6, 7, -5.5, 6, 0, -1.5, 6.5, -0.5, -6.5, 6.5, 0, -1.5, 6.5, 7.5, -6.5, 6, 4, -1.5, 6.5, 4, -1.5, 6.5, 0, -1.5, -7.5, -0.5, 6.5, 6.5, -0.5, 6.5, 6.5, -0.5, -6.5, -7, 0, 5.5, 6, 0, -1.5, 6, 0, 1.5, -7, 0, 5.5, 6, 0, 1.5, 6, 0, 5.5, -7, 0, 5.5, 6, 0, 5.5, 6, 7, 5.5, -7.5, -0.5, 6.5, 6.5, 7.5, 6.5, 6.5, -0.5, 6.5, 6, 0, -1.5, 6.5, 0, 1.5, 6, 0, 1.5, 6.5, -0.5, 6.5, 6.5, 0, 1.5, 6.5, 0, -1.5, 6, 0, 1.5, 6.5, 0, 1.5, 6.5, 4, 1.5, 6, 0, 1.5, 6, 4, 1.5, 6, 0, 5.5, 6.5, -0.5, 6.5, 6.5, 4, 1.5, 6.5, 0, 1.5, 6, 0, 1.5, 6.5, 4, 1.5, 6, 4, 1.5, -7.5, 7.5, -6.5, 6.5, -0.5, -6.5, 6.5, 7.5, -6.5, -7, 7, -5.5, 6, 7, -5.5, 6, 0, -5.5, -7, 7, -5.5, 6, 7, 5.5, 6, 7, -5.5, -7.5, 7.5, -6.5, 6.5, 7.5, -6.5, 6.5, 7.5, 6.5, 6, 0, -1.5, 6, 7, -5.5, 6, 4, -1.5, 6.5, 7.5, -6.5, 6.5, 0, -1.5, 6.5, 4, -1.5, 6, 4, -1.5, 6, 4, 1.5, 6.5, 4, -1.5, 6, 4, -1.5, 6, 7, -5.5, 6, 7, 5.5, 6.5, 7.5, -6.5, 6.5, 4, -1.5, 6.5, 7.5, 6.5, 6, 4, 1.5, 6.5, 4, 1.5, 6.5, 4, -1.5, 6, 4, -1.5, 6, 7, 5.5, 6, 4, 1.5, 6.5, 7.5, 6.5, 6.5, 4, -1.5, 6.5, 4, 1.5, 6, 0, 5.5, 6, 4, 1.5, 6, 7, 5.5, 6.5, -0.5, 6.5, 6.5, 7.5, 6.5, 6.5, 4, 1.5)
@@ -52,7 +52,6 @@ fog_density = 0.005
 
 [node name="MainScene" type="Node3D" unique_id=59475580]
 script = ExtResource("1_4iphx")
-levelIndex = 1
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1544043293]
 
@@ -257,9 +256,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.26, 0)
 
 [node name="JumpOrb" parent="." unique_id=2076773349 instance=ExtResource("10_bs12r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.040392, 1.7405822, 0.41292906)
+jumpForce = 25.0
 cooldown = 0.1
 
 [node name="JumpOrb2" parent="." unique_id=754474650 instance=ExtResource("10_bs12r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.775013, 6.0973196, 0.41292906)
+jumpForce = 25.0
 
-[node name="PauseMenu" parent="." instance=ExtResource("pause_lvl1")]
+[node name="PauseMenu" parent="." unique_id=1227138546 instance=ExtResource("pause_lvl1")]
