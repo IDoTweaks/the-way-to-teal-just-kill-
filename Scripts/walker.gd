@@ -30,6 +30,7 @@ var baseBodyY : float = 0.0
 func _makeTarg(targ):
 	gotShot = true
 	target = targ
+	mode = "chase"
 
 func _ready() -> void:
 	add_to_group("enemies")

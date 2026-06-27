@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://m1yadf45niea"]
+
+[ext_resource type="Script" path="res://Scripts/drone_bullet.gd" id="1_db"]
+
+[sub_resource type="StandardMaterial3D" id="mat_db"]
+albedo_color = Color(0.1, 1, 0.3, 1)
+emission_enabled = true
+emission = Color(0.1, 1, 0.3, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="CapsuleMesh" id="mesh_db"]
+radius = 0.18
+height = 0.7
+
+[sub_resource type="SphereShape3D" id="shape_db"]
+radius = 0.2
+
+[node name="DroneBullet" type="CharacterBody3D"]
+collision_layer = 0
+script = ExtResource("1_db")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+material_override = SubResource("mat_db")
+mesh = SubResource("mesh_db")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("shape_db")

@@ -1,0 +1,103 @@
+[gd_scene format=3 uid="uid://vgvk37eiw6yj"]
+
+[ext_resource type="Script" uid="uid://2pcnmn74i67n" path="res://Scripts/level_1.gd" id="1_lvl"]
+[ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="2_pl"]
+[ext_resource type="PackedScene" uid="uid://cna3205ggf26a" path="res://ObjectScenes/playerGhost.tscn" id="3_gh"]
+[ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="4_fin"]
+[ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="5_pause"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/Exploder.tscn" id="6_expl"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/Charger.tscn" id="7_charg"]
+
+[sub_resource type="StandardMaterial3D" id="mat_level"]
+albedo_color = Color(0.2, 0.22, 0.15, 1)
+
+[sub_resource type="Environment" id="env"]
+ssao_enabled = true
+fog_enabled = true
+fog_light_energy = 1.8
+fog_density = 0.006
+
+[node name="MainScene" type="Node3D"]
+script = ExtResource("1_lvl")
+levelIndex = 5
+
+[node name="Level" type="CSGCombiner3D" parent="."]
+material_override = SubResource("mat_level")
+use_collision = true
+collision_layer = 17
+
+[node name="Floor" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -0.5, 0)
+size = Vector3(44, 1, 28)
+
+[node name="Ceiling" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 8.5, 0)
+size = Vector3(44, 1, 28)
+
+[node name="WallNegX" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 4, 0)
+size = Vector3(1, 8, 28)
+
+[node name="WallPosX" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41.5, 4, 0)
+size = Vector3(1, 8, 28)
+
+[node name="WallNegZ" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 4, -13.5)
+size = Vector3(44, 8, 1)
+
+[node name="WallPosZ" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 4, 13.5)
+size = Vector3(44, 8, 1)
+
+[node name="DividerA" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 4, 4)
+size = Vector3(1, 8, 16)
+
+[node name="DividerB" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27, 4, -4)
+size = Vector3(1, 8, 16)
+
+[node name="Pillar1" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 2, 8)
+size = Vector3(2, 4, 2)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -0.37609485, 0.9265812, 0, -0.9265812, -0.37609485, 0, 18.215263, 0)
+
+[node name="Player" parent="." instance=ExtResource("2_pl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, -8)
+dashBoost = 22.0
+shotGunDmg = 7.5
+
+[node name="Player2" parent="." instance=ExtResource("3_gh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, -8)
+
+[node name="Exploder1" parent="." instance=ExtResource("6_expl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 2, -6)
+
+[node name="Exploder2" parent="." instance=ExtResource("6_expl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2, 6)
+
+[node name="Exploder3" parent="." instance=ExtResource("6_expl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 2, -6)
+
+[node name="Exploder4" parent="." instance=ExtResource("6_expl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 2, 4)
+
+[node name="Exploder5" parent="." instance=ExtResource("6_expl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 2, 0)
+
+[node name="Charger1" parent="." instance=ExtResource("7_charg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 2, 0)
+wallLayer = 16
+
+[node name="FinishOrb" parent="." node_paths=PackedStringArray("player") instance=ExtResource("4_fin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 2, 8)
+toLevel = 0
+player = NodePath("../Player")
+
+[node name="PauseMenu" parent="." instance=ExtResource("5_pause")]

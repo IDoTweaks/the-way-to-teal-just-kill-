@@ -2,6 +2,9 @@ extends Node
 @onready var mainMenu = preload("res://Scenes/mainMenu.tscn")
 @onready var level1 = preload("res://Scenes/level1.tscn")
 @onready var level2 = preload("res://Scenes/level2.tscn")
+@onready var level3 = preload("res://Scenes/level3.tscn")
+@onready var level4 = preload("res://Scenes/level4.tscn")
+@onready var level5 = preload("res://Scenes/level5.tscn")
 @onready var bossArena = preload("res://Scenes/boss1Arena.tscn")
 @onready var levels : Array
 var currentLevel = 1
@@ -132,6 +135,9 @@ func _ready() -> void:
 	levels.append(mainMenu)
 	levels.append(level1)
 	levels.append(level2)
+	levels.append(level3)
+	levels.append(level4)
+	levels.append(level5)
 	_localLoad()
 	_loadSettings()
 

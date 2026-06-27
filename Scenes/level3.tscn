@@ -1,0 +1,111 @@
+[gd_scene format=3 uid="uid://b3pysxxfypw8h"]
+
+[ext_resource type="Script" uid="uid://2pcnmn74i67n" path="res://Scripts/level_1.gd" id="1_lvl"]
+[ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="2_pl"]
+[ext_resource type="PackedScene" uid="uid://cna3205ggf26a" path="res://ObjectScenes/playerGhost.tscn" id="3_gh"]
+[ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="4_fin"]
+[ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="5_pause"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/Charger.tscn" id="6_charg"]
+[ext_resource type="PackedScene" uid="uid://ctoceg007wby5" path="res://ObjectScenes/Xenon.tscn" id="7_xen"]
+
+[sub_resource type="StandardMaterial3D" id="mat_level"]
+albedo_color = Color(0.16, 0.26, 0.18, 1)
+
+[sub_resource type="Environment" id="env"]
+ssao_enabled = true
+fog_enabled = true
+fog_light_energy = 2.0
+fog_density = 0.004
+
+[node name="MainScene" type="Node3D"]
+script = ExtResource("1_lvl")
+levelIndex = 3
+
+[node name="Level" type="CSGCombiner3D" parent="."]
+material_override = SubResource("mat_level")
+use_collision = true
+collision_layer = 17
+
+[node name="Floor" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -0.5, 0)
+size = Vector3(44, 1, 32)
+
+[node name="Ceiling" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 12.5, 0)
+size = Vector3(44, 1, 32)
+
+[node name="WallNegX" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 6, 0)
+size = Vector3(1, 12, 32)
+
+[node name="WallPosX" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41.5, 6, 0)
+size = Vector3(1, 12, 32)
+
+[node name="WallNegZ" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 6, -15.5)
+size = Vector3(44, 12, 1)
+
+[node name="WallPosZ" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 6, 15.5)
+size = Vector3(44, 12, 1)
+
+[node name="Pillar1" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 2, 6)
+size = Vector3(2, 4, 2)
+
+[node name="Pillar2" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2, -6)
+size = Vector3(2, 4, 2)
+
+[node name="Pillar3" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 2, 5)
+size = Vector3(2, 4, 2)
+
+[node name="CoverMid" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 2, -1)
+size = Vector3(3, 4, 3)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -0.37609485, 0.9265812, 0, -0.9265812, -0.37609485, 0, 18.215263, 0)
+
+[node name="Player" parent="." instance=ExtResource("2_pl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, 0)
+dashBoost = 22.0
+shotGunDmg = 7.5
+
+[node name="Player2" parent="." instance=ExtResource("3_gh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, 0)
+
+[node name="Charger1" parent="." instance=ExtResource("6_charg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 2, 4)
+wallLayer = 16
+
+[node name="Charger2" parent="." instance=ExtResource("6_charg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2, -5)
+wallLayer = 16
+
+[node name="Charger3" parent="." instance=ExtResource("6_charg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 2, 4)
+wallLayer = 16
+
+[node name="Charger4" parent="." instance=ExtResource("6_charg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 2, -4)
+wallLayer = 16
+
+[node name="Xenon1" parent="." node_paths=PackedStringArray("player") instance=ExtResource("7_xen")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 2, -8)
+sightDist = 50.0
+player = NodePath("../Player")
+wallLayer = 16
+damage = 5
+
+[node name="FinishOrb" parent="." node_paths=PackedStringArray("player") instance=ExtResource("4_fin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 2, 0)
+toLevel = 4
+player = NodePath("../Player")
+
+[node name="PauseMenu" parent="." instance=ExtResource("5_pause")]

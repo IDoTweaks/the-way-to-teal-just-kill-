@@ -132,6 +132,31 @@ size = Vector3(5, 1, 5)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66, 13.5, 5)
 size = Vector3(8, 1, 8)
 
+[node name="Enclosure" type="CSGCombiner3D" parent="."]
+material_override = SubResource("StandardMaterial3D_level")
+use_collision = true
+collision_layer = 17
+
+[node name="Ceiling" type="CSGBox3D" parent="Enclosure"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 18, 0)
+size = Vector3(86, 1, 32)
+
+[node name="WallWest" type="CSGBox3D" parent="Enclosure"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 9, 0)
+size = Vector3(1, 18, 32)
+
+[node name="WallEast" type="CSGBox3D" parent="Enclosure"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 72.5, 9, 0)
+size = Vector3(1, 18, 32)
+
+[node name="WallNorth" type="CSGBox3D" parent="Enclosure"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 9, -15)
+size = Vector3(86, 18, 1)
+
+[node name="WallSouth" type="CSGBox3D" parent="Enclosure"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 9, 15)
+size = Vector3(86, 18, 1)
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1579051719]
 environment = SubResource("Environment_52fb6")
 
@@ -204,7 +229,7 @@ lifeTime = 25.0
 
 [node name="FinishOrb" parent="." unique_id=898469258 node_paths=PackedStringArray("player") instance=ExtResource("9_in4v8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66, 15, 5)
-toLevel = 2
+toLevel = 3
 player = NodePath("../Player")
 
 [node name="JumpOrb" parent="." unique_id=1801534444 instance=ExtResource("11_5qi50")]

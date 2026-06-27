@@ -256,11 +256,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.26, 0)
 
 [node name="JumpOrb" parent="." unique_id=2076773349 instance=ExtResource("10_bs12r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.040392, 1.7405822, 0.41292906)
-jumpForce = 25.0
+jumpForce = 18.0
 cooldown = 0.1
 
 [node name="JumpOrb2" parent="." unique_id=754474650 instance=ExtResource("10_bs12r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.775013, 6.0973196, 0.41292906)
-jumpForce = 25.0
+jumpForce = 18.0
 
 [node name="PauseMenu" parent="." unique_id=1227138546 instance=ExtResource("pause_lvl1")]

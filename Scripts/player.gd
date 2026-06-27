@@ -508,7 +508,7 @@ func _shoot():
 				forward = forward.rotated(camXform.basis.x.normalized(), randf_range(-spread, spread))
 				forward = forward.rotated(camXform.basis.y.normalized(), randf_range(-spread, spread))
 			var beamStart = sniperGun.global_position if sniperGun.visible else origin
-			var far_point = origin + forward * 300
+			var far_point = origin + forward * 3000
 			var space = get_world_3d().direct_space_state
 			var query = PhysicsRayQueryParameters3D.create(origin, far_point)
 			query.exclude = [self.get_rid()]
@@ -601,9 +601,6 @@ func _ready() -> void:
 	_footprint_tex = _make_teal_texture()
 	_last_footprint_pos = global_position
 	_bullet_tex = _make_bullet_texture()
-	print("bullet tex: ", _bullet_tex)
-	if _bullet_tex:
-		print("bullet tex image: ", _bullet_tex.get_image())
 	_updateHud()
 	
 	

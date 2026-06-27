@@ -60,5 +60,4 @@ func play_music(stream : AudioStream) -> void:
 func music_for_level(idx : int) -> void:
 	match idx:
 		0: play_music(_musicMenu)
-		3: play_music(_musicBoss)
 		_: play_music(_musicLevel)

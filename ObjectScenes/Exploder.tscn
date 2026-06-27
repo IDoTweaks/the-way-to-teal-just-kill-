@@ -1,0 +1,65 @@
+[gd_scene format=3 uid="uid://bxgdhkmypcm0s"]
+
+[ext_resource type="Script" path="res://Scripts/exploder.gd" id="1_ex"]
+[ext_resource type="Shader" path="res://Scripts/enemy.gdshader" id="2_sh"]
+[ext_resource type="Script" path="res://Scripts/meshInstanceBody.gd" id="3_body"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/enemyMarker.tscn" id="4_mark"]
+[ext_resource type="PackedScene" path="res://Models/minecraft_sunglasses.glb" id="5_glasses"]
+
+[sub_resource type="ShaderMaterial" id="green_mat"]
+shader = ExtResource("2_sh")
+shader_parameter/base_color = Color(0, 0.36, 0.13, 1)
+shader_parameter/fill_color = Color(0, 1, 0.27, 1)
+shader_parameter/fill_percent = 1.0
+shader_parameter/min_y = -0.85
+shader_parameter/max_y = 0.85
+
+[sub_resource type="SphereMesh" id="body_mesh"]
+radius = 0.85
+height = 1.7
+
+[sub_resource type="BoxMesh" id="marker_box"]
+size = Vector3(0.2, 0.2, 0.2)
+
+[sub_resource type="SphereShape3D" id="body_shape"]
+radius = 0.85
+
+[sub_resource type="SphereShape3D" id="chase_shape"]
+radius = 24.0
+
+[node name="Enemy" type="CharacterBody3D" node_paths=PackedStringArray("navAgent")]
+script = ExtResource("1_ex")
+navAgent = NodePath("NavigationAgent3D")
+wallLayer = 1
+
+[node name="EnemyMarker" parent="." instance=ExtResource("4_mark")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+
+[node name="body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+material_override = SubResource("green_mat")
+mesh = SubResource("body_mesh")
+script = ExtResource("3_body")
+
+[node name="Sunglasses" parent="body" instance=ExtResource("5_glasses")]
+transform = Transform3D(0.06, 0, 0, 0, 0.06, 0, 0, 0, 0.06, 0, 0.18, -0.82)
+
+[node name="textSpawn" type="MeshInstance3D" parent="body"]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 1.1, 0)
+visible = false
+mesh = SubResource("marker_box")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+shape = SubResource("body_shape")
+
+[node name="chase" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="chase"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+shape = SubResource("chase_shape")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+
+[connection signal="body_entered" from="chase" to="." method="_on_chase_body_entered"]
+[connection signal="body_exited" from="chase" to="." method="_on_chase_body_exited"]
