@@ -58,6 +58,9 @@ var dashDir: Vector3 = Vector3.ZERO
 @onready var shotGun = $playerCam/shotGun
 @onready var shotgunDemo = $playerCam/gun/shotGunDemo
 @onready var shotgunForcePnt = $playerCam/shotGun/shotGunForcePoint
+@onready var leftArm = $playerCam/leftArm
+@onready var rightArm = $playerCam/rightArm
+@onready var scopeOverlay = $HUD/Scope
 @onready var finishOrb = $"../FinishOrb"
 @onready var levelEnd = $levelEnd
 @onready var timer :Label = $HUD/timer
@@ -207,7 +210,19 @@ func _spawn_footprint(pos: Vector3) -> void:
 @export var bullet_hole_size: float = 0.15
 @export var max_bullet_holes: int = 100
 @export var shotGunDmg : float = 4
+@export var sniperDmg : float = 150
+@export var sniperCooldown : float = 1.6
 @onready var shotGunCdTimer = $shotGunCd
+@onready var sniperGun = $playerCam/sniperGun
+var sniperCdTimer : float = 0.0
+@export var sniperRestRot : Vector3 = Vector3(0.22, 3.1415927, 0.18)
+@export var hipfireSpread : float = 7.0
+@export var scopedFov : float = 28.0
+var scoped : bool = false
+var baseFov : float = 75.0
+const SNIPER_REST_POS = Vector3(0.50524026, -0.12744474, -1.0080254)
+const GUN_REST_POS = Vector3(0.388, -0.31, -0.652)
+const GUN_REST_ROT = Vector3(-0.15707964, -3.2637658, 0.15707964)
 
 var _bullet_pool: Array[Node] = []
 var _bullet_tex: ImageTexture
@@ -215,26 +230,54 @@ var currentGun : int = 0
 var shotGunCd = false
 #0 - rifle
 #1 - shotgun
+#2 - sniper
 
 var slamming = false
 var slamStartHeight : float = 0.0
 
+func _showGunModels():
+	gun.visible = currentGun == 0
+	shotGun.visible = currentGun == 1
+	sniperGun.visible = currentGun == 2
+	shotgunDemo.visible = false
+
 func _switchGuns():
 	if Input.is_action_just_pressed("gun1"):
 		currentGun = 0
-		shotGun.visible = false
-		gun.visible = true
-		shotgunDemo.visible = false
+		_showGunModels()
 	elif Input.is_action_just_pressed("gun2"):
-		shotgunDemo.visible = false
 		currentGun = 1
-		shotGun.visible = true
-		gun.visible = false
+		_showGunModels()
+	elif Input.is_action_just_pressed("gun3"):
+		currentGun = 2
+		_showGunModels()
 	elif Input.is_action_just_pressed("scrollUp"):
-		if currentGun >= 1:
-			currentGun = 0
+		currentGun = (currentGun + 1) % 3
+		_showGunModels()
+	elif Input.is_action_just_pressed("scrollDwn"):
+		currentGun = (currentGun + 2) % 3
+		_showGunModels()
+
+func _updateSniperView():
+	var wantScope = currentGun == 2 and Input.is_action_pressed("scope")
+	if wantScope != scoped:
+		scoped = wantScope
+		scopeOverlay.visible = scoped
+		playerCam.fov = scopedFov if scoped else baseFov
+		if scoped:
+			sniperGun.visible = false
+			leftArm.visible = false
+			rightArm.visible = false
 		else:
-			currentGun +=1
+			leftArm.visible = true
+			rightArm.visible = true
+			sniperGun.visible = currentGun == 2
+	if currentGun == 2 and not scoped:
+		if animaPlayer.current_animation == "sniperShoot":
+			sniperGun.rotation = sniperRestRot
+		else:
+			sniperGun.position = SNIPER_REST_POS + (gun.position - GUN_REST_POS)
+			sniperGun.rotation = sniperRestRot + (gun.rotation - GUN_REST_ROT)
 
 func _die():
 	count = false
@@ -391,6 +434,13 @@ func _shootAnim():
 				gun.visible = false
 				animaPlayer.play("shotGunShoot")
 				_spawnParticleAt(shotgunBlast, gunParticleSpawn.global_position)
+		elif currentGun == 2:
+			if Input.is_action_just_pressed("shoot") and sniperCdTimer <= 0:
+				sniperGun.visible = true
+				gun.visible = false
+				shotGun.visible = false
+				animaPlayer.play("sniperShoot")
+				_spawnParticleAt(shotgunBlast, sniperGun.global_position)
 	else:
 		playerCam.position = Vector3();
 		if animaPlayer.current_animation == "shootingAnim":
@@ -440,6 +490,37 @@ func _shoot():
 					var end_point = ray.to_global(ray.target_position)
 					_draw_laser_line(gunParticleSpawn.global_position, end_point, 0.5)
 			_applyForce(shotgunForcePnt.global_position,10)
+	elif currentGun == 2:
+		if sniperCdTimer <= 0:
+			_addStyle("sniper", 22)
+			Audio.play("shotgun", 0.7, -1.0)
+			sniperCdTimer = sniperCooldown
+			_addShake(.05 if scoped else .13)
+			playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
+			var camXform = playerCam.global_transform
+			var origin = camXform.origin
+			var forward = -camXform.basis.z
+			if not scoped:
+				var spread = deg_to_rad(hipfireSpread)
+				forward = forward.rotated(camXform.basis.x.normalized(), randf_range(-spread, spread))
+				forward = forward.rotated(camXform.basis.y.normalized(), randf_range(-spread, spread))
+			var beamStart = sniperGun.global_position if sniperGun.visible else origin
+			var far_point = origin + forward * 300
+			var space = get_world_3d().direct_space_state
+			var query = PhysicsRayQueryParameters3D.create(origin, far_point)
+			query.exclude = [self.get_rid()]
+			var hit = space.intersect_ray(query)
+			if hit:
+				var target = hit.collider
+				if target and target.has_method("_makeTarg"):
+					target._makeTarg(self)
+				if target and target.has_method("_damage"):
+					target._damage(sniperDmg)
+				_spawn_bullet_hole(hit.position, hit.normal)
+				_spawnParticleAt(bulletImpactParticles, hit.position + hit.normal * 0.05)
+				_draw_laser_beam(beamStart, hit.position, 0.35)
+			else:
+				_draw_laser_beam(beamStart, far_point, 0.35)
 
 
 func _applyForce(point :Vector3,force , maxRange:float = 10):
@@ -473,11 +554,45 @@ func _draw_laser_line(from_pos: Vector3, to_pos: Vector3, duration: float = 0.1)
 	await get_tree().create_timer(duration).timeout
 	line_instance.queue_free()
 
+func _draw_laser_beam(from_pos: Vector3, to_pos: Vector3, duration: float = 0.35):
+	var beam = MeshInstance3D.new()
+	var mesh = CylinderMesh.new()
+	var dist = from_pos.distance_to(to_pos)
+	mesh.top_radius = 0.05
+	mesh.bottom_radius = 0.05
+	mesh.height = dist
+	mesh.radial_segments = 10
+	var mat = StandardMaterial3D.new()
+	mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = StandardMaterial3D.TRANSPARENCY_ALPHA
+	mat.albedo_color = Color(0.2, 0.6, 1.0, 0.9)
+	mat.emission_enabled = true
+	mat.emission = Color(0.25, 0.65, 1.0)
+	mat.emission_energy_multiplier = 6.0
+	beam.mesh = mesh
+	beam.material_override = mat
+	get_parent().add_child(beam)
+	if dist > 0.001:
+		var ydir = (to_pos - from_pos).normalized()
+		var xdir = ydir.cross(Vector3.UP)
+		if xdir.length() < 0.01:
+			xdir = ydir.cross(Vector3.RIGHT)
+		xdir = xdir.normalized()
+		var zdir = xdir.cross(ydir).normalized()
+		beam.global_transform = Transform3D(Basis(xdir, ydir, zdir), (from_pos + to_pos) * 0.5)
+	var tw = create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(mat, "albedo_color:a", 0.0, duration)
+	tw.tween_property(beam, "scale", Vector3(0.15, 1.0, 0.15), duration)
+	await get_tree().create_timer(duration).timeout
+	beam.queue_free()
+
 func _ready() -> void:
 	maxScore = _calcMaxScore()
 	print("maxScore: ", maxScore)
 	finishOrb.open = true
 	finishOrb.canvas =$levelEnd
+	baseFov = playerCam.fov
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	_footprint_tex = _make_teal_texture()
 	_last_footprint_pos = global_position
@@ -498,7 +613,8 @@ func _process(delta: float) -> void:
 	_updateStyleHud()
 	#call input functions
 	_shootAnim()
-	
+	_updateSniperView()
+
 	if shakeAmount > 0:
 		playerCam.position += Vector3(randf_range(-shakeAmount,shakeAmount),randf_range(-shakeAmount,shakeAmount),0)
 		shakeAmount = move_toward(shakeAmount,0,shakeDecay * delta)
@@ -509,8 +625,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	_switchGuns()
 	#cam
 	if event is InputEventMouseMotion:
-		rotate_y(-event.relative.x * SENS)
-		playerCam.rotate_x(-event.relative.y * SENS)
+		var sens = Global.scopedSens if scoped else Global.sensitivity
+		rotate_y(-event.relative.x * sens)
+		playerCam.rotate_x(-event.relative.y * sens)
 		playerCam.rotation.x = clamp(playerCam.rotation.x,deg_to_rad(-90),deg_to_rad(90))
 		
 	if Input.is_action_just_pressed("jump"):
@@ -558,6 +675,8 @@ func _physics_process(delta: float) -> void:
 		knockbackTimer -= delta
 	if dashCdTimer > 0:
 		dashCdTimer -= delta
+	if sniperCdTimer > 0:
+		sniperCdTimer -= delta
 	if jumpBuffer > 0:
 		jumpBuffer -= delta
 	if wallJumpCd > 0:
@@ -590,6 +709,7 @@ func _physics_process(delta: float) -> void:
 			elif slamming == false:
 				slamming = true
 				slamStartHeight = global_position.y
+				animaPlayer.play("slam")
 		wasSliding = slide
 		if !slide:
 			if animaPlayer.current_animation == "inSlide":

@@ -30,11 +30,13 @@ func _physics_process(delta: float) -> void:
 	var collision = move_and_collide(velocity * delta)
 	if collision:
 		var body = collision.get_collider()
-		if body.has_method("_takeDamage") and !body.has_method("_xenon"):
+		if body.has_method("player"):
 			_spawnImpact()
 			body._takeDamage(damage)
 			queue_free()
-		elif !body.has_method("_xenon"):
+		elif body.has_method("_enemy"):
+			add_collision_exception_with(body)
+		else:
 			_bounce(collision)
 
 func _spawnImpact():

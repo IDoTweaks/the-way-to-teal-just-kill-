@@ -6,13 +6,13 @@
 [ext_resource type="Theme" uid="uid://bfunkytheme01" path="res://UI/funkyTheme.tres" id="4_theme"]
 
 [sub_resource type="StyleBoxFlat" id="Panel_sb"]
-bg_color = Color(0.03, 0.08, 0.1, 0.9)
+bg_color = Color(0.012, 0.018, 0.022, 0.96)
 border_width_left = 5
 border_width_top = 5
 border_width_right = 5
 border_width_bottom = 5
-border_color = Color(0.1, 0.8, 0.88, 1)
-shadow_color = Color(0.05, 0.7, 0.7, 0.22)
+border_color = Color(0, 0.85, 0.78, 1)
+shadow_color = Color(0, 0.7, 0.65, 0.25)
 shadow_size = 22
 
 [node name="SettingsMenu" type="Control"]
@@ -26,7 +26,7 @@ script = ExtResource("1_set")
 
 [node name="Dim" type="ColorRect" parent="."]
 material = ExtResource("3_energy")
-modulate = Color(1, 1, 1, 0.6)
+modulate = Color(0.7, 0.8, 0.8, 0.86)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -74,8 +74,8 @@ material = ExtResource("2_funky")
 custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
 rotation = -0.04
-theme_override_colors/font_color = Color(0.45, 0.9, 1, 1)
-theme_override_colors/font_outline_color = Color(0.02, 0.18, 0.2, 1)
+theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
+theme_override_colors/font_outline_color = Color(0, 0.5, 0.46, 1)
 theme_override_constants/outline_size = 18
 theme_override_font_sizes/font_size = 62
 text = "SETTINGS"
@@ -85,7 +85,7 @@ layout_mode = 2
 
 [node name="VolLabel" type="Label" parent="Center/Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.1, 1, 0.5, 1)
+theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
 theme_override_font_sizes/font_size = 26
 text = "// MASTER VOLUME"
 
@@ -100,7 +100,7 @@ value = 1.0
 
 [node name="MusicLabel" type="Label" parent="Center/Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.1, 1, 0.5, 1)
+theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
 theme_override_font_sizes/font_size = 26
 text = "// MUSIC"
 
@@ -115,7 +115,7 @@ value = 1.0
 
 [node name="SfxLabel" type="Label" parent="Center/Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.1, 1, 0.5, 1)
+theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
 theme_override_font_sizes/font_size = 26
 text = "// SFX"
 
@@ -130,7 +130,7 @@ value = 1.0
 
 [node name="DispLabel" type="Label" parent="Center/Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.1, 1, 0.5, 1)
+theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
 theme_override_font_sizes/font_size = 26
 text = "// DISPLAY MODE"
 
@@ -148,7 +148,7 @@ popup/item_2/id = 2
 
 [node name="ResLabel" type="Label" parent="Center/Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.1, 1, 0.5, 1)
+theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
 theme_override_font_sizes/font_size = 26
 text = "// RESOLUTION"
 
@@ -166,6 +166,36 @@ popup/item_2/text = "1280 x 720"
 popup/item_2/id = 2
 popup/item_3/text = "1152 x 648"
 popup/item_3/id = 3
+
+[node name="SensLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
+theme_override_font_sizes/font_size = 26
+text = "// SENSITIVITY"
+
+[node name="SensSlider" type="HSlider" parent="Center/Panel/Margin/VBox"]
+modulate = Color(0.3, 0.95, 0.95, 1)
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+min_value = 0.0005
+max_value = 0.02
+step = 0.0005
+value = 0.005
+
+[node name="ScopeSensLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
+theme_override_font_sizes/font_size = 26
+text = "// SCOPED SENSITIVITY"
+
+[node name="ScopeSensSlider" type="HSlider" parent="Center/Panel/Margin/VBox"]
+modulate = Color(0.3, 0.95, 0.95, 1)
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+min_value = 0.0005
+max_value = 0.02
+step = 0.0005
+value = 0.0022
 
 [node name="HSeparator2" type="HSeparator" parent="Center/Panel/Margin/VBox"]
 layout_mode = 2

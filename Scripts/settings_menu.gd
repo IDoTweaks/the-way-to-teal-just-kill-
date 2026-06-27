@@ -6,6 +6,8 @@ signal closed
 @onready var sfxSlider : HSlider = $Center/Panel/Margin/VBox/SfxSlider
 @onready var displayOption : OptionButton = $Center/Panel/Margin/VBox/DisplayOption
 @onready var resOption : OptionButton = $Center/Panel/Margin/VBox/ResOption
+@onready var sensSlider : HSlider = $Center/Panel/Margin/VBox/SensSlider
+@onready var scopeSensSlider : HSlider = $Center/Panel/Margin/VBox/ScopeSensSlider
 @onready var backBtn : Button = $Center/Panel/Margin/VBox/BackBtn
 
 const BUS_MASTER := 0
@@ -24,13 +26,29 @@ func _ready() -> void:
 	sfxSlider.value_changed.connect(_on_sfx_changed)
 	displayOption.item_selected.connect(_on_display_selected)
 	resOption.item_selected.connect(_on_res_selected)
+	sensSlider.value_changed.connect(_on_sens_changed)
+	scopeSensSlider.value_changed.connect(_on_scope_sens_changed)
 	backBtn.pressed.connect(_on_back_pressed)
 	_syncDisplay()
+	_syncControls()
 
 func open() -> void:
 	_syncVolumes()
 	_syncDisplay()
+	_syncControls()
 	show()
+
+func _syncControls() -> void:
+	sensSlider.set_value_no_signal(Global.sensitivity)
+	scopeSensSlider.set_value_no_signal(Global.scopedSens)
+
+func _on_sens_changed(value : float) -> void:
+	Global.sensitivity = value
+	Global._saveSettings()
+
+func _on_scope_sens_changed(value : float) -> void:
+	Global.scopedSens = value
+	Global._saveSettings()
 
 func _syncVolumes() -> void:
 	volumeSlider.set_value_no_signal(Global.masterVol)

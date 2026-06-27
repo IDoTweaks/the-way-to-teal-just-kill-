@@ -24,6 +24,8 @@ var shouldMove = false
 var canAttack : bool = true
 var textActive = false
 var txt
+var animTime : float = 0.0
+var baseBodyY : float = 0.0
 
 func _makeTarg(targ):
 	gotShot = true
@@ -32,6 +34,7 @@ func _makeTarg(targ):
 func _ready() -> void:
 	add_to_group("enemies")
 	body._updateMat(1)
+	baseBodyY = body.position.y
 	await get_tree().physics_frame
 
 func _takeDamage(dmg):
@@ -84,6 +87,15 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func _process(delta: float) -> void:
+	var spd = Vector3(velocity.x, 0, velocity.z).length()
+	animTime += delta * (1.0 + spd * 0.45)
+	body.position.y = baseBodyY + abs(sin(animTime * 3.0)) * 0.10
+	body.rotation.z = sin(animTime * 3.0) * 0.06
+	if target != null and is_instance_valid(target):
+		var look = target.global_position - global_position
+		look.y = 0
+		if look.length() > 0.1:
+			rotation.y = lerp_angle(rotation.y, atan2(-look.x, -look.z), delta * 8.0)
 	if txt == null:
 		textActive = false
 

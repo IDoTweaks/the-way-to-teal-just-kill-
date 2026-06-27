@@ -21,6 +21,8 @@ var musicVol := 1.0
 var sfxVol := 1.0
 var displayMode := 1
 var resIndex := 0
+var sensitivity := 0.005
+var scopedSens := 0.0022
 
 const SETTINGS_RES : Array[Vector2i] = [
 	Vector2i(1920, 1080),
@@ -37,6 +39,8 @@ func _loadSettings():
 		sfxVol = config.get_value("audio", "sfx", sfxVol)
 		displayMode = config.get_value("display", "mode", displayMode)
 		resIndex = config.get_value("display", "res", resIndex)
+		sensitivity = config.get_value("controls", "sensitivity", sensitivity)
+		scopedSens = config.get_value("controls", "scopedSens", scopedSens)
 	_applySettings()
 
 func _saveSettings():
@@ -46,6 +50,8 @@ func _saveSettings():
 	config.set_value("audio", "sfx", sfxVol)
 	config.set_value("display", "mode", displayMode)
 	config.set_value("display", "res", resIndex)
+	config.set_value("controls", "sensitivity", sensitivity)
+	config.set_value("controls", "scopedSens", scopedSens)
 	config.save("user://settings.cfg")
 
 func _applySettings():

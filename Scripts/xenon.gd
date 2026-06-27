@@ -30,12 +30,15 @@ var shouldMove = false
 var canAttack : bool = true
 var textActive = false
 var txt
+var animTime : float = 0.0
+var baseBodyY : float = 0.0
 func _makeTarg(targ):
 	gotShot = true
 	target = targ
 func _ready() -> void:
 	add_to_group("enemies")
 	body._updateMat(1)
+	baseBodyY = body.position.y
 	await get_tree().physics_frame
 func _takeDamage(dmg):
 	_damage(dmg)
@@ -84,6 +87,8 @@ func _shootAt(targetPos : Vector3):
 	if bulletSpawn == null:
 		return
 	if canAttack:
+		if animPlayer.has_animation("attack"):
+			animPlayer.play("attack")
 		var myBullet = bullet.instantiate()
 		myBullet.dest = targetPos
 		if lifeTime != 0.0:
@@ -122,6 +127,16 @@ func _physics_process(delta: float) -> void:
 	#if shouldMove:
 	move_and_slide()
 func _process(delta: float) -> void:
+	animTime += delta
+	body.position.y = baseBodyY + sin(animTime * 2.4) * 0.09
+	var faceTarget = target if (target != null and is_instance_valid(target)) else player
+	if faceTarget != null and is_instance_valid(faceTarget):
+		var look = faceTarget.global_position - global_position
+		look.y = 0
+		if look.length() > 0.1:
+			rotation.y = lerp_angle(rotation.y, atan2(-look.x, -look.z), delta * 8.0)
+	else:
+		body.rotation.y = sin(animTime * 1.3) * 0.12
 	if txt == null:
 		textActive = false
 	if not gotShot:

@@ -65,9 +65,9 @@ Button/styles/pressed = SubResource("StyleBoxFlat_3")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_energy"]
 shader = ExtResource("2_energy")
-shader_parameter/deep = Color(0.02, 0.05, 0.12, 1.0)
-shader_parameter/glow_blue = Color(0.04, 0.25, 0.6, 1.0)
-shader_parameter/glow_green = Color(0.0, 0.45, 0.3, 1.0)
+shader_parameter/deep = Color(0.008, 0.02, 0.025, 1.0)
+shader_parameter/glow_blue = Color(0.0, 0.28, 0.3, 1.0)
+shader_parameter/glow_green = Color(0.0, 0.55, 0.5, 1.0)
 
 [node name="MainMenu2" type="Control" unique_id=527281505]
 layout_mode = 3
@@ -80,11 +80,11 @@ script = ExtResource("1_k7s4i")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1268340044]
 material = SubResource("ShaderMaterial_energy")
-modulate = Color(1, 1, 1, 0.62)
+modulate = Color(1, 1, 1, 0.82)
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.05, 0.05, 0.08, 1)
+color = Color(0.01, 0.02, 0.03, 1)
 
 [node name="BackgroundPattern" type="TextureRect" parent="." unique_id=788495792]
 modulate = Color(0.15, 0.15, 0.18, 0.3)
@@ -112,8 +112,8 @@ anchor_right = 1.0
 offset_top = 120.0
 offset_bottom = 240.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0.18, 0.68, 1.0, 1)
-theme_override_colors/font_outline_color = Color(0.02, 0.06, 0.14, 0.9)
+theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
+theme_override_colors/font_outline_color = Color(0, 0.12, 0.11, 0.9)
 theme_override_constants/outline_size = 30
 theme_override_font_sizes/font_size = 92
 text = "THE WAY TO TEAL"
@@ -135,8 +135,8 @@ offset_bottom = -310.0
 grow_horizontal = 2
 grow_vertical = 2
 rotation = 0.22340214
-theme_override_colors/font_color = Color(0.74658525, 2.0094587e-06, 8.663535e-07, 1)
-theme_override_colors/font_outline_color = Color(0.2, 0.2, 0.2, 0.8)
+theme_override_colors/font_color = Color(0, 0.9, 0.82, 1)
+theme_override_colors/font_outline_color = Color(0.9, 1, 0.98, 0.5)
 theme_override_constants/outline_size = 26
 theme_override_font_sizes/font_size = 60
 text = "(just kill:)"
@@ -162,9 +162,9 @@ theme_override_constants/separation = 16
 [node name="JoinGameBtn" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=66041543]
 custom_minimum_size = Vector2(300, 58)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
-theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
+theme_override_colors/font_focus_color = Color(0.01, 0.04, 0.04, 1)
+theme_override_colors/font_hover_color = Color(0.01, 0.04, 0.04, 1)
 theme_override_font_sizes/font_size = 28
 text = "START"
 
@@ -174,18 +174,18 @@ layout_mode = 2
 [node name="SettingsBtn" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=1666292464]
 custom_minimum_size = Vector2(300, 58)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
-theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
+theme_override_colors/font_focus_color = Color(0.01, 0.04, 0.04, 1)
+theme_override_colors/font_hover_color = Color(0.01, 0.04, 0.04, 1)
 theme_override_font_sizes/font_size = 28
 text = "SETTINGS"
 
 [node name="QuitBtn" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=810246644]
 custom_minimum_size = Vector2(300, 58)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
-theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
+theme_override_colors/font_focus_color = Color(0.01, 0.04, 0.04, 1)
+theme_override_colors/font_hover_color = Color(0.01, 0.04, 0.04, 1)
 theme_override_font_sizes/font_size = 28
 text = "QUIT"
 

@@ -38,6 +38,7 @@ itch.io:https://idotweaks.itch.io/the-way-to-tealjust-kill
 
 ## credits
 - models - sadly i dont remember who made each model but i can tell you they are from sketchfab(sorry about that)
+- sound effects - "FPS Placeholder Sounds" by Jack Menhorn (opengameart.org), licensed CC-BY 3.0. UI sounds by Kenney (CC0).
 - ai - thank you for debugging + making shaders + scripts to generate decals
 - everything else - me(da goat)
 

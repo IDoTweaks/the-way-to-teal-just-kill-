@@ -41,6 +41,9 @@ func _physics_process(delta: float) -> void:
 		elif weapons[i] == 1:
 			gun.visible = false
 			shotGun.visible = true
+		elif weapons[i] == 2:
+			gun.visible = false
+			shotGun.visible = false
 		i+=1
 	else:
 		visible =false
