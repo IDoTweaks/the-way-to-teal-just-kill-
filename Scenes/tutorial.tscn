@@ -245,8 +245,8 @@ pixel_size = 0.018
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
 outline_modulate = Color(0, 0.1, 0.09, 1)
-text = "SLIDE   SHIFT
-DASH   CTRL"
+text = "SLIDE   CTRL
+DASH   SHIFT"
 font = ExtResource("6_orb")
 font_size = 80
 outline_size = 24

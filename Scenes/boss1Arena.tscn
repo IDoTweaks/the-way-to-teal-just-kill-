@@ -3,9 +3,31 @@
 [ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="1_2qj3r"]
 [ext_resource type="PackedScene" uid="uid://ccle7gxe1ekv3" path="res://ObjectScenes/boss1.tscn" id="1_v4ypp"]
 [ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="pause_boss"]
+[ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="6_fin"]
+[ext_resource type="Theme" uid="uid://bfunkytheme01" path="res://UI/funkyTheme.tres" id="7_theme"]
+[ext_resource type="FontVariation" path="res://Fonts/Orbitron.tres" id="8_orb"]
+[ext_resource type="Script" path="res://Scripts/arena_bounds.gd" id="9_bounds"]
+[ext_resource type="Script" uid="uid://2pcnmn74i67n" path="res://Scripts/level_1.gd" id="10_lvl"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d4gj8"]
 albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="mat_pillar"]
+albedo_color = Color(0.1, 0.2, 0.13, 1)
+
+[sub_resource type="StyleBoxFlat" id="boss_panel"]
+bg_color = Color(0, 0.04, 0.035, 0.72)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0.85, 0.72, 1)
+
+[sub_resource type="StyleBoxFlat" id="bar_bg"]
+bg_color = Color(0.02, 0.08, 0.07, 1)
+
+[sub_resource type="StyleBoxFlat" id="bar_fill"]
+bg_color = Color(0, 0.85, 0.72, 1)
 
 [sub_resource type="Environment" id="Environment_8fags"]
 background_color = Color(0, 0.68235296, 1, 1)
@@ -24,6 +46,8 @@ albedo_color = Color(0, 0.25882354, 0, 1)
 data = PackedVector3Array(-28.958853, -1.9511461, -28.958847, -37.83656, -1.9511461, -15.672417, 0, -1.9511461, 0, -37.83656, -1.9511461, -15.672417, -40.954, -1.9511461, -3.5803123e-06, 0, -1.9511461, 0, -37.83656, -1.9511461, -15.672417, -28.958853, -1.9511461, -28.958847, -28.958853, 0.048853874, -28.958847, -40.954, -1.9511461, -3.5803123e-06, -37.83656, -1.9511461, -15.672417, -37.83656, 0.048853874, -15.672417, -15.672422, -1.9511461, -37.83656, -28.958853, -1.9511461, -28.958847, 0, -1.9511461, 0, 4.8837154e-07, -1.9511461, -40.954, -15.672422, -1.9511461, -37.83656, 0, -1.9511461, 0, -28.958853, -1.9511461, -28.958847, -15.672422, -1.9511461, -37.83656, -15.672422, 0.048853874, -37.83656, -15.672422, -1.9511461, -37.83656, 4.8837154e-07, -1.9511461, -40.954, 4.8837154e-07, 0.048853874, -40.954, -40.954, -1.9511461, -3.5803123e-06, -37.83656, -1.9511461, 15.672419, 0, -1.9511461, 0, -37.83656, -1.9511461, 15.672419, -28.958849, -1.9511461, 28.958849, 0, -1.9511461, 0, -37.83656, -1.9511461, 15.672419, -40.954, -1.9511461, -3.5803123e-06, -40.954, 0.048853874, -3.5803123e-06, -28.958849, -1.9511461, 28.958849, -37.83656, -1.9511461, 15.672419, -37.83656, 0.048853874, 15.672419, -15.672416, -1.9511461, 37.836563, -28.958849, -1.9511461, 28.958849, -28.958849, 0.048853874, 28.958849, -28.958849, -1.9511461, 28.958849, -15.672416, -1.9511461, 37.836563, 0, -1.9511461, 0, -15.672416, -1.9511461, 37.836563, -1.7901561e-06, -1.9511461, 40.954, 0, -1.9511461, 0, -1.7901561e-06, -1.9511461, 40.954, -15.672416, -1.9511461, 37.836563, -15.672416, 0.048853874, 37.836563, -15.672422, 0.048853874, -37.83656, -28.958853, 0.048853874, -28.958847, -28.958853, -1.9511461, -28.958847, -28.958853, 0.048853874, -28.958847, -37.83656, 0.048853874, -15.672417, -37.83656, -1.9511461, -15.672417, -37.83656, 0.048853874, -15.672417, -40.954, 0.048853874, -3.5803123e-06, -40.954, -1.9511461, -3.5803123e-06, -37.83656, 0.048853874, -15.672417, -28.958853, 0.048853874, -28.958847, 0, 0.048853874, 0, -40.954, 0.048853874, -3.5803123e-06, -37.83656, 0.048853874, -15.672417, 0, 0.048853874, 0, 4.8837154e-07, 0.048853874, -40.954, -15.672422, 0.048853874, -37.83656, -15.672422, -1.9511461, -37.83656, -28.958853, 0.048853874, -28.958847, -15.672422, 0.048853874, -37.83656, 0, 0.048853874, 0, -15.672422, 0.048853874, -37.83656, 4.8837154e-07, 0.048853874, -40.954, 0, 0.048853874, 0, -40.954, 0.048853874, -3.5803123e-06, -37.83656, 0.048853874, 15.672419, -37.83656, -1.9511461, 15.672419, -37.83656, 0.048853874, 15.672419, -28.958849, 0.048853874, 28.958849, -28.958849, -1.9511461, 28.958849, -37.83656, 0.048853874, 15.672419, -40.954, 0.048853874, -3.5803123e-06, 0, 0.048853874, 0, -28.958849, 0.048853874, 28.958849, -37.83656, 0.048853874, 15.672419, 0, 0.048853874, 0, -28.958849, 0.048853874, 28.958849, -15.672416, 0.048853874, 37.836563, -15.672416, -1.9511461, 37.836563, -15.672416, 0.048853874, 37.836563, -1.7901561e-06, 0.048853874, 40.954, -1.7901561e-06, -1.9511461, 40.954, -15.672416, 0.048853874, 37.836563, -28.958849, 0.048853874, 28.958849, 0, 0.048853874, 0, -1.7901561e-06, 0.048853874, 40.954, -15.672416, 0.048853874, 37.836563, 0, 0.048853874, 0, 15.672423, -1.9511461, -37.83656, 4.8837154e-07, -1.9511461, -40.954, 0, -1.9511461, 0, 28.958845, -1.9511461, -28.958855, 15.672423, -1.9511461, -37.83656, 0, -1.9511461, 0, 4.8837154e-07, -1.9511461, -40.954, 15.672423, -1.9511461, -37.83656, 15.672423, 0.048853874, -37.83656, 37.836563, -1.9511461, -15.672417, 28.958845, -1.9511461, -28.958855, 0, -1.9511461, 0, 40.954, -1.9511461, 0, 37.836563, -1.9511461, -15.672417, 0, -1.9511461, 0, 15.672423, -1.9511461, -37.83656, 28.958845, -1.9511461, -28.958855, 28.958845, 0.048853874, -28.958855, 28.958845, -1.9511461, -28.958855, 37.836563, -1.9511461, -15.672417, 37.836563, 0.048853874, -15.672417, 37.836563, -1.9511461, -15.672417, 40.954, -1.9511461, 0, 40.954, 0.048853874, 0, -1.7901561e-06, -1.9511461, 40.954, 15.672417, -1.9511461, 37.83656, 0, -1.9511461, 0, 15.672417, -1.9511461, 37.83656, 28.958849, -1.9511461, 28.958849, 0, -1.9511461, 0, 15.672417, -1.9511461, 37.83656, -1.7901561e-06, -1.9511461, 40.954, -1.7901561e-06, 0.048853874, 40.954, 28.958849, -1.9511461, 28.958849, 15.672417, -1.9511461, 37.83656, 15.672417, 0.048853874, 37.83656, 37.83656, -1.9511461, 15.672418, 40.954, -1.9511461, 0, 0, -1.9511461, 0, 28.958849, -1.9511461, 28.958849, 37.83656, -1.9511461, 15.672418, 0, -1.9511461, 0, 40.954, -1.9511461, 0, 37.83656, -1.9511461, 15.672418, 37.83656, 0.048853874, 15.672418, 37.83656, -1.9511461, 15.672418, 28.958849, -1.9511461, 28.958849, 28.958849, 0.048853874, 28.958849, 15.672423, 0.048853874, -37.83656, 4.8837154e-07, 0.048853874, -40.954, 4.8837154e-07, -1.9511461, -40.954, 28.958845, 0.048853874, -28.958855, 15.672423, 0.048853874, -37.83656, 15.672423, -1.9511461, -37.83656, 4.8837154e-07, 0.048853874, -40.954, 15.672423, 0.048853874, -37.83656, 0, 0.048853874, 0, 15.672423, 0.048853874, -37.83656, 28.958845, 0.048853874, -28.958855, 0, 0.048853874, 0, 37.836563, 0.048853874, -15.672417, 28.958845, 0.048853874, -28.958855, 28.958845, -1.9511461, -28.958855, 40.954, 0.048853874, 0, 37.836563, 0.048853874, -15.672417, 37.836563, -1.9511461, -15.672417, 28.958845, 0.048853874, -28.958855, 37.836563, 0.048853874, -15.672417, 0, 0.048853874, 0, 37.836563, 0.048853874, -15.672417, 40.954, 0.048853874, 0, 0, 0.048853874, 0, -1.7901561e-06, 0.048853874, 40.954, 15.672417, 0.048853874, 37.83656, 15.672417, -1.9511461, 37.83656, 15.672417, 0.048853874, 37.83656, -1.7901561e-06, 0.048853874, 40.954, 0, 0.048853874, 0, 28.958849, 0.048853874, 28.958849, 15.672417, 0.048853874, 37.83656, 0, 0.048853874, 0, 37.83656, 0.048853874, 15.672418, 40.954, 0.048853874, 0, 40.954, -1.9511461, 0, 28.958849, 0.048853874, 28.958849, 37.83656, 0.048853874, 15.672418, 37.83656, -1.9511461, 15.672418, 15.672417, 0.048853874, 37.83656, 28.958849, 0.048853874, 28.958849, 28.958849, -1.9511461, 28.958849, 40.954, 0.048853874, 0, 37.83656, 0.048853874, 15.672418, 0, 0.048853874, 0, 37.83656, 0.048853874, 15.672418, 28.958849, 0.048853874, 28.958849, 0, 0.048853874, 0)
 
 [node name="Boss1Arena" type="Node3D" unique_id=287803265]
+script = ExtResource("10_lvl")
+levelIndex = 7
 
 [node name="acid" type="CSGCombiner3D" parent="." unique_id=1620958335]
 material_override = SubResource("StandardMaterial3D_d4gj8")
@@ -33,11 +57,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.0517564, 0)
 radius = 223.754
 sides = 16
 
-[node name="Enemy" parent="acid" unique_id=1301325712 instance=ExtResource("1_v4ypp")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.58461, 2.8837652, -4.8147774)
+[node name="Boss" parent="." node_paths=PackedStringArray("player", "bossBar", "bossName", "finishOrb") instance=ExtResource("1_v4ypp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+player = NodePath("../Player")
+wallLayer = 16
+bossBar = NodePath("../BossHud/Center/Panel/VBox/Bar")
+bossName = NodePath("../BossHud/Center/Panel/VBox/Name")
+finishOrb = NodePath("../FinishOrb")
 
 [node name="Player" parent="." unique_id=659499291 instance=ExtResource("1_2qj3r")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16437149, 0.731138, 8.953987)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 24)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1967115698]
 environment = SubResource("Environment_8fags")
@@ -59,5 +88,85 @@ sides = 16
 
 [node name="CSGBakedCollisionShape3D" type="CollisionShape3D" parent="floor" unique_id=1949797234]
 shape = SubResource("ConcavePolygonShape3D_v4ypp")
+
+[node name="Covers" type="CSGCombiner3D" parent="."]
+material_override = SubResource("mat_pillar")
+use_collision = true
+collision_layer = 17
+
+[node name="P1" type="CSGBox3D" parent="Covers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 3, 0)
+size = Vector3(2.5, 7, 2.5)
+
+[node name="P2" type="CSGBox3D" parent="Covers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 3, 0)
+size = Vector3(2.5, 7, 2.5)
+
+[node name="P3" type="CSGBox3D" parent="Covers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 16)
+size = Vector3(2.5, 7, 2.5)
+
+[node name="P4" type="CSGBox3D" parent="Covers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -16)
+size = Vector3(2.5, 7, 2.5)
+
+[node name="P5" type="CSGBox3D" parent="Covers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 2, 11)
+size = Vector3(2.5, 4, 2.5)
+
+[node name="P6" type="CSGBox3D" parent="Covers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 2, -11)
+size = Vector3(2.5, 4, 2.5)
+
+[node name="ArenaBounds" type="Node3D" parent="." node_paths=PackedStringArray("player")]
+script = ExtResource("9_bounds")
+player = NodePath("../Player")
+
+[node name="FinishOrb" parent="." node_paths=PackedStringArray("player") instance=ExtResource("6_fin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+player = NodePath("../Player")
+
+[node name="BossHud" type="CanvasLayer" parent="."]
+
+[node name="Center" type="Control" parent="BossHud"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="BossHud/Center"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -380.0
+offset_top = 24.0
+offset_right = 380.0
+offset_bottom = 110.0
+grow_horizontal = 2
+theme = ExtResource("7_theme")
+theme_override_styles/panel = SubResource("boss_panel")
+
+[node name="VBox" type="VBoxContainer" parent="BossHud/Center/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Name" type="Label" parent="BossHud/Center/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 0.78, 1)
+theme_override_fonts/font = ExtResource("8_orb")
+theme_override_font_sizes/font_size = 30
+text = "THE HEART OF THE GREEN"
+horizontal_alignment = 1
+
+[node name="Bar" type="ProgressBar" parent="BossHud/Center/Panel/VBox"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+theme_override_styles/background = SubResource("bar_bg")
+theme_override_styles/fill = SubResource("bar_fill")
+max_value = 900.0
+value = 900.0
+show_percentage = false
 
 [node name="PauseMenu" parent="." instance=ExtResource("pause_boss")]

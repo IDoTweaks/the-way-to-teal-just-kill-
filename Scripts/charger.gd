@@ -155,7 +155,7 @@ func _physics_process(delta: float) -> void:
 
 	if chargeState == "dash" and _targetValid():
 		if global_position.distance_to(target.global_position) < 2.0:
-			target._takeDamage(damage)
+			target._takeDamage(damage, global_position)
 			chargeState = "recover"
 			chargeTimer = recoverTime
 

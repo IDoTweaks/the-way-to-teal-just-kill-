@@ -4,7 +4,6 @@ extends Node3D
 @onready var children = self.get_children()
 @onready var orgPos : Array
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	for ray in children:
 		if ray is RayCast3D:
@@ -13,7 +12,6 @@ func _ready() -> void:
 	randomizeRays()
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
 

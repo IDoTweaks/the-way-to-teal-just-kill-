@@ -144,6 +144,7 @@ func _ready() -> void:
 	levels.append(level4)
 	levels.append(level5)
 	levels.append(level6)
+	levels.append(bossArena)
 	_localLoad()
 	_loadSettings()
 

@@ -23,7 +23,7 @@ func _physics_process(delta: float) -> void:
 	if collision:
 		var body = collision.get_collider()
 		if body.has_method("player"):
-			body._takeDamage(damage)
+			body._takeDamage(damage, global_position - dir * 5.0)
 			_impact()
 			queue_free()
 		elif body.has_method("_enemy"):

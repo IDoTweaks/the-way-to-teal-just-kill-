@@ -6,10 +6,8 @@ var damage = 0
 @onready var text = $Label3D
 var orgScale
 var lookat
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	orgScale = text.scale
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	_grow(delta)
 func _resetScale():

@@ -75,8 +75,7 @@ func _physics_process(delta: float) -> void:
 		animPlayer.play("attack")
 		canAttack = false
 		attackTimer.start()
-		target._takeDamage(damage)
-	# Add the gravity.
+		target._takeDamage(damage, global_position)
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 		

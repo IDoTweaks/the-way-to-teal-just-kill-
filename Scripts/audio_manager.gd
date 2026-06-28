@@ -58,6 +58,9 @@ func play_music(stream : AudioStream) -> void:
 	_music.play()
 
 func music_for_level(idx : int) -> void:
-	match idx:
-		0: play_music(_musicMenu)
-		_: play_music(_musicLevel)
+	if idx == 0:
+		play_music(_musicMenu)
+	elif idx == Global.levels.size() - 1:
+		play_music(_musicBoss)
+	else:
+		play_music(_musicLevel)

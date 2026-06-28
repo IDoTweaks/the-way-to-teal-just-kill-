@@ -12,6 +12,5 @@ func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("restart"):
 		_reload()
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass

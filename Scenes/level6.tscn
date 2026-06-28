@@ -151,7 +151,7 @@ wallLayer = 16
 
 [node name="FinishOrb" parent="." node_paths=PackedStringArray("player") instance=ExtResource("4_fin")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 2, 13)
-toLevel = 0
+toLevel = 7
 player = NodePath("../Player")
 
 [node name="PauseMenu" parent="." instance=ExtResource("5_pause")]

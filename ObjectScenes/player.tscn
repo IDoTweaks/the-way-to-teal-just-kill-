@@ -1137,7 +1137,6 @@ text = "3 SNIPER"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[connection signal="button_down" from="GameOver/MainContainer/MenuButtons/retry" to="." method="_on_retry_button_down"]
 [connection signal="button_down" from="GameOver/MainContainer/MenuButtons/retry" to="GameOver" method="_on_retry_button_down"]
 [connection signal="button_down" from="GameOver/MainContainer/MenuButtons/QuitBtn" to="GameOver" method="_on_quit_btn_button_down"]
 [connection signal="timeout" from="shotGunCd" to="." method="_on_shot_gun_cd_timeout"]

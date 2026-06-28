@@ -7,6 +7,20 @@ const JUMP_VELOCITY = 4.5
 const MAXCAMSHAKE = 0.03
 var shakeAmount : float = 0.0
 var shakeDecay : float = 8.0
+# juice
+var camPitch : float = 0.0
+var camRoll : float = 0.0
+var camKickPitch : float = 0.0
+@export var maxRoll : float = 0.05
+@export var speedFovAdd : float = 18.0
+var _hitStopUntil : float = 0.0
+var _hurtFlash : float = 0.0
+var _lastRankIdx : int = 0
+var _crossDot : ColorRect
+var _hitMark : Label
+var _vignette : TextureRect
+var _hitDir : Control
+var _hitArrow : Label
 @export var health = 100
 var time = 0.0;
 var count = true
@@ -133,6 +147,9 @@ func _onKill():
 	lastKillTime = now
 	styleMeter = clamp(styleMeter + amount, 0.0, 100.0)
 	lastStyleAction = "kill"
+	_hitStop(0.05, 0.06)
+	_hitmarker(true)
+	Audio.play("pickup", 1.0 + min(comboCount, 8) * 0.07, -4.0)
 
 func _getStyleRank() -> String:
 	if styleMeter >= 97.0: return "SSS"
@@ -143,8 +160,14 @@ func _getStyleRank() -> String:
 	if styleMeter >= 22.0: return "C"
 	return "D"
 
+const STYLE_RANKS = ["D", "C", "B", "A", "S", "SS", "SSS"]
+
 func _updateStyleHud():
 	var rank = _getStyleRank()
+	var rankIdx = STYLE_RANKS.find(rank)
+	if rankIdx > _lastRankIdx:
+		_rankPop(rankIdx)
+	_lastRankIdx = rankIdx
 	styleLabel.text = rank
 	styleBar.value = styleMeter
 	match rank:
@@ -166,8 +189,6 @@ func _make_teal_texture() -> ImageTexture:
 	var img = Image.create(64, 64, false, Image.FORMAT_RGBA8)
 	img.fill(Color(0, 0, 0, 0))
 
-	# Sole shape: two overlapping ellipses (ball of foot + heel),
-	# offset along Y to form a basic shoe-sole silhouette.
 	var ball_center = Vector2(32, 22)
 	var ball_radii = Vector2(15, 17)
 	var heel_center = Vector2(32, 46)
@@ -177,7 +198,6 @@ func _make_teal_texture() -> ImageTexture:
 		for y in range(64):
 			var p = Vector2(x, y)
 
-			# normalized distance into each ellipse (1.0 = on edge, 0 = center)
 			var ball_d = ((p.x - ball_center.x) / ball_radii.x) ** 2 + ((p.y - ball_center.y) / ball_radii.y) ** 2
 			var heel_d = ((p.x - heel_center.x) / heel_radii.x) ** 2 + ((p.y - heel_center.y) / heel_radii.y) ** 2
 			var inside_ball = ball_d <= 1.0
@@ -186,27 +206,21 @@ func _make_teal_texture() -> ImageTexture:
 			if not (inside_ball or inside_heel):
 				continue
 
-			# pick whichever shape we're closer to the center of, for shading
 			var norm_d = min(ball_d, heel_d)
 
 			var col: Color
 			if norm_d < 0.35:
-				# bright glowing core
 				col = Color(0.25, 0.95, 0.7, 0.95)
 			elif norm_d < 0.7:
-				# mid teal body
 				var t = (norm_d - 0.35) / 0.35
 				col = Color(0.11, 0.62, 0.46, 1).lerp(Color(0.06, 0.4, 0.3, 1), t)
 				col.a = 0.9
 			elif norm_d < 0.92:
-				# darker inner rim before the edge glow
 				col = Color(0.04, 0.22, 0.17, 0.85)
 			else:
-				# bright outer rim glow, then fade to transparent past d=1.0
 				var t = clamp((norm_d - 0.92) / 0.18, 0.0, 1.0)
 				col = Color(0.3, 1.0, 0.75, 1).lerp(Color(0.3, 1.0, 0.75, 0), t)
 
-			# subtle radial streaks for a "scanned/etched" tech look
 			var angle = p.angle_to_point(ball_center if inside_ball else heel_center)
 			var streak = sin(angle * 10.0) * 0.08
 			col.a = clamp(col.a + streak, 0.0, 1.0)
@@ -255,6 +269,9 @@ var shotGunCd = false
 #0 - rifle
 #1 - shotgun
 #2 - sniper
+
+var shotGunRestPos : Vector3
+var shotGunRestRot : Vector3
 
 var slamming = false
 var slamStartHeight : float = 0.0
@@ -324,7 +341,9 @@ func _updateSniperView():
 			rightArm.visible = true
 			sniperGun.visible = currentGun == 2
 	if not scoped and (fovTween == null or not fovTween.is_running()):
-		playerCam.fov = Global.fov
+		var hspeed = Vector2(velocity.x, velocity.z).length()
+		var add = clamp((hspeed - SPEED) / (SPEED * 2.0), 0.0, 1.0) * speedFovAdd
+		playerCam.fov = lerp(playerCam.fov, Global.fov + add, 0.12)
 	if currentGun == 2 and not scoped:
 		if animaPlayer.current_animation == "sniperShoot":
 			sniperGun.rotation = sniperRestRot
@@ -334,6 +353,7 @@ func _updateSniperView():
 
 func _die():
 	count = false
+	Engine.time_scale = 1.0
 	$GameOver.visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	Audio.play("lose")
@@ -342,6 +362,7 @@ func _die():
 
 func _finishLevel():
 	count = false
+	Engine.time_scale = 1.0
 	Audio.play("win")
 	_spawnParticleAt(finishParticles, global_position)
 	var earnedScore = maxScore - _calcMaxScore()
@@ -503,6 +524,7 @@ func _shoot():
 			if target and target.has_method("_makeTarg"):
 				target._makeTarg(self)
 			if target and target.has_method("_damage"):
+				_hitmarker(false)
 				target._damage(damage)
 			var hit_pos = gunRay.get_collision_point()
 			var hit_normal = gunRay.get_collision_normal()
@@ -524,6 +546,7 @@ func _shoot():
 				if ray.is_colliding():
 					var target = ray.get_collider()
 					if target and target.has_method("_damage"):
+						_hitmarker(false)
 						target._damage(shotGunDmg)
 					if target and target.has_method("_makeTarg"):
 						target._makeTarg(self)
@@ -560,6 +583,7 @@ func _shoot():
 				if target and target.has_method("_makeTarg"):
 					target._makeTarg(self)
 				if target and target.has_method("_damage"):
+					_hitmarker(false)
 					target._damage(sniperDmg)
 				_spawn_bullet_hole(hit.position, hit.normal)
 				_spawnParticleAt(bulletImpactParticles, hit.position + hit.normal * 0.05)
@@ -644,8 +668,11 @@ func _ready() -> void:
 	_bullet_tex = _make_bullet_texture()
 	_updateHud()
 	_updateWeaponHud()
-	
-	
+	_buildJuiceHud()
+	shotGunRestPos = shotGun.position
+	shotGunRestRot = shotGun.rotation
+
+
 func _process(delta: float) -> void:
 	if count:
 		time +=  delta
@@ -661,6 +688,14 @@ func _process(delta: float) -> void:
 	if shakeAmount > 0:
 		playerCam.position += Vector3(randf_range(-shakeAmount,shakeAmount),randf_range(-shakeAmount,shakeAmount),0)
 		shakeAmount = move_toward(shakeAmount,0,shakeDecay * delta)
+	var strafe = Input.get_axis("left", "right")
+	var rollMul = 0.25 if scoped else 1.0
+	camRoll = lerp(camRoll, -strafe * maxRoll * rollMul, delta * 8.0)
+	camKickPitch = lerp(camKickPitch, 0.0, delta * 8.0)
+	playerCam.rotation.x = camPitch + camKickPitch
+	playerCam.rotation.z = camRoll
+	_updateJuice(delta)
+	_reloadVisual()
 	#NOTE-use only when unhandles input isnt good enough
 	
 func _unhandled_input(event: InputEvent) -> void:
@@ -675,8 +710,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		var sens = Global.scopedSens if scoped else Global.sensitivity
 		rotate_y(-event.relative.x * sens)
-		playerCam.rotate_x(-event.relative.y * sens)
-		playerCam.rotation.x = clamp(playerCam.rotation.x,deg_to_rad(-90),deg_to_rad(90))
+		camPitch = clamp(camPitch - event.relative.y * sens, deg_to_rad(-90), deg_to_rad(90))
 		
 	if Input.is_action_just_pressed("jump"):
 		jumpBuffer = JUMP_BUFFER_TIME
@@ -735,6 +769,7 @@ func _physics_process(delta: float) -> void:
 			_spawnSlam()
 		if airTime > 0.35:
 			_spawnParticleAt(landParticles, feet.global_position)
+			_landImpact(airTime)
 		coyoteTimer = COYOTE_TIME
 		slamming = false
 		dashing = false
@@ -870,7 +905,6 @@ func _physics_process(delta: float) -> void:
 				velocity.x = lerp(velocity.x, target_x, slide_accel * delta)
 				velocity.z = lerp(velocity.z, target_z, slide_accel * delta)
 			else:
-				# Very low friction when sliding with no input — coast
 				velocity.x = move_toward(velocity.x, 0, 2.0 * delta)
 				velocity.z = move_toward(velocity.z, 0, 2.0 * delta)
 	
@@ -893,15 +927,138 @@ func _updateHud():
 		healthBar.material.set_shader_parameter("health", clamp(health / 100.0, 0.0, 1.0))
 
 
-func _takeDamage(damage):
+func _takeDamage(damage, source = null):
 	if count:
 		_addShake(.06)
 		_spawnParticleAt(hurtParticles, global_position)
 		Audio.play("player_hurt")
 		health -= damage
+		_hurtFlash = 0.6
+		if source != null:
+			_showHitDir(source)
 		_updateHud()
 		if health <= 0:
 			_die()
+
+func _hitStop(scale : float, dur : float):
+	Engine.time_scale = scale
+	_hitStopUntil = Time.get_ticks_msec() + dur * 1000.0
+
+func _reloadProgress() -> float:
+	if currentGun == 1 and shotGunCd:
+		var wt = shotGunCdTimer.wait_time
+		if wt > 0:
+			return 1.0 - shotGunCdTimer.time_left / wt
+	if currentGun == 2 and sniperCdTimer > 0 and sniperCooldown > 0:
+		return 1.0 - sniperCdTimer / sniperCooldown
+	return -1.0
+
+func _reloadVisual():
+	var prog = _reloadProgress()
+	if prog < 0.0:
+		return
+	var dip = sin(clamp(prog, 0.0, 1.0) * PI)
+	var posOff = Vector3(0, -dip * 0.13, dip * 0.05)
+	var rotOff = Vector3(dip * 0.7, 0, sin(prog * TAU) * 0.35)
+	if currentGun == 1 and animaPlayer.current_animation != "shotGunShoot":
+		shotGun.position = shotGunRestPos + posOff
+		shotGun.rotation = shotGunRestRot + rotOff
+	elif currentGun == 2 and animaPlayer.current_animation != "sniperShoot":
+		sniperGun.position = SNIPER_REST_POS + posOff
+		sniperGun.rotation = sniperRestRot + rotOff
+
+func _landImpact(at : float):
+	var f = clamp(at / 0.6, 0.0, 1.0)
+	_addShake(0.02 + f * 0.06)
+	camKickPitch = -0.06 * f
+
+func _buildJuiceHud():
+	var hud = $HUD
+	_vignette = TextureRect.new()
+	_vignette.texture = _make_vignette_texture()
+	_vignette.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_vignette.stretch_mode = TextureRect.STRETCH_SCALE
+	_vignette.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_vignette.modulate = Color(1, 1, 1, 0)
+	hud.add_child(_vignette)
+	_crossDot = ColorRect.new()
+	_crossDot.color = Color(0, 1, 0.85, 0.8)
+	_crossDot.set_anchors_preset(Control.PRESET_CENTER)
+	_crossDot.size = Vector2(5, 5)
+	_crossDot.position = Vector2(-2.5, -2.5)
+	_crossDot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hud.add_child(_crossDot)
+	_hitMark = Label.new()
+	_hitMark.text = "X"
+	_hitMark.set_anchors_preset(Control.PRESET_CENTER)
+	_hitMark.add_theme_font_size_override("font_size", 26)
+	_hitMark.position = Vector2(-9, -18)
+	_hitMark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hitMark.modulate = Color(1, 1, 1, 0)
+	hud.add_child(_hitMark)
+	_hitDir = Control.new()
+	_hitDir.set_anchors_preset(Control.PRESET_CENTER)
+	_hitDir.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hitDir.modulate = Color(1, 1, 1, 0)
+	hud.add_child(_hitDir)
+	_hitArrow = Label.new()
+	_hitArrow.text = "^"
+	_hitArrow.add_theme_font_size_override("font_size", 40)
+	_hitArrow.add_theme_color_override("font_color", Color(1, 0.2, 0.2))
+	_hitArrow.position = Vector2(-12, -140)
+	_hitDir.add_child(_hitArrow)
+
+func _hitmarker(killed : bool):
+	if _hitMark == null:
+		return
+	_hitMark.modulate = Color(0, 1, 0.85, 1) if killed else Color(1, 1, 1, 0.9)
+	_hitMark.pivot_offset = _hitMark.size / 2.0
+	_hitMark.scale = Vector2(1.6, 1.6) if killed else Vector2(1.1, 1.1)
+	var tw = create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(_hitMark, "modulate:a", 0.0, 0.28)
+	tw.tween_property(_hitMark, "scale", Vector2(0.8, 0.8), 0.28)
+
+func _showHitDir(source):
+	if _hitDir == null:
+		return
+	var srcPos = source if source is Vector3 else source.global_position
+	var toSrc = srcPos - global_position
+	var basis = playerCam.global_transform.basis
+	var ang = atan2(toSrc.dot(basis.x), toSrc.dot(-basis.z))
+	_hitDir.rotation = ang
+	_hitDir.modulate.a = 1.0
+	var tw = create_tween()
+	tw.tween_property(_hitDir, "modulate:a", 0.0, 0.9)
+
+func _rankPop(idx : int):
+	if styleLabel:
+		styleLabel.pivot_offset = styleLabel.size / 2.0
+		styleLabel.scale = Vector2(1.8, 1.8)
+	Audio.play("pickup", 0.9 + idx * 0.12, -2.0)
+
+func _updateJuice(delta : float):
+	if _hitStopUntil > 0.0 and Time.get_ticks_msec() >= _hitStopUntil:
+		Engine.time_scale = 1.0
+		_hitStopUntil = 0.0
+	_hurtFlash = move_toward(_hurtFlash, 0.0, delta * 1.8)
+	if _vignette:
+		var lowHp = clamp((40.0 - health) / 40.0, 0.0, 1.0) * 0.45
+		var pulse = (sin(Time.get_ticks_msec() * 0.008) * 0.5 + 0.5) * 0.2 if health < 25 else 0.0
+		_vignette.modulate.a = clamp(lowHp + pulse + _hurtFlash, 0.0, 0.85)
+
+func _make_vignette_texture() -> ImageTexture:
+	var s = 128
+	var img = Image.create(s, s, false, Image.FORMAT_RGBA8)
+	var c = Vector2(s * 0.5, s * 0.5)
+	var maxd = c.length()
+	for x in range(s):
+		for y in range(s):
+			var d = Vector2(x, y).distance_to(c) / maxd
+			var a = clamp((d - 0.55) / 0.45, 0.0, 1.0)
+			img.set_pixel(x, y, Color(0.95, 0.05, 0.05, a * a))
+	return ImageTexture.create_from_image(img)
 
 func _spawnSlam():
 	_addShake(.08)

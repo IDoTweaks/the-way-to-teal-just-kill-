@@ -15,7 +15,6 @@ var _baseTitle2Rot = 0.0
 var _baseTagRot = 0.0
 var _baseBtnRot = 0.0
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	Audio.music_for_level(0)
 	settingsCont.closed.connect(_on_settings_closed)

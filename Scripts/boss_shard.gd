@@ -1,52 +1,55 @@
 extends CharacterBody3D
-func _sniper(): pass
 func _enemy(): pass
+func _bossPart(): pass
 
-@onready var attackTimer = $attackCd
-@export var scoreWorth = 6000
-@export var health = 70
-@onready var body = $body
-@onready var eye = $body/Eye
-@onready var dmgTxt = preload("res://ObjectScenes/damageText.tscn")
-@onready var textSpawn = $body/textSpawn
-@onready var muzzle = $body/muzzle
-@export var sightDist : float = 60.0
+@export var scoreWorth = 4000
+@export var health = 130
+@export var damage = 16
+@export var beamDamage = 28
 @export var player : CharacterBody3D
 @export_flags_3d_physics var wallLayer : int
-@export var damage = 35
-@export var chargeTime : float = 1.4
-@export var lockTime : float = 0.45
-@export var hitRadius : float = 1.3
+
+@onready var body = $body
+@onready var muzzle = $muzzle
+@onready var textSpawn = $textSpawn
+@onready var dmgTxt = preload("res://ObjectScenes/damageText.tscn")
+@onready var bullet = preload("res://ObjectScenes/greenBullet.tscn")
 @onready var explosionParticles = preload("res://Particles/enemyExplode.tscn")
-var particleInstance
-var target
-var mode : String = "idle"
-var gotShot = false
-var canAttack : bool = true
-var charging : bool = false
-var chargeTimer : float = 0.0
-var locked : bool = false
-var lockedTarget : Vector3 = Vector3.ZERO
+
+var core
+var orbitAngle = 0.0
+var orbitRadius = 12.0
+var orbitHeight = 5.0
+var orbitSpeed = 0.55
+var fireGap = 2.6
+var beamGap = 6.0
+var maxHealth = 0
+var dead = false
 var textActive = false
 var txt
-var animTime : float = 0.0
-var baseBodyY : float = 0.0
-var fireKick : float = 0.0
-var dead = false
+var animTime = 0.0
+var fireCd = 0.0
+var beamCd = 0.0
+var charging = false
+var chargeTimer = 0.0
+var chargeTime = 1.3
+var lockTime = 0.4
+var hitRadius = 1.3
+var locked = false
+var lockedTarget = Vector3.ZERO
 var aimLine : MeshInstance3D
 var aimMesh : ImmediateMesh
 var aimMat : StandardMaterial3D
 
 func _makeTarg(targ):
-	gotShot = true
-	target = targ
+	pass
 
 func _ready() -> void:
 	add_to_group("enemies")
-	body._updateMat(1)
-	baseBodyY = body.position.y
-	if eye.material_override:
-		eye.material_override = eye.material_override.duplicate()
+	maxHealth = health
+	body._updateMat(0.0)
+	fireCd = fireGap * randf_range(0.4, 1.0)
+	beamCd = beamGap * randf_range(0.6, 1.2)
 	aimMesh = ImmediateMesh.new()
 	aimMat = StandardMaterial3D.new()
 	aimMat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
@@ -58,17 +61,13 @@ func _ready() -> void:
 	add_child(aimLine)
 	aimLine.global_transform = Transform3D.IDENTITY
 	aimLine.visible = false
-	await get_tree().physics_frame
-
-func _activeTarget():
-	if target != null and is_instance_valid(target):
-		return target
-	return player
 
 func _takeDamage(dmg):
 	_damage(dmg)
 
 func _damage(dmg):
+	if dead:
+		return
 	health -= dmg
 	Audio.play("enemy_hit", 1.0, -4.0)
 	if !textActive:
@@ -76,7 +75,7 @@ func _damage(dmg):
 	else:
 		_updateDmgTxt(dmg)
 	if health >= 0:
-		body._updateMat(health / 70.0)
+		body._updateMat(1.0 - float(health) / float(maxHealth))
 	else:
 		_die()
 
@@ -84,38 +83,50 @@ func _die():
 	if dead:
 		return
 	dead = true
-	body._updateMat(0)
+	body._updateMat(1.0)
 	Audio.play("enemy_death")
-	if target and target.has_method("_onKill"):
-		target._onKill()
 	if aimLine:
 		aimLine.queue_free()
-	particleInstance = explosionParticles.instantiate()
-	particleInstance.position = global_position
-	get_parent().add_child(particleInstance)
-	particleInstance.emitting = true
+	var p = explosionParticles.instantiate()
+	p.position = global_position
+	get_parent().add_child(p)
+	p.emitting = true
+	if core != null and is_instance_valid(core) and core.has_method("_onShardDown"):
+		core._onShardDown(self)
 	queue_free()
 
-func _canSeePlayer():
-	var tgt = _activeTarget()
-	if tgt == null:
+func _hasLineOfSight() -> bool:
+	if player == null:
 		return false
-	if global_position.distance_to(tgt.global_position) > sightDist:
-		return false
-	return _hasLineOfSight(tgt)
-
-func _hasLineOfSight(tgt):
 	var spaceState := get_world_3d().direct_space_state
-	var query := PhysicsRayQueryParameters3D.create(global_position, tgt.global_position)
+	var query := PhysicsRayQueryParameters3D.create(muzzle.global_position, player.global_position)
 	query.exclude = [self]
 	query.collision_mask = wallLayer
 	return spaceState.intersect_ray(query).is_empty()
 
-func _drawAimLine():
-	var tgt = _activeTarget()
-	if tgt == null:
+func _volley():
+	if player == null:
 		return
-	_drawAimLineTo(tgt.global_position)
+	var n = 5
+	var toP = player.global_position - muzzle.global_position
+	var base = atan2(toP.x, toP.z)
+	for i in range(n):
+		var a = base + deg_to_rad((i - (n / 2)) * 9.0)
+		var dir = Vector3(sin(a), 0, cos(a))
+		var b = bullet.instantiate()
+		b.dest = muzzle.global_position + dir * 60.0
+		b.speed = 16.0
+		b.damage = damage
+		b.lifeTime = 5.0
+		get_parent().add_child(b)
+		b.global_position = muzzle.global_position
+	Audio.play("shotgun", 0.8, -8.0)
+
+func _startBeam():
+	charging = true
+	locked = false
+	chargeTimer = chargeTime
+	aimLine.visible = true
 
 func _drawAimLineTo(pos : Vector3):
 	aimMesh.clear_surfaces()
@@ -132,14 +143,12 @@ func _distToSegment(p : Vector3, a : Vector3, b : Vector3) -> float:
 		t = clamp((p - a).dot(ab) / denom, 0.0, 1.0)
 	return p.distance_to(a + ab * t)
 
-func _fire():
+func _fireBeam():
 	charging = false
 	locked = false
-	fireKick = 1.0
 	aimLine.visible = false
 	aimMat.albedo_color = Color(1, 0.12, 0.1)
-	attackTimer.start()
-	Audio.play("shotgun", 0.8, -3.0)
+	Audio.play("shotgun", 0.7, -2.0)
 	var origin = muzzle.global_position
 	var dir = lockedTarget - origin
 	if dir.length() < 0.01:
@@ -153,10 +162,9 @@ func _fire():
 	var hit := spaceState.intersect_ray(query)
 	if not hit.is_empty():
 		endPoint = hit.position
-	var tgt = _activeTarget()
-	if tgt != null and tgt.has_method("_takeDamage"):
-		if _distToSegment(tgt.global_position, origin, endPoint) <= hitRadius:
-			tgt._takeDamage(damage, global_position)
+	if player != null and player.has_method("_takeDamage"):
+		if _distToSegment(player.global_position, origin, endPoint) <= hitRadius:
+			player._takeDamage(beamDamage, global_position)
 	_spawnBeam(origin, endPoint)
 
 func _spawnBeam(a : Vector3, b : Vector3):
@@ -186,46 +194,46 @@ func _spawnBeam(a : Vector3, b : Vector3):
 	get_tree().create_timer(0.22).timeout.connect(beam.queue_free)
 
 func _physics_process(delta: float) -> void:
-	var tgt = _activeTarget()
+	if dead:
+		return
+	orbitAngle += orbitSpeed * delta
+	var center = core.global_position if (core != null and is_instance_valid(core)) else global_position
+	var pos = Vector3(center.x + cos(orbitAngle) * orbitRadius, orbitHeight, center.z + sin(orbitAngle) * orbitRadius)
+	global_position = pos
 	if charging:
 		chargeTimer -= delta
 		if not locked:
-			if tgt == null or not _hasLineOfSight(tgt):
+			if not _hasLineOfSight():
 				charging = false
 				aimLine.visible = false
 				aimMat.albedo_color = Color(1, 0.12, 0.1)
-				attackTimer.start()
+				beamCd = beamGap
 				return
-			lockedTarget = tgt.global_position
-			_drawAimLine()
+			if player != null:
+				lockedTarget = player.global_position
+			_drawAimLineTo(lockedTarget)
 			if chargeTimer <= lockTime:
 				locked = true
 				aimMat.albedo_color = Color(1, 0.85, 0.12)
 		else:
 			_drawAimLineTo(lockedTarget)
 		if charging and chargeTimer <= 0:
-			_fire()
-	elif canAttack and _canSeePlayer():
-		charging = true
-		locked = false
-		chargeTimer = chargeTime
-		aimLine.visible = true
-		canAttack = false
+			_fireBeam()
+			beamCd = beamGap
+	else:
+		fireCd -= delta
+		if fireCd <= 0 and _hasLineOfSight():
+			_volley()
+			fireCd = fireGap
+		beamCd -= delta
+		if beamCd <= 0 and _hasLineOfSight():
+			_startBeam()
 
 func _process(delta: float) -> void:
 	animTime += delta
-	body.position.y = baseBodyY + sin(animTime * 1.6) * 0.05
-	fireKick = move_toward(fireKick, 0.0, delta * 5.0)
-	var chargeP = 0.0
-	if charging:
-		chargeP = clamp(1.0 - chargeTimer / max(chargeTime, 0.01), 0.0, 1.0)
-	if eye.material_override:
-		eye.material_override.emission_energy_multiplier = 4.0 + chargeP * 12.0 + fireKick * 10.0
-	var leanPitch = -0.25 * chargeP + fireKick * 0.4
-	body.rotation.x = lerp_angle(body.rotation.x, leanPitch, delta * 12.0)
-	var tgt = _activeTarget()
-	if tgt != null and is_instance_valid(tgt):
-		var look = tgt.global_position - global_position
+	body.rotation.y = animTime * 1.5
+	if player != null and is_instance_valid(player):
+		var look = player.global_position - global_position
 		look.y = 0
 		if look.length() > 0.1:
 			rotation.y = lerp_angle(rotation.y, atan2(-look.x, -look.z), delta * 6.0)
@@ -244,14 +252,4 @@ func _spawnDmgTxt(damage:int):
 	txt.damage = damage
 	txt.global_position = textSpawn.global_position
 	textActive = true
-	txt.lookat = _activeTarget()
-
-func _on_chase_body_entered(bod: Node3D) -> void:
-	if bod.has_method("player"):
-		target = bod
-
-func _on_chase_body_exited(bod: Node3D) -> void:
-	pass
-
-func _on_attack_cd_timeout() -> void:
-	canAttack = true
+	txt.lookat = player

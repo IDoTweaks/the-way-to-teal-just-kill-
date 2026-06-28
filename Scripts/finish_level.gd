@@ -9,9 +9,8 @@ var currentLevel = 1
 @onready var gradeShow = $UI/MainContainer/gradeShow
 @onready var gradeFire = $UI/MainContainer/GradeFire
 @onready var ui = $UI
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	pass
 
 func _setScore(newScore:int):
 	targScore = newScore
@@ -28,7 +27,6 @@ func _setLevel(lvl):
 	else:
 		nextBtn.text = "MENU"
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	if self.visible == false:
 		ui.visible = false

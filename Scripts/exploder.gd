@@ -79,7 +79,7 @@ func _boom(doDamage : bool):
 	particleInstance.emitting = true
 	if doDamage and _targetValid():
 		if global_position.distance_to(target.global_position) <= blastRadius and target.has_method("_takeDamage"):
-			target._takeDamage(damage)
+			target._takeDamage(damage, global_position)
 
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():

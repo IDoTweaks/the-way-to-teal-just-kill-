@@ -9,12 +9,10 @@ var dir = Vector3.ZERO
 var launched = false
 @onready var impactParticles = preload("res://Particles/enemyBulletImpact.tscn")
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass
  
  
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	lifeTime -= delta
 	if lifeTime <= 0:
@@ -32,7 +30,7 @@ func _physics_process(delta: float) -> void:
 		var body = collision.get_collider()
 		if body.has_method("player"):
 			_spawnImpact()
-			body._takeDamage(damage)
+			body._takeDamage(damage, global_position - dir * 5.0)
 			queue_free()
 		elif body.has_method("_enemy"):
 			add_collision_exception_with(body)
