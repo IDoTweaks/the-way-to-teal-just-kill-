@@ -662,7 +662,8 @@ func _ready() -> void:
 	finishOrb.canvas =$levelEnd
 	playerCam.fov = Global.fov
 	Global._addTry(Global.currentLevel)
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	if not OS.has_feature("web"):
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	_footprint_tex = _make_teal_texture()
 	_last_footprint_pos = global_position
 	_bullet_tex = _make_bullet_texture()
@@ -699,15 +700,16 @@ func _process(delta: float) -> void:
 	#NOTE-use only when unhandles input isnt good enough
 	
 func _unhandled_input(event: InputEvent) -> void:
-	
 	_switchGuns()
 	if event is InputEventMouseButton and event.pressed:
+		if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+			return
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
 			_cycleGun(1)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			_cycleGun(-1)
-	#cam
-	if event is InputEventMouseMotion:
+	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		var sens = Global.scopedSens if scoped else Global.sensitivity
 		rotate_y(-event.relative.x * sens)
 		camPitch = clamp(camPitch - event.relative.y * sens, deg_to_rad(-90), deg_to_rad(90))

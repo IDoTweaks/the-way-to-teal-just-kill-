@@ -89,6 +89,8 @@ func _applyVol(bus : int, value : float):
 	AudioServer.set_bus_mute(bus, value <= 0.001)
 
 func _applyDisplay():
+	if OS.has_feature("web"):
+		return
 	match displayMode:
 		0:
 			DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)

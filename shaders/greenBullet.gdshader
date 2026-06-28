@@ -21,8 +21,6 @@ uniform float edge_position : hint_range(0.0, 1.0, 0.01) = 0.1;
 uniform bool proximity_fade = false;
 uniform float proximity_fade_distance = 1.0;
 
-uniform sampler2D depth_texture : hint_depth_texture, repeat_disable, filter_nearest;
-
 group_uniforms Billboard;
 uniform bool billboard = false;
 
@@ -71,13 +69,4 @@ void fragment() {
 	ALBEDO = (mix(secondary_color, primary_color, value) * COLOR.rgb) * emission * COLOR.a * emission_mult;
 	
 	ALPHA = value;
-	
-	// Proximity Fade
-	if(proximity_fade){
-		float proximity_depth_tex = textureLod(depth_texture, SCREEN_UV, 0.0).r;
-		vec4 ndc = OUTPUT_IS_SRGB ? vec4(vec3(SCREEN_UV, proximity_depth_tex) * 2.0 - 1.0, 1.0) : vec4(SCREEN_UV * 2.0 - 1.0, proximity_depth_tex, 1.0);
-		vec4 proximity_view_pos = INV_PROJECTION_MATRIX * ndc;
-		proximity_view_pos.xyz /= proximity_view_pos.w;
-		ALPHA *= clamp(1.0 - smoothstep(proximity_view_pos.z + proximity_fade_distance, proximity_view_pos.z, VERTEX.z), 0.0, 1.0);
-	}
 }
