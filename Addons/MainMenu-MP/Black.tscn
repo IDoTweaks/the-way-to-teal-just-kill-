@@ -208,6 +208,15 @@ theme_override_colors/font_hover_color = Color(0.01, 0.04, 0.04, 1)
 theme_override_font_sizes/font_size = 42
 text = "TUTORIAL"
 
+[node name="MusicBtn" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=66041545]
+custom_minimum_size = Vector2(380, 72)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
+theme_override_colors/font_focus_color = Color(0.01, 0.04, 0.04, 1)
+theme_override_colors/font_hover_color = Color(0.01, 0.04, 0.04, 1)
+theme_override_font_sizes/font_size = 42
+text = "MUSIC"
+
 [node name="SettingsBtn" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=1666292464]
 custom_minimum_size = Vector2(380, 72)
 layout_mode = 2
@@ -251,4 +260,5 @@ color = Color(0, 0, 0, 0.3)
 [connection signal="button_down" from="UI/MainContainer/MenuButtons/JoinGameBtn" to="." method="_on_join_game_btn_button_down"]
 [connection signal="button_down" from="UI/MainContainer/MenuButtons/TutorialBtn" to="." method="_on_tutorial_btn_button_down"]
 [connection signal="button_down" from="UI/MainContainer/MenuButtons/SettingsBtn" to="." method="_on_settings_btn_button_down"]
+[connection signal="button_down" from="UI/MainContainer/MenuButtons/MusicBtn" to="." method="_on_music_btn_button_down"]
 [connection signal="button_down" from="UI/MainContainer/MenuButtons/QuitBtn" to="." method="_on_quit_btn_button_down"]
