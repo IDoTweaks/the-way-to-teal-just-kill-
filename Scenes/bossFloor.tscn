@@ -3,7 +3,10 @@
 [ext_resource type="Script" uid="uid://bbyrw7brxaab0" path="res://Scripts/boss_floor.gd" id="1_i4i7f"]
 [ext_resource type="Shader" uid="uid://gs1w87wuiau3" path="res://shaders/bossFloor.gdshader" id="2_i00bq"]
 [ext_resource type="Script" uid="uid://ftkpxag3edus" path="res://Scripts/tile_body.gd" id="2_kag7s"]
+[ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="3_epdkb"]
 [ext_resource type="Script" uid="uid://b5qub0rkp56eq" path="res://Scripts/death_area.gd" id="3_rg004"]
+[ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="4_uvyhu"]
+[ext_resource type="PackedScene" uid="uid://cxd7ktd7qi6m2" path="res://ObjectScenes/snake.tscn" id="5_3fud5"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_i00bq"]
 render_priority = 0
@@ -30,12 +33,16 @@ albedo_color = Color(0, 1, 0.76862746, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_mipte"]
 
-[sub_resource type="Environment" id="Environment_uvyhu"]
+[sub_resource type="Environment" id="Environment_kag7s"]
 background_mode = 1
-background_color = Color(0.75686276, 1, 1, 1)
+background_color = Color(0.84313726, 1, 1, 1)
 
-[node name="BossFloor" type="Node3D" unique_id=2125884418]
+[node name="BossFloor" type="Node3D" unique_id=2125884418 node_paths=PackedStringArray("player", "snake")]
 script = ExtResource("1_i4i7f")
+player = NodePath("Player2")
+snake = NodePath("Snake")
+width = 20
+length = 20
 
 [node name="tileBody" type="StaticBody3D" parent="." unique_id=2072072099]
 script = ExtResource("2_kag7s")
@@ -60,11 +67,22 @@ material_override = SubResource("StandardMaterial3D_r12i4")
 transparency = 1.0
 mesh = SubResource("BoxMesh_mipte")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=231186887]
-transform = Transform3D(1, 0, 0, 0, 0.020575935, 0.9997883, 0, -0.9997883, 0.020575935, 0, 20.075508, 0)
+[node name="Player2" parent="." unique_id=659499291 instance=ExtResource("3_epdkb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=413791453]
-environment = SubResource("Environment_uvyhu")
+[node name="Snake" parent="." unique_id=15968244 node_paths=PackedStringArray("bossFloor", "player") instance=ExtResource("5_3fud5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+bossFloor = NodePath("..")
+player = NodePath("../Player2")
+
+[node name="FinishOrb" parent="." unique_id=1930821478 instance=ExtResource("4_uvyhu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -4)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1568334010]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 207, 971, 378)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=244998746]
+environment = SubResource("Environment_kag7s")
 
 [connection signal="body_entered" from="tileBody/deathArea" to="tileBody/deathArea" method="_on_body_entered"]
 [connection signal="body_exited" from="tileBody/deathArea" to="tileBody/deathArea" method="_on_body_exited"]

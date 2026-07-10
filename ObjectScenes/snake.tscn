@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cxd7ktd7qi6m2"]
 
 [ext_resource type="Shader" uid="uid://gs1w87wuiau3" path="res://shaders/bossFloor.gdshader" id="1_1ha6j"]
+[ext_resource type="Script" uid="uid://hahci5tp3ev0" path="res://Scripts/snake.gd" id="1_brudt"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_brudt"]
 render_priority = 0
@@ -37,6 +38,10 @@ albedo_color = Color(0, 0.6627451, 0, 1)
 [sub_resource type="BoxMesh" id="BoxMesh_0dflv"]
 
 [node name="Snake" type="Node3D" unique_id=15968244]
+script = ExtResource("1_brudt")
+tickTime = null
+stepTime = null
+jointDelay = null
 
 [node name="head" type="StaticBody3D" parent="." unique_id=1763522216]
 
@@ -59,27 +64,27 @@ transform = Transform3D(0.06, 0, 0, 0, 0.19999999, 0, 0, 0, 0.67666996, -0.51775
 material_override = SubResource("StandardMaterial3D_brudt")
 mesh = SubResource("BoxMesh_1ha6j")
 
-[node name="horn" type="StaticBody3D" parent="." unique_id=1856774841]
+[node name="horn" type="StaticBody3D" parent="head" unique_id=1856774841]
 
-[node name="MeshInstance3D5" type="MeshInstance3D" parent="horn" unique_id=345506428]
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="head/horn" unique_id=345506428]
 transform = Transform3D(0.17104931, 0, 0, 0, 0.14461271, -0.46743107, 0, 0.13815628, 0.4892754, -0.35524303, 0.4415226, -0.5247081)
 material_override = SubResource("StandardMaterial3D_wdflr")
 mesh = SubResource("BoxMesh_1ha6j")
 
-[node name="MeshInstance3D6" type="MeshInstance3D" parent="horn" unique_id=111113562]
+[node name="MeshInstance3D6" type="MeshInstance3D" parent="head/horn" unique_id=111113562]
 transform = Transform3D(0.17104933, 0, 0, 0, 0.08185196, -0.35664144, 0, 0.21795993, 0.13393192, -0.35524303, 0.77970105, -0.77567273)
 material_override = SubResource("StandardMaterial3D_wdflr")
 mesh = SubResource("BoxMesh_1ha6j")
 
-[node name="horn2" type="StaticBody3D" parent="." unique_id=1837411325]
+[node name="horn2" type="StaticBody3D" parent="head" unique_id=1837411325]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -0.6196195, 0, 0)
 
-[node name="MeshInstance3D5" type="MeshInstance3D" parent="horn2" unique_id=2051505923]
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="head/horn2" unique_id=2051505923]
 transform = Transform3D(0.17104931, 0, 0, 0, 0.14461271, -0.46743107, 0, 0.13815628, 0.4892754, -0.35524303, 0.4415226, -0.5247081)
 material_override = SubResource("StandardMaterial3D_wdflr")
 mesh = SubResource("BoxMesh_1ha6j")
 
-[node name="MeshInstance3D6" type="MeshInstance3D" parent="horn2" unique_id=445001221]
+[node name="MeshInstance3D6" type="MeshInstance3D" parent="head/horn2" unique_id=445001221]
 transform = Transform3D(0.17104933, 0, 0, 0, 0.08185196, -0.35664144, 0, 0.21795993, 0.13393192, -0.35524303, 0.77970105, -0.77567273)
 material_override = SubResource("StandardMaterial3D_wdflr")
 mesh = SubResource("BoxMesh_1ha6j")
