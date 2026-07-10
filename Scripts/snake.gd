@@ -25,7 +25,10 @@ func _step():
 	if bossFloor == null || player == null:
 		return
 	var head = segms[0]
-	var nextTile = bossFloor._pathFind(head.global_position.x,head.global_position.z, player.global_position.x,player.global_position.z)
+	var blockers = []
+	for i in range(1,segms.size()):
+		blockers.append(segms[i].global_position)
+	var nextTile = bossFloor._pathFind(head.global_position.x,head.global_position.z, player.global_position.x,player.global_position.z,blockers)
 	if nextTile == null or !is_instance_valid(nextTile):
 		return
 	var targ = Vector3(nextTile.global_position.x,head.global_position.y,nextTile.global_position.z)

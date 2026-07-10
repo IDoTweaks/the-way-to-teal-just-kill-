@@ -94,13 +94,18 @@ func _wrld2Tile(x,z):
 	return best
 
 
-func _pathFind(fromX,fromZ,toX,toZ):
+func _pathFind(fromX,fromZ,toX,toZ,blockers = []):
 	if floor == null:
 		return floor #complicated way to return null XD
 	var start = _wrld2Tile(fromX,fromZ)
 	var goal = _wrld2Tile(toX,toZ)
 	if start.x == -1 || goal.x == -1: return null
 	if start == goal:return floor[start.x][start.y]
+	var blocked = {}
+	for b in blockers:
+		var tmp = _wrld2Tile(b.x,b.z)
+		if tmp.x != -1:
+			blocked[tmp] = true
 	var visited = {start: true}
 	var cameFrom = {}
 	var queue = [start]
@@ -122,6 +127,8 @@ func _pathFind(fromX,fromZ,toX,toZ):
 				continue
 			var n = Vector2i(nextX,nextZ)
 			if visited.has(n):
+				continue
+			if blocked.has(n) and n!=goal:
 				continue
 			if !is_instance_valid(floor[nextX][nextZ]):
 				continue
