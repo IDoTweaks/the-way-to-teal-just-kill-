@@ -26,7 +26,7 @@ func _step():
 		return
 	var head = segms[0]
 	var blockers = []
-	for i in range(1,segms.size()):
+	for i in range(1,segms.size() - 1): #ignore the tail like real snakes
 		blockers.append(segms[i].global_position)
 	var nextTile = bossFloor._pathFind(head.global_position.x,head.global_position.z, player.global_position.x,player.global_position.z,blockers)
 	if nextTile == null or !is_instance_valid(nextTile):
@@ -54,3 +54,9 @@ func _step():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
+
+func _occupied():
+	var arr = []
+	for seg in segms:
+		arr.append(seg.global_position)
+	return arr
