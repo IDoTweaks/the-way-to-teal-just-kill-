@@ -9,7 +9,9 @@ the game is about a blue man in a green world where he faces discrimination, its
 
 ## Contributing
 
-sadly this project was made ONLY for the stardance competition so i will not be accepting any contributions but you may use the code here to your liking idc
+sadly this project was made ONLY for competitions so i will not be accepting any contributions but you may use the code here to your liking idc
+IF YOU DECIDE TO CHANGE THE CODE:
+i tried leaving comments at important parts but the code in general its quite messy so a good rule of thumb if there is a magic number(a fixed value in a function without a variable to change it) there changing it would probably do no good
 
 ## Demo
 
