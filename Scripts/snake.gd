@@ -16,6 +16,8 @@ const OPEN_COL = Color(0,1,.85)
 @export var sleepTime : float = 2.4
 @export var windUpTime : float = .7
 @export var stageDamage : float = .2
+@export var maxHit : float = .35
+@export var dealEvery : float = .2
 @export var phase2At : float = .5
 @export var tickTime : float = .4
 @export var stepTime : float = .15
@@ -66,6 +68,10 @@ var damageable := false
 var stageDmg : float = 0.0
 var segMats : Array = []
 var marker : MeshInstance3D
+var glasses : Node3D
+var nextDealAt : float = 0.0
+var dealPending := false
+var dealNum := 0
 var spinT := 0.0
 var spinHitNow := 0.0
 var spinFxNow := 0.0
@@ -91,6 +97,7 @@ var trail : Array[Vector3] = []
 @onready var dmgTxt = preload("res://ObjectScenes/damageText.tscn")
 @onready var explodeParticles = preload("res://Particles/enemyExplode.tscn")
 @onready var barScript = preload("res://Scripts/boss_bar.gd")
+@onready var dealScript = preload("res://Scripts/office_deal.gd")
 var bossBar
 var jawBase1 : float
 var jawBase2 : float
@@ -111,9 +118,11 @@ func _ready() -> void:
 	jawBase2 = jaw2.rotation.y
 	add_to_group("enemies")
 	maxHealth = health
+	nextDealAt = maxHealth * (1.0 - dealEvery)
 	atkCd = attackGap
 	_makeGlow()
 	_makeMarker()
+	_makeGlasses()
 	bossBar = CanvasLayer.new()
 	bossBar.set_script(barScript)
 	add_child(bossBar)
@@ -400,6 +409,7 @@ func _damage(dmg):
 	if !damageable or left <= 0:
 		Audio.play("enemy_hit", 1.6, -14.0)
 		return
+	dmg = min(dmg, cap * maxHit)
 	dmg = min(dmg, left)
 	stageDmg += dmg
 	health -= dmg
@@ -412,6 +422,9 @@ func _damage(dmg):
 		return
 	if phase == 1 and float(health) / float(maxHealth) <= phase2At:
 		_enterPhase2()
+	while nextDealAt > 0 and health <= nextDealAt:
+		nextDealAt -= maxHealth * dealEvery
+		dealPending = true
 	if stageDmg >= cap:
 		_wake()
 
@@ -492,6 +505,33 @@ func _makeMarker():
 	marker.visible = false
 	segms[0].add_child(marker)
 
+func _makeGlasses():
+	glasses = Node3D.new()
+	var frameMat = StandardMaterial3D.new()
+	frameMat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+	frameMat.albedo_color = Color(.07,.07,.09)
+	var lensMat = StandardMaterial3D.new()
+	lensMat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+	lensMat.transparency = StandardMaterial3D.TRANSPARENCY_ALPHA
+	lensMat.albedo_color = Color(.65,.85,1.0,.4)
+	var parts = [
+		[Vector3(.03,.26,.28),Vector3(-.55,.24,.28),lensMat],
+		[Vector3(.03,.26,.28),Vector3(-.55,.1,-.24),lensMat],
+		[Vector3(.03,.04,.26),Vector3(-.55,.17,.02),frameMat],
+		[Vector3(.5,.04,.04),Vector3(-.3,.24,.44),frameMat],
+		[Vector3(.5,.04,.04),Vector3(-.3,.1,-.4),frameMat],
+	]
+	for p in parts:
+		var m = MeshInstance3D.new()
+		var box = BoxMesh.new()
+		box.size = p[0]
+		m.mesh = box
+		m.material_override = p[2]
+		glasses.add_child(m)
+		m.position = p[1]
+	glasses.visible = false
+	segms[0].add_child(glasses)
+
 func _setExposed(on : bool):
 	for mat in segMats:
 		mat.emission_enabled = on
@@ -558,6 +598,23 @@ func _wake():
 	tween.tween_property(segms[0],"rotation:z",0.0,.25)
 	for i in range(segms.size()):
 		tween.tween_property(segms[i],"global_position:y",orgY[i],.25)
+	if dealPending:
+		dealPending = false
+		if player != null and player.paraLevel > 0 and player.health > 0:
+			_offerDeal()
+
+func _offerDeal():
+	charging = true
+	dealNum += 1
+	var deal = CanvasLayer.new()
+	deal.set_script(dealScript)
+	deal.snake = self
+	deal.player = player
+	deal.visitNum = dealNum
+	add_child(deal)
+	await deal.done
+	charging = false
+	atkCd = attackGap
 
 func _fightLoop(delta : float):
 	if dead or player == null or _busy():
