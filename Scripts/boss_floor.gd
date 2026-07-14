@@ -6,6 +6,8 @@ extends Node3D
 @export var length : int
 @export var wallPad : float = .6
 @export var wallHeight : float = 26.0
+@export var snakeGap : int = 6
+@export var fallDepth : float = 6.0
 @export var showBriefing : bool = true
 @onready var boundsScript = preload("res://Scripts/arena_bounds.gd")
 @onready var briefingScript = preload("res://Scripts/para_briefing.gd")
@@ -90,13 +92,18 @@ func _arangeFloor(dist,arr : Array, baseX,baseZ):
 		for j in range(0,arr[i].size()):
 			arr[i][j].position.x = baseX + (horiz * dist)
 			arr[i][j].position.z = baseZ + (vert * dist)
-			if i == arr.size() / 2 and j == arr[i].size() / 2:
-				player.global_position.x = arr[i][j].global_position.x
-				player.global_position.z = arr[i][j].global_position.z
-				snake.global_position.x = arr[i][j].global_position.x
-				snake.global_position.z = arr[i][j].global_position.z
 			vert+=1;
 		horiz+=1
+	var ci = arr.size() / 2
+	var cj = arr[ci].size() / 2
+	if player != null:
+		player.global_position.x = arr[ci][cj].global_position.x
+		player.global_position.z = arr[ci][cj].global_position.z
+	if snake != null:
+		var si = clamp(ci + snakeGap,0,arr.size() - 1)
+		var sj = clamp(cj + snakeGap,0,arr[si].size() - 1)
+		snake.global_position.x = arr[si][sj].global_position.x
+		snake.global_position.z = arr[si][sj].global_position.z
 
 func _randSelectTiles(ammount : int):
 	var count : int = 0;
@@ -212,6 +219,17 @@ func _noDeadEnd(i,j,extra):
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
+
+func _physics_process(delta: float) -> void:
+	_checkFall()
+
+func _checkFall():
+	if player == null or floor == null or floor.size() == 0:
+		return
+	if player.global_position.y > global_position.y - fallDepth:
+		return
+	if player.has_method("_takeDamage"):
+		player._takeDamage(10000)
 
 func _wrld2Tile(x,z):
 	var best = Vector2i(-1,-1)

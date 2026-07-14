@@ -70,10 +70,11 @@ mesh = SubResource("BoxMesh_mipte")
 [node name="Player2" parent="." unique_id=659499291 instance=ExtResource("3_epdkb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
-[node name="Snake" parent="." unique_id=15968244 node_paths=PackedStringArray("bossFloor", "player") instance=ExtResource("5_3fud5")]
+[node name="Snake" parent="." unique_id=15968244 node_paths=PackedStringArray("bossFloor", "player", "finishOrb") instance=ExtResource("5_3fud5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 bossFloor = NodePath("..")
 player = NodePath("../Player2")
+finishOrb = NodePath("../FinishOrb")
 
 [node name="FinishOrb" parent="." unique_id=1930821478 instance=ExtResource("4_uvyhu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -4)

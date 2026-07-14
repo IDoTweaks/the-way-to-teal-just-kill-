@@ -1,7 +1,16 @@
 extends CharacterBody3D
+func _snake(): pass
+func _enemy(): pass
 
 @export var bossFloor : Node3D
 @export var player : Node3D
+@export var finishOrb : Node3D
+@export var scoreWorth = 18000
+@export var health = 700
+@export var attackGap : float = 2.6
+@export var venomRange : float = 9.0
+@export var spinRange : float = 4.5
+@export var phase2At : float = .5
 @export var tickTime : float = .4
 @export var stepTime : float = .15
 @export var jointDelay : float = .04
@@ -67,9 +76,19 @@ var trail : Array[Vector3] = []
 @onready var dustParticles = preload("res://Particles/landDust.tscn")
 @onready var trailParticles = preload("res://Particles/dashTrail.tscn")
 @onready var venomBall = preload("res://ObjectScenes/venomBall.tscn")
+@onready var dmgTxt = preload("res://ObjectScenes/damageText.tscn")
+@onready var explodeParticles = preload("res://Particles/enemyExplode.tscn")
+@onready var barScript = preload("res://Scripts/boss_bar.gd")
+var bossBar
 var jawBase1 : float
 var jawBase2 : float
 var marks : Array = []
+var maxHealth = 0
+var phase = 1
+var dead = false
+var atkCd : float = 0.0
+var lastAtk : String = ""
+var stepTimer : Timer
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -78,15 +97,24 @@ func _ready() -> void:
 		orgY.append(seg.global_position.y)
 	jawBase1 = jaw1.rotation.y
 	jawBase2 = jaw2.rotation.y
-	var timer = Timer.new()
-	timer.wait_time = tickTime
-	timer.autostart = true
-	add_child(timer)
-	timer.timeout.connect(_onTick)
+	add_to_group("enemies")
+	maxHealth = health
+	atkCd = attackGap
+	bossBar = CanvasLayer.new()
+	bossBar.set_script(barScript)
+	add_child(bossBar)
+	stepTimer = Timer.new()
+	stepTimer.wait_time = tickTime
+	stepTimer.autostart = true
+	add_child(stepTimer)
+	stepTimer.timeout.connect(_onTick)
+	if finishOrb:
+		finishOrb.visible = false
+		finishOrb.open = false
 	#_atkCharge()
 
 func _onTick():
-	if !moving and !coiled and !launching and !charging and !spinning:
+	if !dead and !moving and !coiled and !launching and !charging and !spinning:
 		_step()
 	#if tick < 10:
 		#tick +=1
@@ -236,6 +264,7 @@ func _launch(toX,toZ, speed,delta):
 
 func _physics_process(delta: float) -> void:
 	_updateRings(delta)
+	_fightLoop(delta)
 	if spinning:
 		_spinStep(delta)
 		velocity = Vector3.ZERO
@@ -328,6 +357,112 @@ func _slam():
 	if abs(player.global_position.y - head.global_position.y) > slamHeight:
 		return
 	_hitPlayer(slamDamage,1,slamKb,head.global_position)
+
+func _makeTarg(targ):
+	if targ != null and targ.has_method("player"):
+		player = targ
+
+func _takeDamage(dmg):
+	_damage(dmg)
+
+func _damage(dmg):
+	if dead:
+		return
+	health -= dmg
+	Audio.play("enemy_hit", 1.0, -4.0)
+	_spawnDmgTxt(dmg)
+	if bossBar:
+		bossBar._setHealth(float(health) / float(maxHealth))
+	if health <= 0:
+		_die()
+	elif phase == 1 and float(health) / float(maxHealth) <= phase2At:
+		_enterPhase2()
+
+func _spawnDmgTxt(dmg):
+	var txt = dmgTxt.instantiate()
+	get_parent().add_child(txt)
+	txt.global_position = segms[0].global_position + Vector3(0,.8,0)
+	txt.damage = dmg
+
+func _enterPhase2():
+	phase = 2
+	tickTime *= .6
+	stepTime *= .7
+	coilTime *= .7
+	jumpTime *= .75
+	whipUpTime *= .7
+	whipDownTime *= .7
+	spinSpeed *= 1.4
+	spinHitCd *= .7
+	ringSpeed *= 1.3
+	venomSpeed *= 1.3
+	venomGap *= .6
+	venomShots += 2
+	attackGap *= .6
+	atkCd = min(atkCd, attackGap)
+	if stepTimer:
+		stepTimer.wait_time = tickTime
+	if bossBar:
+		bossBar._setRage()
+	Audio.play("enemy_death", .6, -2.0)
+	if player != null and player.has_method("_addShake"):
+		player._addShake(.2)
+
+func _die():
+	if dead:
+		return
+	dead = true
+	spinning = false
+	launching = false
+	charging = true
+	_clearMarks()
+	Audio.play("enemy_death", .7, 2.0)
+	for i in 5:
+		var burst = explodeParticles.instantiate()
+		get_parent().add_child(burst)
+		burst.global_position = segms[randi_range(0,segms.size() - 1)].global_position
+		burst.emitting = true
+	if player != null and player.has_method("_addShake"):
+		player._addShake(.25)
+	if finishOrb:
+		finishOrb.global_position = Vector3(segms[0].global_position.x,orgY[0] + .5,segms[0].global_position.z)
+		finishOrb.visible = true
+		finishOrb.open = true
+	queue_free()
+
+func _busy():
+	return charging or launching or coiled or spinning
+
+func _fightLoop(delta : float):
+	if dead or player == null or _busy():
+		return
+	atkCd -= delta
+	if atkCd <= 0:
+		_pickAttack()
+
+func _pickAttack():
+	atkCd = attackGap
+	var head = segms[0]
+	var flat = Vector2(player.global_position.x - head.global_position.x,player.global_position.z - head.global_position.z)
+	var dist = flat.length()
+	var pool = []
+	if dist > venomRange:
+		pool = ["venom","venom","charge"]
+	elif dist < spinRange:
+		pool = ["spin","spin","charge"]
+	else:
+		pool = ["charge","charge","venom","spin"]
+	pool.shuffle()
+	var pick = pool[0]
+	if pick == lastAtk and pool.size() > 1:
+		pick = pool[1]
+	lastAtk = pick
+	if pick == "spin":
+		_spin()
+	elif pick == "venom":
+		_venom()
+	else:
+		_charge()
 
 func _hitPlayer(dmg,para : int,force : float,from : Vector3):
 	if player == null:
