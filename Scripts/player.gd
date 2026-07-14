@@ -726,14 +726,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("jump"):
 		jumpBuffer = JUMP_BUFFER_TIME
 
-	if event is InputEventKey and event.pressed and !event.echo:
-		if event.keycode == KEY_P:
-			_paralyze(1)
-			print("para ", paraLevel)
-		elif event.keycode == KEY_O:
-			_curePara(1, 5)
-			print("para ", paraLevel)
-
 func _calcDownForce():
 	#calculate the position in the future
 	var horizontalVel = Vector3(velocity.x,0,velocity.z)

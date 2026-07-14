@@ -1,7 +1,7 @@
 extends StaticBody3D
 
-func _enemy(): pass
-func _snakePart(): pass
+func _enemy():pass
+func _snakePart():pass
 
 @export var dmgMult : float = 1.0
 

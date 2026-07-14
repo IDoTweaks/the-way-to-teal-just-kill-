@@ -96,14 +96,14 @@ func _buildOffice() -> void:
 	bulb.omni_range = 9
 	office.add_child(bulb)
 	bulb.position = Vector3(0, 3.5, 0)
-	var sign = Label3D.new()
-	sign.text = "SNEK & CO.\nVENOM MANAGEMENT"
-	sign.font_size = 90
-	sign.modulate = TEAL
-	sign.pixel_size = .004
-	sign.rotation.y = -PI / 2
-	office.add_child(sign)
-	sign.position = Vector3(4.7, 2.6, 0)
+	var logo = Label3D.new()
+	logo.text = "SNEK & CO.\nVENOM MANAGEMENT"
+	logo.font_size = 90
+	logo.modulate = TEAL
+	logo.pixel_size = .004
+	logo.rotation.y = -PI / 2
+	office.add_child(logo)
+	logo.position = Vector3(4.7, 2.6, 0)
 	var poster = Label3D.new()
 	poster.text = "employee of the eon:\nthe snake"
 	poster.font_size = 48

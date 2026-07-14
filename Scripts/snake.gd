@@ -1,6 +1,6 @@
 extends CharacterBody3D
-func _snake(): pass
-func _enemy(): pass
+func _snake():pass
+func _enemy():pass
 
 const OPEN_COL = Color(0,1,.85)
 
@@ -144,14 +144,6 @@ func _onTick():
 	#elif tick == 10:
 		#_atkCharge()
 
-func _unhandled_input(event):
-	if event is InputEventKey and event.pressed and event.keycode == KEY_C:
-		_charge()
-	if event is InputEventKey and event.pressed and event.keycode == KEY_V:
-		_spin()
-	if event is InputEventKey and event.pressed and event.keycode == KEY_B:
-		_venom()
-		
 
 func _charge():
 	if _busy():
@@ -773,7 +765,7 @@ func _spawnRing(center : Vector3):
 		pieces.append({"node":piece,"ang":a})
 	rings.append({"holder":holder,"pieces":pieces,"doors":doors,"center":center,"r":1.0,"hit":false,"slots":slots})
 
-func _inDoor(ang : float,doors) -> bool:
+func _inDoor(ang,doors):
 	for d in doors:
 		if abs(wrapf(ang - d,-PI,PI)) < doorWidth:
 			return true

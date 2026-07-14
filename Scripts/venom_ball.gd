@@ -1,6 +1,6 @@
 extends CharacterBody3D
 
-func _venom(): pass
+func _venom():pass
 
 @export var speed : float = 18.0
 @export var damage : int = 10
