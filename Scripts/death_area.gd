@@ -5,7 +5,7 @@ var targ = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass
+	deathRay.visible = false
 
 func _activate(type : int):
 	await _warning(currDelt)
