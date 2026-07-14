@@ -75,7 +75,7 @@ func _on_settings_closed() -> void:
 func _on_music_btn_button_down() -> void:
 	musicOpen = true
 	musicOverlay.visible = true
-	musicStatus.text = "selected: %s  //  drag a song into the window" % _levelName(musicSelectedLevel)
+	musicStatus.text = "selected: %s - drag a song into the window" % _levelName(musicSelectedLevel)
 	_refreshMusicRows()
 
 
@@ -99,7 +99,7 @@ func _onFilesDropped(files : PackedStringArray) -> void:
 
 func _onSelectMusicLevel(idx : int) -> void:
 	musicSelectedLevel = idx
-	musicStatus.text = "selected: %s  //  drag a song into the window" % _levelName(idx)
+	musicStatus.text = "selected: %s - drag a song into the window" % _levelName(idx)
 	_refreshMusicRows()
 
 
@@ -218,5 +218,5 @@ func _buildMusicOverlay() -> void:
 	back.pressed.connect(_onMusicBack)
 	box.add_child(back)
 
-	musicStatus.text = "selected: %s  //  drag a song into the window" % _levelName(musicSelectedLevel)
+	musicStatus.text = "selected: %s - drag a song into the window" % _levelName(musicSelectedLevel)
 	_refreshMusicRows()

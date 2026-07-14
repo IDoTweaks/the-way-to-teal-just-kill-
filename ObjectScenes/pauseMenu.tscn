@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://c0c2rfy32f6xl"]
 
 [ext_resource type="Script" uid="uid://8i8rkbxssryd" path="res://Scripts/pause_menu.gd" id="1_pause"]
-[ext_resource type="Material" path="res://shaders/funkyText.tres" id="2_funky"]
+
 [ext_resource type="PackedScene" uid="uid://bbr7awrcekmkp" path="res://ObjectScenes/settingsMenu.tscn" id="3_settings"]
-[ext_resource type="Material" uid="uid://bmenuenergy01" path="res://UI/menuEnergy.tres" id="4_energy"]
+
 [ext_resource type="Theme" uid="uid://bfunkytheme01" path="res://UI/funkyTheme.tres" id="5_theme"]
 
 [node name="PauseMenu" type="CanvasLayer" unique_id=1246286778]
@@ -20,32 +20,13 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Dim" type="ColorRect" parent="Root" unique_id=1657769847]
-modulate = Color(0.7, 0.8, 0.8, 0.86)
-material = ExtResource("4_energy")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="SlashTeal" type="ColorRect" parent="Root" unique_id=92414594]
-layout_mode = 0
-offset_left = -200.0
-offset_top = 215.0
-offset_right = 1250.0
-offset_bottom = 243.0
-rotation = -0.14
-color = Color(0.1, 0.85, 0.85, 0.8)
-
-[node name="SlashGreen" type="ColorRect" parent="Root" unique_id=1644105513]
-layout_mode = 0
-offset_left = -200.0
-offset_top = 330.0
-offset_right = 980.0
-offset_bottom = 340.0
-rotation = -0.14
-color = Color(0.92, 1, 0.98, 0.5)
+color = Color(0.02, 0.03, 0.04, 0.92)
 
 [node name="Center" type="Control" parent="Root" unique_id=1071036095]
 layout_mode = 1
@@ -62,17 +43,15 @@ offset_left = 150.0
 offset_top = 150.0
 offset_right = 760.0
 offset_bottom = 940.0
-rotation = -0.05
 theme = ExtResource("5_theme")
 theme_override_constants/separation = 18
 
 [node name="Title" type="Label" parent="Root/Center/Buttons" unique_id=1715733546]
-material = ExtResource("2_funky")
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
 theme_override_colors/font_outline_color = Color(0, 0.5, 0.46, 1)
-theme_override_constants/outline_size = 28
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/font_size = 120
 text = "PAUSED"
 

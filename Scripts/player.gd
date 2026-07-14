@@ -56,9 +56,9 @@ const MAX_PARA = 10
 @export var paraChipRate : float = 1.0
 @export var paraDashMult : float = 0.5
 var paraLevel : int = 0
-var _paraFlash : float = 0.0
-var _paraChipTimer : float = 0.0
-var _paraVignette : TextureRect
+var paraFlash : float = 0.0
+var paraChipTimer : float = 0.0
+var paraVignette : TextureRect
 
 @onready var feet = $feetPos;
 @onready var playerCam = $playerCam;
@@ -967,7 +967,7 @@ func _paralyze(amount : int = 1):
 	if !count or paraLevel >= MAX_PARA:
 		return
 	paraLevel = min(paraLevel + amount, MAX_PARA)
-	_paraFlash = 0.7
+	paraFlash = 0.7
 	_addShake(.05)
 	Audio.play("player_hurt", 0.6, -5.0)
 	if paraLevel >= MAX_PARA:
@@ -1016,9 +1016,9 @@ func _speedMult():
 func _paraChip(delta : float):
 	if paraLevel < 9 or !count:
 		return
-	_paraChipTimer -= delta
-	if _paraChipTimer <= 0:
-		_paraChipTimer = paraChipRate
+	paraChipTimer -= delta
+	if paraChipTimer <= 0:
+		paraChipTimer = paraChipRate
 		_takeDamage(paraChipDmg)
 
 func _hitStop(scale : float, dur : float):
@@ -1063,14 +1063,14 @@ func _buildJuiceHud():
 	_vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_vignette.modulate = Color(1, 1, 1, 0)
 	hud.add_child(_vignette)
-	_paraVignette = TextureRect.new()
-	_paraVignette.texture = _make_para_texture()
-	_paraVignette.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_paraVignette.stretch_mode = TextureRect.STRETCH_SCALE
-	_paraVignette.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_paraVignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_paraVignette.modulate = Color(1, 1, 1, 0)
-	hud.add_child(_paraVignette)
+	paraVignette = TextureRect.new()
+	paraVignette.texture = _makeParaTexture()
+	paraVignette.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	paraVignette.stretch_mode = TextureRect.STRETCH_SCALE
+	paraVignette.set_anchors_preset(Control.PRESET_FULL_RECT)
+	paraVignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	paraVignette.modulate = Color(1, 1, 1, 0)
+	hud.add_child(paraVignette)
 	_crossDot = ColorRect.new()
 	_crossDot.color = Color(0, 1, 0.85, 0.8)
 	_crossDot.set_anchors_preset(Control.PRESET_CENTER)
@@ -1132,15 +1132,14 @@ func _updateJuice(delta : float):
 		Engine.time_scale = 1.0
 		_hitStopUntil = 0.0
 	_hurtFlash = move_toward(_hurtFlash, 0.0, delta * 1.8)
-	_paraFlash = move_toward(_paraFlash, 0.0, delta * 1.4)
+	paraFlash = move_toward(paraFlash, 0.0, delta * 1.4)
 	if _vignette:
 		var lowHp = clamp((40.0 - health) / 40.0, 0.0, 1.0) * 0.45
 		var pulse = (sin(Time.get_ticks_msec() * 0.008) * 0.5 + 0.5) * 0.2 if health < 25 else 0.0
 		_vignette.modulate.a = clamp(lowHp + pulse + _hurtFlash, 0.0, 0.85)
-	if _paraVignette:
+	if paraVignette:
 		var f = float(paraLevel) / float(MAX_PARA)
-		var creep = (sin(Time.get_ticks_msec() * 0.004) * 0.5 + 0.5) * 0.15 * f
-		_paraVignette.modulate.a = clamp(f * 0.65 + creep + _paraFlash, 0.0, 0.9)
+		paraVignette.modulate.a = clamp(f * 0.6 + paraFlash, 0.0, 0.85)
 
 func _make_vignette_texture() -> ImageTexture:
 	var s = 128
@@ -1154,7 +1153,7 @@ func _make_vignette_texture() -> ImageTexture:
 			img.set_pixel(x, y, Color(0.95, 0.05, 0.05, a * a))
 	return ImageTexture.create_from_image(img)
 
-func _make_para_texture() -> ImageTexture:
+func _makeParaTexture() -> ImageTexture:
 	var s = 128
 	var img = Image.create(s, s, false, Image.FORMAT_RGBA8)
 	var c = Vector2(s * 0.5, s * 0.5)
@@ -1162,10 +1161,8 @@ func _make_para_texture() -> ImageTexture:
 	for x in range(s):
 		for y in range(s):
 			var d = Vector2(x, y).distance_to(c) / maxd
-			var a = clamp((d - 0.3) / 0.7, 0.0, 1.0)
-			var veins = sin(atan2(y - c.y, x - c.x) * 9.0) * 0.5 + 0.5
-			var col = Color(0.45, 0.05, 0.85).lerp(Color(0.7, 0.3, 1.0), veins)
-			img.set_pixel(x, y, Color(col.r, col.g, col.b, a * a * (0.75 + veins * 0.25)))
+			var a = clamp((d - 0.45) / 0.55, 0.0, 1.0)
+			img.set_pixel(x, y, Color(0.5, 0.12, 0.85, a * a))
 	return ImageTexture.create_from_image(img)
 
 func _spawnSlam():

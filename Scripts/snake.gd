@@ -42,7 +42,7 @@ var spinning := false
 var spinT := 0.0
 var spinHitNow := 0.0
 var spinFxNow := 0.0
-var spinCentre : Vector3
+var spinCenter : Vector3
 var rings : Array = []
 var segms := []
 var moving := false
@@ -310,11 +310,11 @@ func _slam():
 		return
 	if player.has_method("_addShake"):
 		player._addShake(.1)
-	var centre = bossFloor._wrld2Tile(head.global_position.x,head.global_position.z)
+	var center = bossFloor._wrld2Tile(head.global_position.x,head.global_position.z)
 	var pTile = bossFloor._wrld2Tile(player.global_position.x,player.global_position.z)
-	if centre.x == -1 or pTile.x == -1:
+	if center.x == -1 or pTile.x == -1:
 		return
-	if abs(pTile.x - centre.x) > slamRadius or abs(pTile.y - centre.y) > slamRadius:
+	if abs(pTile.x - center.x) > slamRadius or abs(pTile.y - center.y) > slamRadius:
 		return
 	if abs(player.global_position.y - head.global_position.y) > slamHeight:
 		return
@@ -336,8 +336,8 @@ func _spin():
 	charging = true
 	while moving:
 		await get_tree().process_frame
-	spinCentre = segms[0].global_position
-	spinCentre.y = orgY[0]
+	spinCenter = segms[0].global_position
+	spinCenter.y = orgY[0]
 	spinT = 0.0
 	spinHitNow = 0.0
 	spinFxNow = 0.0
@@ -351,7 +351,7 @@ func _spinStep(delta : float):
 	for i in range(segms.size()):
 		var a = ang - i * spinLag
 		var rad = spinRadius * (.35 + .65 * (float(i) / float(segms.size() - 1)))
-		var pos = spinCentre + Vector3(cos(a),0,sin(a)) * rad
+		var pos = spinCenter + Vector3(cos(a),0,sin(a)) * rad
 		pos.y = orgY[i] + sin(spinT * 7.0 + i) * .12
 		segms[i].global_position = pos
 		segms[i].rotation.y = atan2(cos(a),sin(a))
@@ -365,12 +365,12 @@ func _spinStep(delta : float):
 		fx.emitting = true
 	spinHitNow -= delta
 	if spinHitNow <= 0 and player != null:
-		var flat = Vector2(player.global_position.x - spinCentre.x,player.global_position.z - spinCentre.z)
-		if flat.length() < spinRadius and abs(player.global_position.y - spinCentre.y) < slamHeight:
+		var flat = Vector2(player.global_position.x - spinCenter.x,player.global_position.z - spinCenter.z)
+		if flat.length() < spinRadius and abs(player.global_position.y - spinCenter.y) < slamHeight:
 			spinHitNow = spinHitCd
 			if player.has_method("_addShake"):
 				player._addShake(.07)
-			_hitPlayer(spinDamage,1,spinKb,spinCentre)
+			_hitPlayer(spinDamage,1,spinKb,spinCenter)
 	if spinT >= spinTime:
 		spinning = false
 		_tailWhip()
@@ -406,20 +406,20 @@ func _groundSlam():
 	burst.emitting = true
 	var dust = dustParticles.instantiate()
 	get_parent().add_child(dust)
-	dust.global_position = spinCentre
+	dust.global_position = spinCenter
 	dust.emitting = true
 	if player != null and player.has_method("_addShake"):
 		player._addShake(.18)
-	_spawnRing(spinCentre)
+	_spawnRing(spinCenter)
 
-func _spawnRing(centre : Vector3):
+func _spawnRing(center : Vector3):
 	var doors = []
 	var base = randf() * TAU
 	for d in range(ringDoors):
 		doors.append(wrapf(base + TAU * float(d) / float(ringDoors),0,TAU))
 	var holder = Node3D.new()
 	get_parent().add_child(holder)
-	holder.global_position = Vector3(centre.x,centre.y + .1,centre.z)
+	holder.global_position = Vector3(center.x,center.y + .1,center.z)
 	var pieces = []
 	var slots = 72
 	for i in range(slots):
@@ -440,7 +440,7 @@ func _spawnRing(centre : Vector3):
 		piece.material_override = mat
 		holder.add_child(piece)
 		pieces.append({"node":piece,"ang":a})
-	rings.append({"holder":holder,"pieces":pieces,"doors":doors,"centre":centre,"r":1.0,"hit":false,"slots":slots})
+	rings.append({"holder":holder,"pieces":pieces,"doors":doors,"center":center,"r":1.0,"hit":false,"slots":slots})
 
 func _inDoor(ang : float,doors) -> bool:
 	for d in doors:
@@ -468,14 +468,14 @@ func _updateRings(delta : float):
 			piece.scale = Vector3(1.0,1.0,max(arc / .5,1.0))
 			piece.material_override.albedo_color.a = .8 * fade
 		if !ring["hit"] and player != null:
-			var centre = ring["centre"]
-			var flat = Vector2(player.global_position.x - centre.x,player.global_position.z - centre.z)
+			var center = ring["center"]
+			var flat = Vector2(player.global_position.x - center.x,player.global_position.z - center.z)
 			var dist = flat.length()
-			if abs(dist - r) < ringWidth and abs(player.global_position.y - centre.y) < slamHeight:
+			if abs(dist - r) < ringWidth and abs(player.global_position.y - center.y) < slamHeight:
 				var pAng = wrapf(atan2(flat.y,flat.x),0,TAU)
 				if !_inDoor(pAng,ring["doors"]):
 					ring["hit"] = true
-					_hitPlayer(ringDamage,1,ringKb,centre)
+					_hitPlayer(ringDamage,1,ringKb,center)
 		if r >= ringMaxRadius:
 			holder.queue_free()
 			rings.erase(ring)

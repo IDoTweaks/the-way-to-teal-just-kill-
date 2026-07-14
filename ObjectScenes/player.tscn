@@ -10,17 +10,11 @@
 [ext_resource type="Script" uid="uid://us4lk8xgjfay" path="res://Scripts/game_over.gd" id="8_rfol3"]
 [ext_resource type="Shader" uid="uid://c3ykk7lod3i32" path="res://shaders/styleFire.gdshader" id="9_fire"]
 [ext_resource type="Shader" uid="uid://bkra75bcwljf7" path="res://shaders/healthBar.gdshader" id="10_hp"]
-[ext_resource type="Shader" uid="uid://bihmuurth0hxf" path="res://shaders/uiEnergy.gdshader" id="11_energy"]
-[ext_resource type="Material" path="res://shaders/funkyText.tres" id="12_funky"]
+
+
 [ext_resource type="Theme" uid="uid://bfunkytheme01" path="res://UI/funkyTheme.tres" id="13_theme"]
 [ext_resource type="PackedScene" uid="uid://blkrl04v60e0i" path="res://Models/blue-night_a.v.as-m24.glb" id="14_va7cm"]
 [ext_resource type="Shader" uid="uid://10bvbyc3gcgu" path="res://shaders/scope.gdshader" id="15_scope"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_energy"]
-shader = ExtResource("11_energy")
-shader_parameter/deep = Color(0.02, 0.05, 0.12, 1)
-shader_parameter/glow_blue = Color(0.04, 0.25, 0.6, 1)
-shader_parameter/glow_green = Color(0, 0.45, 0.3, 1)
 
 [sub_resource type="Gradient" id="Gradient_gacgy"]
 
@@ -801,7 +795,6 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Title" type="Label" parent="GameOver/MainContainer" unique_id=1728092983]
-material = ExtResource("12_funky")
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -871,7 +864,6 @@ text = "QUIT"
 
 [node name="TextureRect" type="TextureRect" parent="GameOver" unique_id=859501969]
 z_index = -1
-material = SubResource("ShaderMaterial_energy")
 offset_left = -492.0
 offset_top = -602.0
 offset_right = 2213.0
@@ -1006,7 +998,6 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="timer" type="Label" parent="HUD" unique_id=1972703702]
-material = ExtResource("12_funky")
 offset_left = 816.0
 offset_top = 3.0
 offset_right = 1099.0
@@ -1020,7 +1011,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="enemyCounter" type="Label" parent="HUD" unique_id=771400001]
-material = ExtResource("12_funky")
 offset_left = 32.0
 offset_top = 26.0
 offset_right = 460.0
@@ -1056,7 +1046,6 @@ anchor_bottom = 1.0
 mouse_filter = 2
 
 [node name="styleRankLabel" type="Label" parent="HUD/StyleMeterUI" unique_id=999222222]
-material = ExtResource("12_funky")
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0

@@ -16,12 +16,12 @@ var center : Vector3
 func _ready() -> void:
 	center = global_position
 
-func _setRect(hx : float, hz : float, ceil : float):
+func _setRect(hx : float, hz : float, roof : float):
 	rectMode = true
 	catchFloor = false
 	halfX = hx
 	halfZ = hz
-	ceiling = ceil
+	ceiling = roof
 	center = global_position
 
 func _physics_process(delta: float) -> void:

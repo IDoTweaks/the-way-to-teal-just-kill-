@@ -1,16 +1,10 @@
 [gd_scene format=3 uid="uid://cmf4i5g6obn3y"]
 
 [ext_resource type="Script" uid="uid://cunl3i248huq6" path="res://Scripts/finish_level.gd" id="1_c24de"]
-[ext_resource type="Shader" uid="uid://bihmuurth0hxf" path="res://shaders/uiEnergy.gdshader" id="2_energy"]
-[ext_resource type="Shader" uid="uid://c3ykk7lod3i32" path="res://shaders/styleFire.gdshader" id="3_fire"]
-[ext_resource type="ShaderMaterial" path="res://shaders/funkyText.tres" id="4_funky"]
-[ext_resource type="Theme" uid="uid://bfunkytheme01" path="res://UI/funkyTheme.tres" id="5_theme"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_energy"]
-shader = ExtResource("2_energy")
-shader_parameter/deep = Color(0.02, 0.05, 0.12, 1)
-shader_parameter/glow_blue = Color(0.04, 0.25, 0.6, 1)
-shader_parameter/glow_green = Color(0, 0.45, 0.3, 1)
+[ext_resource type="Shader" uid="uid://c3ykk7lod3i32" path="res://shaders/styleFire.gdshader" id="3_fire"]
+
+[ext_resource type="Theme" uid="uid://bfunkytheme01" path="res://UI/funkyTheme.tres" id="5_theme"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_fire"]
 shader = ExtResource("3_fire")
@@ -86,15 +80,13 @@ grow_vertical = 2
 script = ExtResource("1_c24de")
 
 [node name="Background" type="ColorRect" parent="." unique_id=170738047]
-material = SubResource("ShaderMaterial_energy")
-modulate = Color(1, 1, 1, 0.6)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.03, 0.06, 0.12, 1)
+color = Color(0.02, 0.03, 0.04, 0.92)
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=84086019]
 
@@ -107,7 +99,6 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Title" type="Label" parent="UI/MainContainer" unique_id=263088528]
-material = ExtResource("4_funky")
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -116,7 +107,7 @@ offset_bottom = 170.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0.18, 0.65, 1, 1)
 theme_override_colors/font_outline_color = Color(0.02, 0.06, 0.14, 0.9)
-theme_override_constants/outline_size = 14
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/font_size = 72
 text = "LEVEL CLEARED"
 horizontal_alignment = 1
@@ -139,7 +130,6 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="gradeCaption" type="Label" parent="UI/MainContainer" unique_id=771122335]
-material = ExtResource("4_funky")
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -154,14 +144,13 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.05, 0.88, 0.42, 1)
 theme_override_colors/font_outline_color = Color(0.02, 0.06, 0.04, 0.9)
-theme_override_constants/outline_size = 8
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/font_size = 34
 text = "GRADE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="gradeShow" type="Label" parent="UI/MainContainer" unique_id=1169089017]
-material = ExtResource("4_funky")
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -176,14 +165,13 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.05, 0.88, 0.42, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 18
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/font_size = 200
 text = "S"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="ScoreShow" type="Label" parent="UI/MainContainer" unique_id=912895409]
-material = ExtResource("4_funky")
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -198,7 +186,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.18, 0.65, 1, 1)
 theme_override_colors/font_outline_color = Color(0.02, 0.06, 0.14, 0.9)
-theme_override_constants/outline_size = 10
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/font_size = 56
 text = "SCORE
 0"
