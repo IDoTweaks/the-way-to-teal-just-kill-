@@ -6,6 +6,9 @@ extends Node
 @onready var level4 = preload("res://Scenes/level4.tscn")
 @onready var level5 = preload("res://Scenes/level5.tscn")
 @onready var level6 = preload("res://Scenes/level6.tscn")
+@onready var level7 = preload("res://Scenes/level7.tscn")
+@onready var level8 = preload("res://Scenes/level8.tscn")
+@onready var level9 = preload("res://Scenes/level9.tscn")
 @onready var snakeBoss = preload("res://Scenes/bossFloor.tscn")
 @onready var tutorial = preload("res://Scenes/tutorial.tscn")
 @onready var levels : Array
@@ -148,6 +151,9 @@ func _ready() -> void:
 	levels.append(level4)
 	levels.append(level5)
 	levels.append(level6)
+	levels.append(level7)
+	levels.append(level8)
+	levels.append(level9)
 	levels.append(snakeBoss)
 	bossLevels = [levels.find(snakeBoss)]
 	bossNames = {levels.find(snakeBoss): "THE SNAKE"}

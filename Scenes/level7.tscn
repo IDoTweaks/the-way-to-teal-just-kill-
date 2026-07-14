@@ -1,0 +1,146 @@
+[gd_scene format=3 uid="uid://blvl7foundry1"]
+
+[ext_resource type="Script" uid="uid://2pcnmn74i67n" path="res://Scripts/level_1.gd" id="1_lvl"]
+[ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="2_pl"]
+[ext_resource type="PackedScene" uid="uid://cna3205ggf26a" path="res://ObjectScenes/playerGhost.tscn" id="3_gh"]
+[ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="4_fin"]
+[ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="5_pause"]
+[ext_resource type="PackedScene" uid="uid://dh8322144axab" path="res://ObjectScenes/walker.tscn" id="6_walk"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/Exploder.tscn" id="7_expl"]
+[ext_resource type="PackedScene" uid="uid://ctoceg007wby5" path="res://ObjectScenes/Xenon.tscn" id="8_xen"]
+[ext_resource type="PackedScene" uid="uid://b7cyrd3uhdaei" path="res://ObjectScenes/Drone.tscn" id="9_drone"]
+[ext_resource type="PackedScene" uid="uid://du4s8p1pljnlb" path="res://ObjectScenes/jumpOrb.tscn" id="10_orb"]
+
+[sub_resource type="StandardMaterial3D" id="mat_level"]
+albedo_color = Color(0.17, 0.23, 0.16, 1)
+
+[sub_resource type="Environment" id="env"]
+ssao_enabled = true
+fog_enabled = true
+fog_light_energy = 1.9
+fog_density = 0.005
+
+[node name="MainScene" type="Node3D"]
+script = ExtResource("1_lvl")
+levelIndex = 7
+
+[node name="Level" type="CSGCombiner3D" parent="."]
+material_override = SubResource("mat_level")
+use_collision = true
+collision_layer = 17
+
+[node name="Floor" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, -0.5, 0)
+size = Vector3(54, 1, 34)
+
+[node name="Ceiling" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 14.5, 0)
+size = Vector3(54, 1, 34)
+
+[node name="BackWall" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 7, 0)
+size = Vector3(1, 14, 34)
+
+[node name="EndWall" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52.5, 7, 0)
+size = Vector3(1, 14, 34)
+
+[node name="WallLeft" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 7, -16.5)
+size = Vector3(54, 14, 1)
+
+[node name="WallRight" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 7, 16.5)
+size = Vector3(54, 14, 1)
+
+[node name="Catwalk1" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 5, -13.5)
+size = Vector3(50, 1, 5)
+
+[node name="Catwalk2" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 5, 13.5)
+size = Vector3(50, 1, 5)
+
+[node name="Catwalk3" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 5, 0)
+size = Vector3(5, 1, 24)
+
+[node name="Catwalk4" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 5, 0)
+size = Vector3(5, 1, 24)
+
+[node name="Pillar1" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 2.5, 0)
+size = Vector3(3, 5, 3)
+
+[node name="Pillar2" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 2.5, 0)
+size = Vector3(3, 5, 3)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -0.37609485, 0.9265812, 0, -0.9265812, -0.37609485, 0, 18.215263, 0)
+
+[node name="Player" parent="." instance=ExtResource("2_pl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, 0)
+dashBoost = 22.0
+shotGunDmg = 7.5
+
+[node name="Player2" parent="." instance=ExtResource("3_gh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, 0)
+
+[node name="Walker1" parent="." instance=ExtResource("6_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 1, -6)
+
+[node name="Walker2" parent="." instance=ExtResource("6_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 1, 6)
+
+[node name="Walker3" parent="." instance=ExtResource("6_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 1, -4)
+
+[node name="Exploder1" parent="." instance=ExtResource("7_expl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 1, 0)
+wallLayer = 16
+
+[node name="Exploder2" parent="." instance=ExtResource("7_expl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 1, 6)
+wallLayer = 16
+
+[node name="XenonN" parent="." node_paths=PackedStringArray("player") instance=ExtResource("8_xen")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 6.5, -13)
+sightDist = 45.0
+player = NodePath("../Player")
+wallLayer = 16
+damage = 10
+
+[node name="XenonS" parent="." node_paths=PackedStringArray("player") instance=ExtResource("8_xen")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 6.5, 13)
+sightDist = 45.0
+player = NodePath("../Player")
+wallLayer = 16
+damage = 10
+
+[node name="Drone1" parent="." node_paths=PackedStringArray("player") instance=ExtResource("9_drone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 8, 4)
+player = NodePath("../Player")
+wallLayer = 16
+
+[node name="Drone2" parent="." node_paths=PackedStringArray("player") instance=ExtResource("9_drone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 8, -4)
+player = NodePath("../Player")
+wallLayer = 16
+
+[node name="OrbN" parent="." instance=ExtResource("10_orb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1, -11)
+
+[node name="OrbS" parent="." instance=ExtResource("10_orb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 1, 11)
+
+[node name="FinishOrb" parent="." node_paths=PackedStringArray("player") instance=ExtResource("4_fin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 6.5, 0)
+toLevel = 8
+player = NodePath("../Player")
+
+[node name="PauseMenu" parent="." instance=ExtResource("5_pause")]

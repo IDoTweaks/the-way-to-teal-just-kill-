@@ -1,0 +1,199 @@
+[gd_scene format=3 uid="uid://blvmagauntl01"]
+
+[ext_resource type="Script" uid="uid://2pcnmn74i67n" path="res://Scripts/level_1.gd" id="1_lvl"]
+[ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="2_pl"]
+[ext_resource type="PackedScene" uid="uid://cna3205ggf26a" path="res://ObjectScenes/playerGhost.tscn" id="3_gh"]
+[ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="4_fin"]
+[ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="5_pause"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/Charger.tscn" id="6_charg"]
+[ext_resource type="PackedScene" uid="uid://ctoceg007wby5" path="res://ObjectScenes/Xenon.tscn" id="7_xen"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/Exploder.tscn" id="8_expl"]
+[ext_resource type="PackedScene" uid="uid://dh8322144axab" path="res://ObjectScenes/walker.tscn" id="9_walk"]
+[ext_resource type="PackedScene" uid="uid://bmjkfi53x6qdg" path="res://ObjectScenes/SniperEnemy.tscn" id="10_snip"]
+[ext_resource type="PackedScene" uid="uid://b7cyrd3uhdaei" path="res://ObjectScenes/Drone.tscn" id="11_drone"]
+[ext_resource type="PackedScene" uid="uid://du4s8p1pljnlb" path="res://ObjectScenes/jumpOrb.tscn" id="12_orb"]
+
+[sub_resource type="StandardMaterial3D" id="mat_level"]
+albedo_color = Color(0.15, 0.25, 0.17, 1)
+
+[sub_resource type="Environment" id="env"]
+ssao_enabled = true
+fog_enabled = true
+fog_light_energy = 1.8
+fog_density = 0.004
+
+[node name="MainScene" type="Node3D"]
+script = ExtResource("1_lvl")
+levelIndex = 9
+
+[node name="Level" type="CSGCombiner3D" parent="."]
+material_override = SubResource("mat_level")
+use_collision = true
+collision_layer = 17
+
+[node name="Floor" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, -0.5, 0)
+size = Vector3(92, 1, 26)
+
+[node name="Ceiling" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 10.5, 0)
+size = Vector3(92, 1, 26)
+
+[node name="BackWall" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 5, 0)
+size = Vector3(1, 10, 26)
+
+[node name="EndWall" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 89.5, 5, 0)
+size = Vector3(1, 10, 26)
+
+[node name="WallLeft" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 5, -12.5)
+size = Vector3(92, 10, 1)
+
+[node name="WallRight" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 5, 12.5)
+size = Vector3(92, 10, 1)
+
+[node name="Gate1Left" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 5, -7.25)
+size = Vector3(1, 10, 10.5)
+
+[node name="Gate1Right" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 5, 7.25)
+size = Vector3(1, 10, 10.5)
+
+[node name="Gate1Top" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 7.5, 0)
+size = Vector3(1, 5, 4)
+
+[node name="Gate2Left" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58, 5, -7.25)
+size = Vector3(1, 10, 10.5)
+
+[node name="Gate2Right" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58, 5, 7.25)
+size = Vector3(1, 10, 10.5)
+
+[node name="Gate2Top" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58, 7.5, 0)
+size = Vector3(1, 5, 4)
+
+[node name="Perch1" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 4, -9)
+size = Vector3(6, 1, 5)
+
+[node name="Cover1" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 1.5, 0)
+size = Vector3(3, 3, 3)
+
+[node name="Cover2" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 1.5, -2)
+size = Vector3(3, 3, 3)
+
+[node name="Perch2" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55, 5, 9)
+size = Vector3(6, 1, 5)
+
+[node name="Perch3" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84, 5, -9)
+size = Vector3(6, 1, 5)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -0.37609485, 0.9265812, 0, -0.9265812, -0.37609485, 0, 18.215263, 0)
+
+[node name="Player" parent="." instance=ExtResource("2_pl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2, 0)
+dashBoost = 22.0
+shotGunDmg = 7.5
+
+[node name="Player2" parent="." instance=ExtResource("3_gh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2, 0)
+
+[node name="ChargerA1" parent="." instance=ExtResource("6_charg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 1.5, -4)
+wallLayer = 16
+
+[node name="ChargerA2" parent="." instance=ExtResource("6_charg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 1.5, 4)
+wallLayer = 16
+
+[node name="XenonA" parent="." node_paths=PackedStringArray("player") instance=ExtResource("7_xen")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 5.5, -9)
+sightDist = 45.0
+player = NodePath("../Player")
+wallLayer = 16
+damage = 10
+
+[node name="OrbA" parent="." instance=ExtResource("12_orb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 1, -9)
+
+[node name="SniperB" parent="." node_paths=PackedStringArray("player") instance=ExtResource("10_snip")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55, 6.5, 9)
+player = NodePath("../Player")
+wallLayer = 16
+
+[node name="ExploderB1" parent="." instance=ExtResource("8_expl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 1, -4)
+wallLayer = 16
+
+[node name="ExploderB2" parent="." instance=ExtResource("8_expl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 1, 5)
+wallLayer = 16
+
+[node name="ExploderB3" parent="." instance=ExtResource("8_expl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 1, -6)
+wallLayer = 16
+
+[node name="WalkerB" parent="." instance=ExtResource("9_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 1, 2)
+
+[node name="OrbB" parent="." instance=ExtResource("12_orb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, 1, 9)
+
+[node name="DroneC1" parent="." node_paths=PackedStringArray("player") instance=ExtResource("11_drone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66, 5, -4)
+player = NodePath("../Player")
+wallLayer = 16
+
+[node name="DroneC2" parent="." node_paths=PackedStringArray("player") instance=ExtResource("11_drone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74, 5, 4)
+player = NodePath("../Player")
+wallLayer = 16
+
+[node name="SniperC" parent="." node_paths=PackedStringArray("player") instance=ExtResource("10_snip")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84, 6.5, -9)
+player = NodePath("../Player")
+wallLayer = 16
+
+[node name="ChargerC" parent="." instance=ExtResource("6_charg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 72, 1.5, 0)
+wallLayer = 16
+
+[node name="WalkerC1" parent="." instance=ExtResource("9_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66, 1, 6)
+
+[node name="WalkerC2" parent="." instance=ExtResource("9_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 78, 1, -6)
+
+[node name="OrbC1" parent="." instance=ExtResource("12_orb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, 1, 0)
+
+[node name="OrbC2" parent="." instance=ExtResource("12_orb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 72, 1, -8)
+
+[node name="OrbC3" parent="." instance=ExtResource("12_orb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 72, 1, 8)
+
+[node name="OrbC4" parent="." instance=ExtResource("12_orb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 1, 0)
+
+[node name="FinishOrb" parent="." node_paths=PackedStringArray("player") instance=ExtResource("4_fin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 86, 1.5, 6)
+toLevel = 10
+player = NodePath("../Player")
+
+[node name="PauseMenu" parent="." instance=ExtResource("5_pause")]

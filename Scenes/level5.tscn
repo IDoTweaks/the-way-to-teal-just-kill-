@@ -6,7 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="4_fin"]
 [ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="5_pause"]
 [ext_resource type="PackedScene" path="res://ObjectScenes/Exploder.tscn" id="6_expl"]
-[ext_resource type="PackedScene" path="res://ObjectScenes/Charger.tscn" id="7_charg"]
+[ext_resource type="PackedScene" uid="uid://dh8322144axab" path="res://ObjectScenes/walker.tscn" id="7_walk"]
+[ext_resource type="PackedScene" uid="uid://du4s8p1pljnlb" path="res://ObjectScenes/jumpOrb.tscn" id="8_orb"]
 
 [sub_resource type="StandardMaterial3D" id="mat_level"]
 albedo_color = Color(0.2, 0.22, 0.15, 1)
@@ -27,40 +28,40 @@ use_collision = true
 collision_layer = 17
 
 [node name="Floor" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -0.5, 0)
-size = Vector3(44, 1, 28)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, -0.5, 0)
+size = Vector3(52, 1, 24)
 
 [node name="Ceiling" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 8.5, 0)
-size = Vector3(44, 1, 28)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 8.5, 0)
+size = Vector3(52, 1, 24)
 
-[node name="WallNegX" type="CSGBox3D" parent="Level"]
+[node name="BackWall" type="CSGBox3D" parent="Level"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 4, 0)
-size = Vector3(1, 8, 28)
+size = Vector3(1, 8, 24)
 
-[node name="WallPosX" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41.5, 4, 0)
-size = Vector3(1, 8, 28)
+[node name="EndWall" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.5, 4, 0)
+size = Vector3(1, 8, 24)
 
-[node name="WallNegZ" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 4, -13.5)
-size = Vector3(44, 8, 1)
+[node name="WallLeft" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 4, -11.5)
+size = Vector3(52, 8, 1)
 
-[node name="WallPosZ" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 4, 13.5)
-size = Vector3(44, 8, 1)
+[node name="WallRight" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 4, 11.5)
+size = Vector3(52, 8, 1)
 
-[node name="DividerA" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 4, 4)
-size = Vector3(1, 8, 16)
+[node name="Divider1" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 4, -4)
+size = Vector3(1, 8, 15)
 
-[node name="DividerB" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27, 4, -4)
-size = Vector3(1, 8, 16)
+[node name="Divider2" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 4, 4)
+size = Vector3(1, 8, 15)
 
-[node name="Pillar1" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 2, 8)
-size = Vector3(2, 4, 2)
+[node name="CenterBlock" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37, 1.5, 0)
+size = Vector3(4, 3, 4)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("env")
@@ -69,34 +70,47 @@ environment = SubResource("env")
 transform = Transform3D(1, 0, 0, 0, -0.37609485, 0.9265812, 0, -0.9265812, -0.37609485, 0, 18.215263, 0)
 
 [node name="Player" parent="." instance=ExtResource("2_pl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2, -7)
 dashBoost = 22.0
 shotGunDmg = 7.5
 
 [node name="Player2" parent="." instance=ExtResource("3_gh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2, -7)
 
 [node name="Exploder1" parent="." instance=ExtResource("6_expl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 2, -6)
-
-[node name="Exploder2" parent="." instance=ExtResource("6_expl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2, 6)
-
-[node name="Exploder3" parent="." instance=ExtResource("6_expl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 2, -6)
-
-[node name="Exploder4" parent="." instance=ExtResource("6_expl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 2, 4)
-
-[node name="Exploder5" parent="." instance=ExtResource("6_expl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 2, 0)
-
-[node name="Charger1" parent="." instance=ExtResource("7_charg")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1, 6)
 wallLayer = 16
 
+[node name="Exploder2" parent="." instance=ExtResource("6_expl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 1, 8)
+wallLayer = 16
+
+[node name="Exploder3" parent="." instance=ExtResource("6_expl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 1, -7)
+wallLayer = 16
+
+[node name="Exploder4" parent="." instance=ExtResource("6_expl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 1, 6)
+wallLayer = 16
+
+[node name="Exploder5" parent="." instance=ExtResource("6_expl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 1, -6)
+wallLayer = 16
+
+[node name="Walker1" parent="." instance=ExtResource("7_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 1, -5)
+
+[node name="Walker2" parent="." instance=ExtResource("7_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 1, 5)
+
+[node name="Walker3" parent="." instance=ExtResource("7_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 1, 0)
+
+[node name="OrbRiser" parent="." instance=ExtResource("8_orb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37, 3.6, 0)
+
 [node name="FinishOrb" parent="." node_paths=PackedStringArray("player") instance=ExtResource("4_fin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 2, 8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 1.5, 8)
 toLevel = 6
 player = NodePath("../Player")
 

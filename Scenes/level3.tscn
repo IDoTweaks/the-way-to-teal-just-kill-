@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="5_pause"]
 [ext_resource type="PackedScene" path="res://ObjectScenes/Charger.tscn" id="6_charg"]
 [ext_resource type="PackedScene" uid="uid://ctoceg007wby5" path="res://ObjectScenes/Xenon.tscn" id="7_xen"]
+[ext_resource type="PackedScene" uid="uid://du4s8p1pljnlb" path="res://ObjectScenes/jumpOrb.tscn" id="8_orb"]
 
 [sub_resource type="StandardMaterial3D" id="mat_level"]
 albedo_color = Color(0.16, 0.26, 0.18, 1)
@@ -27,44 +28,64 @@ use_collision = true
 collision_layer = 17
 
 [node name="Floor" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -0.5, 0)
-size = Vector3(44, 1, 32)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29, -0.5, 0)
+size = Vector3(62, 1, 22)
 
 [node name="Ceiling" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 12.5, 0)
-size = Vector3(44, 1, 32)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29, 9.5, 0)
+size = Vector3(62, 1, 22)
 
-[node name="WallNegX" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 6, 0)
-size = Vector3(1, 12, 32)
+[node name="BackWall" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 4.5, 0)
+size = Vector3(1, 9, 22)
 
-[node name="WallPosX" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41.5, 6, 0)
-size = Vector3(1, 12, 32)
+[node name="EndWall" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 59.5, 4.5, 0)
+size = Vector3(1, 9, 22)
 
-[node name="WallNegZ" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 6, -15.5)
-size = Vector3(44, 12, 1)
+[node name="WallLeft" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29, 4.5, -10.5)
+size = Vector3(62, 9, 1)
 
-[node name="WallPosZ" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 6, 15.5)
-size = Vector3(44, 12, 1)
+[node name="WallRight" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29, 4.5, 10.5)
+size = Vector3(62, 9, 1)
 
-[node name="Pillar1" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 2, 6)
+[node name="Gate1Left" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 4.5, -6.25)
+size = Vector3(1, 9, 8.5)
+
+[node name="Gate1Right" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 4.5, 6.25)
+size = Vector3(1, 9, 8.5)
+
+[node name="Gate1Top" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 7, 0)
+size = Vector3(1, 4, 4.5)
+
+[node name="Gate2Left" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 4.5, -6.25)
+size = Vector3(1, 9, 8.5)
+
+[node name="Gate2Right" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 4.5, 6.25)
+size = Vector3(1, 9, 8.5)
+
+[node name="Gate2Top" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 7, 0)
+size = Vector3(1, 4, 4.5)
+
+[node name="Pillar" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 2, 0)
 size = Vector3(2, 4, 2)
 
-[node name="Pillar2" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2, -6)
-size = Vector3(2, 4, 2)
+[node name="Ledge" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 3, 8)
+size = Vector3(14, 1, 5)
 
-[node name="Pillar3" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 2, 5)
-size = Vector3(2, 4, 2)
-
-[node name="CoverMid" type="CSGBox3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 2, -1)
-size = Vector3(3, 4, 3)
+[node name="SniperPerch" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 53, 5, -5)
+size = Vector3(7, 1, 5)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("env")
@@ -73,38 +94,44 @@ environment = SubResource("env")
 transform = Transform3D(1, 0, 0, 0, -0.37609485, 0.9265812, 0, -0.9265812, -0.37609485, 0, 18.215263, 0)
 
 [node name="Player" parent="." instance=ExtResource("2_pl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2, 0)
 dashBoost = 22.0
 shotGunDmg = 7.5
 
 [node name="Player2" parent="." instance=ExtResource("3_gh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2, 0)
 
-[node name="Charger1" parent="." instance=ExtResource("6_charg")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 2, 4)
+[node name="ChargerA" parent="." instance=ExtResource("6_charg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 1.5, 0)
 wallLayer = 16
 
-[node name="Charger2" parent="." instance=ExtResource("6_charg")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2, -5)
+[node name="ChargerB1" parent="." instance=ExtResource("6_charg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 1.5, -4)
 wallLayer = 16
 
-[node name="Charger3" parent="." instance=ExtResource("6_charg")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 2, 4)
+[node name="ChargerB2" parent="." instance=ExtResource("6_charg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 1.5, 4)
 wallLayer = 16
 
-[node name="Charger4" parent="." instance=ExtResource("6_charg")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 2, -4)
+[node name="ChargerC" parent="." instance=ExtResource("6_charg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 1.5, 0)
 wallLayer = 16
 
-[node name="Xenon1" parent="." node_paths=PackedStringArray("player") instance=ExtResource("7_xen")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 2, -8)
-sightDist = 50.0
+[node name="XenonC" parent="." node_paths=PackedStringArray("player") instance=ExtResource("7_xen")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 53, 6.5, -5)
+sightDist = 45.0
 player = NodePath("../Player")
 wallLayer = 16
-damage = 5
+damage = 10
+
+[node name="OrbB" parent="." instance=ExtResource("8_orb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 1, 8)
+
+[node name="OrbC" parent="." instance=ExtResource("8_orb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 1, -5)
 
 [node name="FinishOrb" parent="." node_paths=PackedStringArray("player") instance=ExtResource("4_fin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55, 1.5, 5)
 toLevel = 4
 player = NodePath("../Player")
 
