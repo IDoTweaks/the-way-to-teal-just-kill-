@@ -12,7 +12,38 @@ extends CharacterBody3D
 @export var launchMult := 5
 @export var jumpTime := .7
 @export var arcHeight := 3.5
+@export var slamDamage := 25
+@export var slamRadius := 1
+@export var slamHeight := 3.0
+@export var jawOpen : float = .55
+@export var rearPitch : float = .45
+@export var bitePitch : float = .35
+@export var slamKb : float = 12.0
+@export var spinTime : float = 2.0
+@export var spinSpeed : float = 9.0
+@export var spinRadius : float = 3.4
+@export var spinLag : float = .5
+@export var spinDamage := 8
+@export var spinKb : float = 15.0
+@export var spinHitCd : float = .45
+@export var whipHeight : float = 3.2
+@export var whipUpTime : float = .35
+@export var whipDownTime : float = .12
+@export var ringSpeed : float = 13.0
+@export var ringWidth : float = 1.3
+@export var ringDamage := 15
+@export var ringKb : float = 20.0
+@export var ringMaxRadius : float = 24.0
+@export var ringDoors : int = 3
+@export var doorWidth : float = .42
 var coiled :=false
+var charging := false
+var spinning := false
+var spinT := 0.0
+var spinHitNow := 0.0
+var spinFxNow := 0.0
+var spinCentre : Vector3
+var rings : Array = []
 var segms := []
 var moving := false
 @onready var orgY := []
@@ -20,15 +51,26 @@ var launching := false
 var speedNow = baseLaunchSpeed
 var launchStart : Vector3
 var launchTarg : Vector3
+var lockedTarg : Vector3
 var launchT :=0.0
 var trail : Array[Vector3] = []
 #var tick := 0
+@onready var jaw1 = $head/horn
+@onready var jaw2 = $head/horn2
+@onready var slamParticles = preload("res://Particles/slamImpact.tscn")
+@onready var dustParticles = preload("res://Particles/landDust.tscn")
+@onready var trailParticles = preload("res://Particles/dashTrail.tscn")
+var jawBase1 : float
+var jawBase2 : float
+var marks : Array = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	segms = [$head,$hulia,$hulia2,$hulia3,$hulia4,$hulia5]
 	for seg in segms:
 		orgY.append(seg.global_position.y)
+	jawBase1 = jaw1.rotation.y
+	jawBase2 = jaw2.rotation.y
 	var timer = Timer.new()
 	timer.wait_time = tickTime
 	timer.autostart = true
@@ -37,7 +79,7 @@ func _ready() -> void:
 	#_atkCharge()
 
 func _onTick():
-	if !moving and !coiled and !launching:
+	if !moving and !coiled and !launching and !charging and !spinning:
 		_step()
 	#if tick < 10:
 		#tick +=1
@@ -47,11 +89,19 @@ func _onTick():
 func _unhandled_input(event):
 	if event is InputEventKey and event.pressed and event.keycode == KEY_C:
 		_charge()
+	if event is InputEventKey and event.pressed and event.keycode == KEY_V:
+		_spin()
 		
 
 func _charge():
-	await _prepCharge()
-	_beginLaunch()
+	if charging or launching or coiled:
+		return
+	charging = true
+	while moving:
+		await get_tree().process_frame
+	if await _prepCharge():
+		_beginLaunch()
+	charging = false
 
 func _step():
 	for i in range(segms.size()):
@@ -89,14 +139,26 @@ func _step():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	pass
+	if marks.is_empty():
+		return
+	var pulse = sin(Time.get_ticks_msec() * .012) * .5 + .5
+	for m in marks:
+		if is_instance_valid(m):
+			m.material_override.emission_energy_multiplier = 1.2 + pulse * 3.2
 
 func _prepCharge():
-	if moving or coiled:
+	if moving or coiled or player == null:
 		return
 	moving = true
+	lockedTarg = player.global_position
+	if bossFloor != null:
+		var block = bossFloor._tileNode(lockedTarg.x,lockedTarg.z)
+		if block != null:
+			lockedTarg = Vector3(block.global_position.x,lockedTarg.y,block.global_position.z)
+			_markBlocks(block)
+	_openJaws()
 	var head = segms[0]
-	var dir = player.global_position - head.global_position
+	var dir = lockedTarg - head.global_position
 	dir.y = 0
 	var yaw = head.rotation.y
 	if dir.length() > .01:
@@ -122,7 +184,7 @@ func _prepCharge():
 
 func _beginLaunch():
 	var head = segms[0]
-	var  offset := Vector3(player.global_position.x - head.global_position.x,0.0,player.global_position.z - head.global_position.z)
+	var  offset := Vector3(lockedTarg.x - head.global_position.x,0.0,lockedTarg.z - head.global_position.z)
 	launchStart = global_position
 	launchTarg = launchStart + offset
 	launchT = 0.0
@@ -164,6 +226,12 @@ func _launch(toX,toZ, speed,delta):
 		velocity.z = 0
 
 func _physics_process(delta: float) -> void:
+	_updateRings(delta)
+	if spinning:
+		_spinStep(delta)
+		velocity = Vector3.ZERO
+		move_and_slide()
+		return
 	if launching:
 		launchT = min(launchT + delta / jumpTime,1.0)
 		var t:= launchT
@@ -177,10 +245,250 @@ func _physics_process(delta: float) -> void:
 			launching = false
 			coiled = false
 			velocity = Vector3.ZERO
+			_slam()
 	else:
 		velocity = Vector3.ZERO
 		move_and_slide()
 	
+
+func _markBlocks(block):
+	_clearMarks()
+	if bossFloor == null:
+		return
+	for t in bossFloor._tilesAround(block.global_position.x,block.global_position.z,slamRadius):
+		var core = t == block
+		var mark = MeshInstance3D.new()
+		var box = BoxMesh.new()
+		box.size = Vector3(.92,.05,.92)
+		mark.mesh = box
+		var mat = StandardMaterial3D.new()
+		mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+		mat.transparency = StandardMaterial3D.TRANSPARENCY_ALPHA
+		mat.albedo_color = Color(.8,.35,1.0,.6) if core else Color(.5,.1,.9,.35)
+		mat.emission_enabled = true
+		mat.emission = Color(.7,.25,1.0)
+		mark.material_override = mat
+		get_parent().add_child(mark)
+		mark.global_position = t.global_position + Vector3(0,.53,0)
+		marks.append(mark)
+
+func _clearMarks():
+	for m in marks:
+		if is_instance_valid(m):
+			m.queue_free()
+	marks.clear()
+
+func _openJaws():
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.set_trans(Tween.TRANS_BACK)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(jaw1,"rotation:y",jawBase1 + jawOpen,coilTime)
+	tween.tween_property(jaw2,"rotation:y",jawBase2 - jawOpen,coilTime)
+	tween.tween_property(segms[0],"rotation:z",-rearPitch,coilTime)
+
+func _bite():
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.set_trans(Tween.TRANS_BOUNCE)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(jaw1,"rotation:y",jawBase1,.1)
+	tween.tween_property(jaw2,"rotation:y",jawBase2,.1)
+	tween.tween_property(segms[0],"rotation:z",bitePitch,.08)
+	tween.chain().tween_property(segms[0],"rotation:z",0.0,.3)
+
+func _slam():
+	var head = segms[0]
+	_bite()
+	_clearMarks()
+	var burst = slamParticles.instantiate()
+	get_parent().add_child(burst)
+	burst.global_position = head.global_position
+	burst.emitting = true
+	Audio.play("slam", .8, -2.0)
+	if player == null or bossFloor == null:
+		return
+	if player.has_method("_addShake"):
+		player._addShake(.1)
+	var centre = bossFloor._wrld2Tile(head.global_position.x,head.global_position.z)
+	var pTile = bossFloor._wrld2Tile(player.global_position.x,player.global_position.z)
+	if centre.x == -1 or pTile.x == -1:
+		return
+	if abs(pTile.x - centre.x) > slamRadius or abs(pTile.y - centre.y) > slamRadius:
+		return
+	if abs(player.global_position.y - head.global_position.y) > slamHeight:
+		return
+	_hitPlayer(slamDamage,1,slamKb,head.global_position)
+
+func _hitPlayer(dmg,para : int,force : float,from : Vector3):
+	if player == null:
+		return
+	if player.has_method("_takeDamage"):
+		player._takeDamage(dmg,from)
+	if player.has_method("_paralyze"):
+		player._paralyze(para)
+	if player.has_method("_applyForce"):
+		player._applyForce(from,force,ringMaxRadius)
+
+func _spin():
+	if charging or launching or coiled or spinning:
+		return
+	charging = true
+	while moving:
+		await get_tree().process_frame
+	spinCentre = segms[0].global_position
+	spinCentre.y = orgY[0]
+	spinT = 0.0
+	spinHitNow = 0.0
+	spinFxNow = 0.0
+	_openJaws()
+	Audio.play("dash", .6, -4.0)
+	spinning = true
+
+func _spinStep(delta : float):
+	spinT += delta
+	var ang = spinT * spinSpeed
+	for i in range(segms.size()):
+		var a = ang - i * spinLag
+		var rad = spinRadius * (.35 + .65 * (float(i) / float(segms.size() - 1)))
+		var pos = spinCentre + Vector3(cos(a),0,sin(a)) * rad
+		pos.y = orgY[i] + sin(spinT * 7.0 + i) * .12
+		segms[i].global_position = pos
+		segms[i].rotation.y = atan2(cos(a),sin(a))
+	spinFxNow -= delta
+	if spinFxNow <= 0:
+		spinFxNow = .1
+		var seg = segms[randi_range(0,segms.size() - 1)]
+		var fx = trailParticles.instantiate()
+		get_parent().add_child(fx)
+		fx.global_position = seg.global_position
+		fx.emitting = true
+	spinHitNow -= delta
+	if spinHitNow <= 0 and player != null:
+		var flat = Vector2(player.global_position.x - spinCentre.x,player.global_position.z - spinCentre.z)
+		if flat.length() < spinRadius and abs(player.global_position.y - spinCentre.y) < slamHeight:
+			spinHitNow = spinHitCd
+			if player.has_method("_addShake"):
+				player._addShake(.07)
+			_hitPlayer(spinDamage,1,spinKb,spinCentre)
+	if spinT >= spinTime:
+		spinning = false
+		_tailWhip()
+
+func _tailWhip():
+	Audio.play("walljump", .5, -4.0)
+	var up = create_tween()
+	up.set_parallel(true)
+	up.set_trans(Tween.TRANS_BACK)
+	up.set_ease(Tween.EASE_OUT)
+	for i in range(1,segms.size()):
+		var t = float(i) / float(segms.size() - 1)
+		up.tween_property(segms[i],"global_position:y",orgY[i] + whipHeight * t,whipUpTime)
+	up.tween_property(segms[0],"rotation:z",-rearPitch,whipUpTime)
+	await up.finished
+	var down = create_tween()
+	down.set_parallel(true)
+	down.set_trans(Tween.TRANS_QUAD)
+	down.set_ease(Tween.EASE_IN)
+	for i in range(1,segms.size()):
+		down.tween_property(segms[i],"global_position:y",orgY[i],whipDownTime)
+	await down.finished
+	_groundSlam()
+	_bite()
+	_reform()
+	charging = false
+
+func _groundSlam():
+	Audio.play("slam", .6, 0.0)
+	var burst = slamParticles.instantiate()
+	get_parent().add_child(burst)
+	burst.global_position = segms[segms.size() - 1].global_position
+	burst.emitting = true
+	var dust = dustParticles.instantiate()
+	get_parent().add_child(dust)
+	dust.global_position = spinCentre
+	dust.emitting = true
+	if player != null and player.has_method("_addShake"):
+		player._addShake(.18)
+	_spawnRing(spinCentre)
+
+func _spawnRing(centre : Vector3):
+	var doors = []
+	var base = randf() * TAU
+	for d in range(ringDoors):
+		doors.append(wrapf(base + TAU * float(d) / float(ringDoors),0,TAU))
+	var holder = Node3D.new()
+	get_parent().add_child(holder)
+	holder.global_position = Vector3(centre.x,centre.y + .1,centre.z)
+	var pieces = []
+	var slots = 72
+	for i in range(slots):
+		var a = TAU * float(i) / float(slots)
+		if _inDoor(a,doors):
+			continue
+		var piece = MeshInstance3D.new()
+		var box = BoxMesh.new()
+		box.size = Vector3(.5,.16,.5)
+		piece.mesh = box
+		var mat = StandardMaterial3D.new()
+		mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+		mat.transparency = StandardMaterial3D.TRANSPARENCY_ALPHA
+		mat.albedo_color = Color(.72,.28,1.0,.8)
+		mat.emission_enabled = true
+		mat.emission = Color(.65,.2,1.0)
+		mat.emission_energy_multiplier = 3.5
+		piece.material_override = mat
+		holder.add_child(piece)
+		pieces.append({"node":piece,"ang":a})
+	rings.append({"holder":holder,"pieces":pieces,"doors":doors,"centre":centre,"r":1.0,"hit":false,"slots":slots})
+
+func _inDoor(ang : float,doors) -> bool:
+	for d in doors:
+		if abs(wrapf(ang - d,-PI,PI)) < doorWidth:
+			return true
+	return false
+
+func _updateRings(delta : float):
+	for ring in rings.duplicate():
+		var holder = ring["holder"]
+		if !is_instance_valid(holder):
+			rings.erase(ring)
+			continue
+		ring["r"] += ringSpeed * delta
+		var r = ring["r"]
+		var arc = TAU * r / float(ring["slots"])
+		var fade = clamp(1.0 - (r / ringMaxRadius),0.0,1.0)
+		for p in ring["pieces"]:
+			var piece = p["node"]
+			if !is_instance_valid(piece):
+				continue
+			var a = p["ang"]
+			piece.position = Vector3(cos(a),0,sin(a)) * r
+			piece.rotation.y = -a
+			piece.scale = Vector3(1.0,1.0,max(arc / .5,1.0))
+			piece.material_override.albedo_color.a = .8 * fade
+		if !ring["hit"] and player != null:
+			var centre = ring["centre"]
+			var flat = Vector2(player.global_position.x - centre.x,player.global_position.z - centre.z)
+			var dist = flat.length()
+			if abs(dist - r) < ringWidth and abs(player.global_position.y - centre.y) < slamHeight:
+				var pAng = wrapf(atan2(flat.y,flat.x),0,TAU)
+				if !_inDoor(pAng,ring["doors"]):
+					ring["hit"] = true
+					_hitPlayer(ringDamage,1,ringKb,centre)
+		if r >= ringMaxRadius:
+			holder.queue_free()
+			rings.erase(ring)
+
+func _reform():
+	var head = segms[0]
+	var back = Vector3(cos(head.rotation.y),0,-sin(head.rotation.y))
+	var tween = create_tween()
+	tween.set_parallel(true)
+	for i in range(1,segms.size()):
+		var targ = head.global_position + back * (coilGap * i)
+		targ.y = orgY[i]
+		tween.tween_property(segms[i],"global_position",targ,.25).set_delay(i * jointDelay)
 
 func _recordTrail():
 	var head = segms[0]

@@ -51,6 +51,15 @@ var dashing: bool = false
 var dashCdTimer: float = 0
 var dashDir: Vector3 = Vector3.ZERO
 
+const MAX_PARA = 10
+@export var paraChipDmg : float = 4.0
+@export var paraChipRate : float = 1.0
+@export var paraDashMult : float = 0.5
+var paraLevel : int = 0
+var _paraFlash : float = 0.0
+var _paraChipTimer : float = 0.0
+var _paraVignette : TextureRect
+
 @onready var feet = $feetPos;
 @onready var playerCam = $playerCam;
 @onready var animaPlayer = $AnimationPlayer
@@ -717,6 +726,14 @@ func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("jump"):
 		jumpBuffer = JUMP_BUFFER_TIME
 
+	if event is InputEventKey and event.pressed and !event.echo:
+		if event.keycode == KEY_P:
+			_paralyze(1)
+			print("para ", paraLevel)
+		elif event.keycode == KEY_O:
+			_curePara(1, 5)
+			print("para ", paraLevel)
+
 func _calcDownForce():
 	#calculate the position in the future
 	var horizontalVel = Vector3(velocity.x,0,velocity.z)
@@ -781,8 +798,9 @@ func _physics_process(delta: float) -> void:
 		coyoteTimer -= delta
 		
 	
+	_paraChip(delta)
 	if knockbackTimer <= 0:
-		slide = Input.is_action_pressed("slide")
+		slide = Input.is_action_pressed("slide") and _canSlide()
 		if slide and not wasSliding:
 			_addStyle("slide", 6)
 			if is_on_floor():
@@ -800,7 +818,7 @@ func _physics_process(delta: float) -> void:
 			if animaPlayer.current_animation == "inSlide":
 				animaPlayer.stop()
 	
-		if Input.is_action_just_pressed("dash") and dashCdTimer <= 0:
+		if Input.is_action_just_pressed("dash") and dashCdTimer <= 0 and _canDash():
 			_addStyle("dash", 9)
 			Audio.play("dash", 1.0, -3.0)
 			animaPlayer.play("dash")
@@ -815,15 +833,17 @@ func _physics_process(delta: float) -> void:
 				fullDir = camForw.normalized()
 			dashDir = Vector3(fullDir.x,0,fullDir.z).normalized()
 			dashCdTimer = dashCooldown
-			if velocity.y < 0:
-				velocity.y = 0
-			velocity.y += fullDir.y * dashBoost
-			velocity.x = fullDir.x * dashBoost
-			velocity.z = fullDir.z * dashBoost
+			var dashPow = _dashPower()
+			if paraLevel < 1:
+				if velocity.y < 0:
+					velocity.y = 0
+				velocity.y += fullDir.y * dashPow
+			velocity.x = fullDir.x * dashPow
+			velocity.z = fullDir.z * dashPow
 		if is_on_floor():
 			velocity += get_gravity()* delta;
 	if knockbackTimer <= 0:
-		if jumpBuffer > 0 and canWallJump and !is_on_floor() and wallJumpCd <= 0:
+		if jumpBuffer > 0 and canWallJump and !is_on_floor() and wallJumpCd <= 0 and _canWallJump():
 			_addStyle("walljump", 13)
 			Audio.play("walljump", 1.0, -3.0)
 			_spawnParticleAt(wallJumpParticles, global_position)
@@ -835,10 +855,10 @@ func _physics_process(delta: float) -> void:
 			jumpBuffer = 0
 			upDashed = false
 			
-		if jumpBuffer > 0 and coyoteTimer > 0:
+		if jumpBuffer > 0 and coyoteTimer > 0 and _canJump():
 			coyoteTimer = 0.0
 			jumpBuffer = 0.0
-			velocity.y = JUMP_VELOCITY
+			velocity.y = JUMP_VELOCITY * _jumpMult()
 			Audio.play("jump", 1.0, -7.0)
 			_spawnParticleAt(jumpParticles, feet.global_position)
 		
@@ -850,29 +870,30 @@ func _physics_process(delta: float) -> void:
 		velocity += get_gravity() * delta
 	if knockbackTimer <= 0:
 		if not slide:
-			if Input.is_action_just_pressed("jump") and coyoteTimer > 0:
+			if Input.is_action_just_pressed("jump") and coyoteTimer > 0 and _canJump():
 				coyoteTimer = 0.0
-				velocity.y = JUMP_VELOCITY
+				velocity.y = JUMP_VELOCITY * _jumpMult()
 				Audio.play("jump", 1.0, -7.0)
 				_spawnParticleAt(jumpParticles, feet.global_position)
 
 			var input_dir := Input.get_vector("left", "right", "forward", "backward")
 			var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 			var horizontal_speed = Vector2(velocity.x, velocity.z).length()
+			var moveSpeed = SPEED * _speedMult()
 
 			if is_on_floor():
 				if direction:
-					var accel = 30.0 if horizontal_speed < SPEED else 10.0
-					velocity.x = move_toward(velocity.x, direction.x * SPEED, accel * delta)
-					velocity.z = move_toward(velocity.z, direction.z * SPEED, accel * delta)
+					var accel = 30.0 if horizontal_speed < moveSpeed else 10.0
+					velocity.x = move_toward(velocity.x, direction.x * moveSpeed, accel * delta)
+					velocity.z = move_toward(velocity.z, direction.z * moveSpeed, accel * delta)
 				else:
 					velocity.x = move_toward(velocity.x, 0, 28 * delta)
 					velocity.z = move_toward(velocity.z, 0, 28 * delta)
 
 			else:
 				if direction:
-					velocity.x += direction.x * airAccel * delta
-					velocity.z += direction.z * airAccel * delta
+					velocity.x += direction.x * airAccel * _airMult() * delta
+					velocity.z += direction.z * airAccel * _airMult() * delta
 					var horizontal = Vector2(velocity.x, velocity.z)
 					var cap = max(SPEED * 1.5, horizontal_speed) 
 					if horizontal.length() > cap:
@@ -942,6 +963,64 @@ func _takeDamage(damage, source = null):
 		if health <= 0:
 			_die()
 
+func _paralyze(amount : int = 1):
+	if !count or paraLevel >= MAX_PARA:
+		return
+	paraLevel = min(paraLevel + amount, MAX_PARA)
+	_paraFlash = 0.7
+	_addShake(.05)
+	Audio.play("player_hurt", 0.6, -5.0)
+	if paraLevel >= MAX_PARA:
+		_die()
+
+func _curePara(amount : int = 1, healthCost : float = 0.0):
+	if paraLevel <= 0 or health <= healthCost:
+		return false
+	paraLevel = max(paraLevel - amount, 0)
+	if healthCost > 0:
+		health -= healthCost
+		_updateHud()
+	Audio.play("pickup", 1.2, -2.0)
+	return true
+
+func _canDash():
+	return paraLevel < 2
+
+func _canSlide():
+	return paraLevel < 3
+
+func _canWallJump():
+	return paraLevel < 4
+
+func _canJump():
+	return paraLevel < 8
+
+func _dashPower():
+	if paraLevel >= 1:
+		return SPEED + (dashBoost - SPEED) * paraDashMult
+	return dashBoost
+
+func _jumpMult():
+	return 0.6 if paraLevel >= 5 else 1.0
+
+func _airMult():
+	return 0.0 if paraLevel >= 6 else 1.0
+
+func _speedMult():
+	if paraLevel >= 9:
+		return 0.25
+	if paraLevel >= 7:
+		return 0.6
+	return 1.0
+
+func _paraChip(delta : float):
+	if paraLevel < 9 or !count:
+		return
+	_paraChipTimer -= delta
+	if _paraChipTimer <= 0:
+		_paraChipTimer = paraChipRate
+		_takeDamage(paraChipDmg)
+
 func _hitStop(scale : float, dur : float):
 	Engine.time_scale = scale
 	_hitStopUntil = Time.get_ticks_msec() + dur * 1000.0
@@ -984,6 +1063,14 @@ func _buildJuiceHud():
 	_vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_vignette.modulate = Color(1, 1, 1, 0)
 	hud.add_child(_vignette)
+	_paraVignette = TextureRect.new()
+	_paraVignette.texture = _make_para_texture()
+	_paraVignette.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_paraVignette.stretch_mode = TextureRect.STRETCH_SCALE
+	_paraVignette.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_paraVignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_paraVignette.modulate = Color(1, 1, 1, 0)
+	hud.add_child(_paraVignette)
 	_crossDot = ColorRect.new()
 	_crossDot.color = Color(0, 1, 0.85, 0.8)
 	_crossDot.set_anchors_preset(Control.PRESET_CENTER)
@@ -1045,10 +1132,15 @@ func _updateJuice(delta : float):
 		Engine.time_scale = 1.0
 		_hitStopUntil = 0.0
 	_hurtFlash = move_toward(_hurtFlash, 0.0, delta * 1.8)
+	_paraFlash = move_toward(_paraFlash, 0.0, delta * 1.4)
 	if _vignette:
 		var lowHp = clamp((40.0 - health) / 40.0, 0.0, 1.0) * 0.45
 		var pulse = (sin(Time.get_ticks_msec() * 0.008) * 0.5 + 0.5) * 0.2 if health < 25 else 0.0
 		_vignette.modulate.a = clamp(lowHp + pulse + _hurtFlash, 0.0, 0.85)
+	if _paraVignette:
+		var f = float(paraLevel) / float(MAX_PARA)
+		var creep = (sin(Time.get_ticks_msec() * 0.004) * 0.5 + 0.5) * 0.15 * f
+		_paraVignette.modulate.a = clamp(f * 0.65 + creep + _paraFlash, 0.0, 0.9)
 
 func _make_vignette_texture() -> ImageTexture:
 	var s = 128
@@ -1060,6 +1152,20 @@ func _make_vignette_texture() -> ImageTexture:
 			var d = Vector2(x, y).distance_to(c) / maxd
 			var a = clamp((d - 0.55) / 0.45, 0.0, 1.0)
 			img.set_pixel(x, y, Color(0.95, 0.05, 0.05, a * a))
+	return ImageTexture.create_from_image(img)
+
+func _make_para_texture() -> ImageTexture:
+	var s = 128
+	var img = Image.create(s, s, false, Image.FORMAT_RGBA8)
+	var c = Vector2(s * 0.5, s * 0.5)
+	var maxd = c.length()
+	for x in range(s):
+		for y in range(s):
+			var d = Vector2(x, y).distance_to(c) / maxd
+			var a = clamp((d - 0.3) / 0.7, 0.0, 1.0)
+			var veins = sin(atan2(y - c.y, x - c.x) * 9.0) * 0.5 + 0.5
+			var col = Color(0.45, 0.05, 0.85).lerp(Color(0.7, 0.3, 1.0), veins)
+			img.set_pixel(x, y, Color(col.r, col.g, col.b, a * a * (0.75 + veins * 0.25)))
 	return ImageTexture.create_from_image(img)
 
 func _spawnSlam():

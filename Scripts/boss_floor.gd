@@ -4,15 +4,52 @@ extends Node3D
 @export var snake : Node3D
 @export var width : int
 @export var length : int
+@export var wallPad : float = .6
+@export var wallHeight : float = 26.0
+@export var showBriefing : bool = true
+@onready var boundsScript = preload("res://Scripts/arena_bounds.gd")
+@onready var briefingScript = preload("res://Scripts/para_briefing.gd")
 var floor = null
 var removedTiles : Dictionary = {}
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	_genFloor(length,width,1.01)
+	_makeBounds()
 	var selected = _selectRemoveable(100)
 	for i in selected:
 		i._activate(0)
-	
+	if showBriefing:
+		var brief = CanvasLayer.new()
+		brief.set_script(briefingScript)
+		add_child(brief)
+
+func _makeBounds():
+	if floor == null or floor.size() == 0 or player == null:
+		return
+	var minX = INF
+	var maxX = -INF
+	var minZ = INF
+	var maxZ = -INF
+	var topY = 0.0
+	for i in range(floor.size()):
+		for j in range(floor[i].size()):
+			var t = floor[i][j]
+			if !is_instance_valid(t):
+				continue
+			minX = min(minX,t.global_position.x)
+			maxX = max(maxX,t.global_position.x)
+			minZ = min(minZ,t.global_position.z)
+			maxZ = max(maxZ,t.global_position.z)
+			topY = t.global_position.y
+	if minX > maxX:
+		return
+	var bounds = Node3D.new()
+	bounds.set_script(boundsScript)
+	add_child(bounds)
+	bounds.global_position = Vector3((minX + maxX) * .5,topY,(minZ + maxZ) * .5)
+	bounds.player = player
+	bounds._setRect(((maxX - minX) * .5) + wallPad,((maxZ - minZ) * .5) + wallPad,wallHeight)
+
 
 func _selectAndShoot(toSelect : int):
 	var selected
@@ -192,6 +229,33 @@ func _wrld2Tile(x,z):
 				best = Vector2i(i,j)
 	return best
 
+
+func _tileNode(x,z):
+	if floor == null:
+		return null
+	var c = _wrld2Tile(x,z)
+	if c.x == -1:
+		return null
+	var t = floor[c.x][c.y]
+	if !is_instance_valid(t) or removedTiles.has(t):
+		return null
+	return t
+
+func _tilesAround(x,z,rad : int):
+	var arr = []
+	if floor == null:
+		return arr
+	var c = _wrld2Tile(x,z)
+	if c.x == -1:
+		return arr
+	for i in range(c.x - rad,c.x + rad + 1):
+		for j in range(c.y - rad,c.y + rad + 1):
+			if i < 0 or i >= floor.size() or j < 0 or j >= floor[i].size():
+				continue
+			var t = floor[i][j]
+			if is_instance_valid(t) and !removedTiles.has(t):
+				arr.append(t)
+	return arr
 
 func _pathFind(fromX,fromZ,toX,toZ,blockers = []):
 	if floor == null:
