@@ -124,13 +124,10 @@ func _arm() -> void:
 	btn.grab_focus()
 
 func _input(event : InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
+	if event is InputEventKey:
+		if armed and event.is_action_pressed("ui_accept"):
+			return
 		get_viewport().set_input_as_handled()
-		return
-	if !armed:
-		return
-	if event is InputEventKey and event.pressed and !event.echo:
-		_dismiss()
 
 func _dismiss() -> void:
 	get_tree().paused = false

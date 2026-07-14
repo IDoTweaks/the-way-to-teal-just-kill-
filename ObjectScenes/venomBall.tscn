@@ -3,8 +3,8 @@
 [ext_resource type="Script" path="res://Scripts/venom_ball.gd" id="1_venom"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_venom"]
-radius = 0.22
-height = 0.44
+radius = 0.12
+height = 0.24
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_venom"]
 albedo_color = Color(0.55, 0.15, 0.9, 1)
@@ -13,7 +13,7 @@ emission = Color(0.6, 0.2, 1, 1)
 emission_energy_multiplier = 2.5
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_venom"]
-radius = 0.22
+radius = 0.12
 
 [node name="VenomBall" type="CharacterBody3D"]
 script = ExtResource("1_venom")

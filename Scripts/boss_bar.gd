@@ -2,10 +2,12 @@ extends CanvasLayer
 
 const PURPLE = Color(0.62, 0.25, 1.0)
 const RAGE = Color(0.9, 0.25, 0.3)
+const TEAL = Color(0.0, 0.85, 0.72)
 
 var bar : ProgressBar
 var label : Label
 var fill : StyleBoxFlat
+var raging := false
 
 func _ready() -> void:
 	layer = 50
@@ -54,7 +56,18 @@ func _setHealth(frac : float):
 	if bar:
 		bar.value = clamp(frac, 0.0, 1.0)
 
+func _setOpen(open : bool):
+	if label == null:
+		return
+	if open:
+		label.text = "THE SNAKE - EXPOSED"
+		label.add_theme_color_override("font_color", TEAL)
+	else:
+		label.text = "THE SNAKE - ENRAGED" if raging else "THE SNAKE"
+		label.add_theme_color_override("font_color", RAGE if raging else PURPLE)
+
 func _setRage():
+	raging = true
 	if label:
 		label.text = "THE SNAKE - ENRAGED"
 		label.add_theme_color_override("font_color", RAGE)

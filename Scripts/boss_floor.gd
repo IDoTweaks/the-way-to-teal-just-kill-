@@ -15,6 +15,8 @@ var floor = null
 var removedTiles : Dictionary = {}
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	Global.currentLevel = Global._snakeLevel()
+	Global._addTry(Global.currentLevel)
 	_genFloor(length,width,1.01)
 	_makeBounds()
 	var selected = _selectRemoveable(100)

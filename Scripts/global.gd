@@ -6,9 +6,11 @@ extends Node
 @onready var level4 = preload("res://Scenes/level4.tscn")
 @onready var level5 = preload("res://Scenes/level5.tscn")
 @onready var level6 = preload("res://Scenes/level6.tscn")
-@onready var bossArena = preload("res://Scenes/boss1Arena.tscn")
+@onready var snakeBoss = preload("res://Scenes/bossFloor.tscn")
 @onready var tutorial = preload("res://Scenes/tutorial.tscn")
 @onready var levels : Array
+var bossLevels : Array = []
+var bossNames : Dictionary = {}
 var currentLevel = 1
 var maxUnlocked = 1
 var tutorialComplete := false
@@ -146,9 +148,20 @@ func _ready() -> void:
 	levels.append(level4)
 	levels.append(level5)
 	levels.append(level6)
-	levels.append(bossArena)
+	levels.append(snakeBoss)
+	bossLevels = [levels.find(snakeBoss)]
+	bossNames = {levels.find(snakeBoss): "THE SNAKE"}
 	_localLoad()
 	_loadSettings()
+
+func _isBoss(idx):
+	return bossLevels.has(idx)
+
+func _bossName(idx):
+	return bossNames.get(idx, "BOSS")
+
+func _snakeLevel():
+	return levels.find(snakeBoss)
 
 func _addRun(score, time):
 	grades.append(score)

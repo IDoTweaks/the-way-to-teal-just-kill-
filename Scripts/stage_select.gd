@@ -36,8 +36,8 @@ func _buildStages() -> void:
 		stageList.add_child(b)
 
 func _stageName(i : int) -> String:
-	if i == Global.levels.size() - 1:
-		return "BOSS"
+	if Global._isBoss(i):
+		return "BOSS - %s" % Global._bossName(i)
 	return "LEVEL %d" % i
 
 func open() -> void:
@@ -49,7 +49,7 @@ func _select(i : int) -> void:
 	_refresh()
 
 func _refresh() -> void:
-	nameLabel.text = ("BOSS - THE HEART OF THE GREEN" if selected == Global.levels.size() - 1 else "LEVEL %d" % selected)
+	nameLabel.text = _stageName(selected)
 	if Global._isUnlocked(selected):
 		var bs = Global._ghostScore(selected)
 		scoreLabel.text = "BEST SCORE: %s" % (str(bs) if bs >= 0 else "-")

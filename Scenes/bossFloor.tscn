@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://b5qub0rkp56eq" path="res://Scripts/death_area.gd" id="3_rg004"]
 [ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="4_uvyhu"]
 [ext_resource type="PackedScene" uid="uid://cxd7ktd7qi6m2" path="res://ObjectScenes/snake.tscn" id="5_3fud5"]
+[ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="6_pause"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_i00bq"]
 render_priority = 0
@@ -76,14 +77,17 @@ bossFloor = NodePath("..")
 player = NodePath("../Player2")
 finishOrb = NodePath("../FinishOrb")
 
-[node name="FinishOrb" parent="." unique_id=1930821478 instance=ExtResource("4_uvyhu")]
+[node name="FinishOrb" parent="." unique_id=1930821478 node_paths=PackedStringArray("player") instance=ExtResource("4_uvyhu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -4)
+player = NodePath("../Player2")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1568334010]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 207, 971, 378)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=244998746]
 environment = SubResource("Environment_kag7s")
+
+[node name="PauseMenu" parent="." instance=ExtResource("6_pause")]
 
 [connection signal="body_entered" from="tileBody/deathArea" to="tileBody/deathArea" method="_on_body_entered"]
 [connection signal="body_exited" from="tileBody/deathArea" to="tileBody/deathArea" method="_on_body_exited"]

@@ -69,7 +69,7 @@ func music_for_level(idx : int) -> void:
 		return
 	if idx == 0:
 		play_music(_musicMenu)
-	elif idx == Global.levels.size() - 1:
+	elif Global._isBoss(idx):
 		play_music(_musicBoss)
 	else:
 		play_music(_musicLevel)

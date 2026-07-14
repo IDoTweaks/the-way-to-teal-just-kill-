@@ -2,6 +2,8 @@ extends CharacterBody3D
 func _snake(): pass
 func _enemy(): pass
 
+const OPEN_COL = Color(0,1,.85)
+
 @export var bossFloor : Node3D
 @export var player : Node3D
 @export var finishOrb : Node3D
@@ -10,6 +12,10 @@ func _enemy(): pass
 @export var attackGap : float = 2.6
 @export var venomRange : float = 9.0
 @export var spinRange : float = 4.5
+@export var chargeMinRange : float = 3.5
+@export var sleepTime : float = 2.4
+@export var windUpTime : float = .7
+@export var stageDamage : float = .2
 @export var phase2At : float = .5
 @export var tickTime : float = .4
 @export var stepTime : float = .15
@@ -31,6 +37,7 @@ func _enemy(): pass
 @export var spinTime : float = 2.0
 @export var spinSpeed : float = 9.0
 @export var spinRadius : float = 3.4
+@export var spinHitRadius : float = 5.0
 @export var spinLag : float = .5
 @export var spinDamage := 8
 @export var spinKb : float = 15.0
@@ -48,12 +55,17 @@ func _enemy(): pass
 @export var doorWidth : float = .42
 @export var venomShots : int = 3
 @export var venomGap : float = .22
-@export var venomSpeed : float = 18.0
+@export var venomSpeed : float = 11.0
 @export var venomDamage := 10
 @export var venomKb : float = 8.0
 var coiled :=false
 var charging := false
 var spinning := false
+var sleeping := false
+var damageable := false
+var stageDmg : float = 0.0
+var segMats : Array = []
+var marker : MeshInstance3D
 var spinT := 0.0
 var spinHitNow := 0.0
 var spinFxNow := 0.0
@@ -100,6 +112,8 @@ func _ready() -> void:
 	add_to_group("enemies")
 	maxHealth = health
 	atkCd = attackGap
+	_makeGlow()
+	_makeMarker()
 	bossBar = CanvasLayer.new()
 	bossBar.set_script(barScript)
 	add_child(bossBar)
@@ -114,7 +128,7 @@ func _ready() -> void:
 	#_atkCharge()
 
 func _onTick():
-	if !dead and !moving and !coiled and !launching and !charging and !spinning:
+	if !dead and !moving and !coiled and !launching and !charging and !spinning and !sleeping:
 		_step()
 	#if tick < 10:
 		#tick +=1
@@ -131,14 +145,19 @@ func _unhandled_input(event):
 		
 
 func _charge():
-	if charging or launching or coiled:
+	if _busy():
 		return
 	charging = true
 	while moving:
 		await get_tree().process_frame
+	await _roar()
+	if dead:
+		charging = false
+		return
 	if await _prepCharge():
 		_beginLaunch()
-	charging = false
+	else:
+		_endAttack()
 
 func _step():
 	for i in range(segms.size()):
@@ -176,6 +195,10 @@ func _step():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	if sleeping and marker != null and is_instance_valid(marker):
+		var bob = sin(Time.get_ticks_msec() * .006)
+		marker.position.y = 1.4 + bob * .18
+		marker.rotate_y(delta * 2.0)
 	if marks.is_empty():
 		return
 	var pulse = sin(Time.get_ticks_msec() * .012) * .5 + .5
@@ -284,6 +307,7 @@ func _physics_process(delta: float) -> void:
 			coiled = false
 			velocity = Vector3.ZERO
 			_slam()
+			_slamDone()
 	else:
 		velocity = Vector3.ZERO
 		move_and_slide()
@@ -358,6 +382,9 @@ func _slam():
 		return
 	_hitPlayer(slamDamage,1,slamKb,head.global_position)
 
+func _slamDone():
+	_endAttack()
+
 func _makeTarg(targ):
 	if targ != null and targ.has_method("player"):
 		player = targ
@@ -368,6 +395,13 @@ func _takeDamage(dmg):
 func _damage(dmg):
 	if dead:
 		return
+	var cap = maxHealth * stageDamage
+	var left = cap - stageDmg
+	if !damageable or left <= 0:
+		Audio.play("enemy_hit", 1.6, -14.0)
+		return
+	dmg = min(dmg, left)
+	stageDmg += dmg
 	health -= dmg
 	Audio.play("enemy_hit", 1.0, -4.0)
 	_spawnDmgTxt(dmg)
@@ -375,8 +409,11 @@ func _damage(dmg):
 		bossBar._setHealth(float(health) / float(maxHealth))
 	if health <= 0:
 		_die()
-	elif phase == 1 and float(health) / float(maxHealth) <= phase2At:
+		return
+	if phase == 1 and float(health) / float(maxHealth) <= phase2At:
 		_enterPhase2()
+	if stageDmg >= cap:
+		_wake()
 
 func _spawnDmgTxt(dmg):
 	var txt = dmgTxt.instantiate()
@@ -430,8 +467,97 @@ func _die():
 		finishOrb.open = true
 	queue_free()
 
+func _makeGlow():
+	for seg in segms:
+		var mesh = seg.get_node_or_null("MeshInstance3D")
+		if mesh != null and mesh.material_override != null:
+			mesh.material_override = mesh.material_override.duplicate()
+			segMats.append(mesh.material_override)
+
+func _makeMarker():
+	marker = MeshInstance3D.new()
+	var cone = CylinderMesh.new()
+	cone.top_radius = .3
+	cone.bottom_radius = 0.0
+	cone.height = .5
+	marker.mesh = cone
+	var mat = StandardMaterial3D.new()
+	mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = OPEN_COL
+	mat.emission_enabled = true
+	mat.emission = OPEN_COL
+	mat.emission_energy_multiplier = 3.0
+	marker.material_override = mat
+	marker.position = Vector3(0,1.4,0)
+	marker.visible = false
+	segms[0].add_child(marker)
+
+func _setExposed(on : bool):
+	for mat in segMats:
+		mat.emission_enabled = on
+		mat.emission = OPEN_COL
+		mat.emission_energy_multiplier = 2.2 if on else 0.0
+	if marker != null and is_instance_valid(marker):
+		marker.visible = on
+
 func _busy():
-	return charging or launching or coiled or spinning
+	return charging or launching or coiled or spinning or sleeping
+
+func _roar():
+	Audio.play("enemy_death", .45, -1.0)
+	_openJaws()
+	if player != null and player.has_method("_addShake"):
+		player._addShake(.07)
+	var fx = dustParticles.instantiate()
+	get_parent().add_child(fx)
+	fx.global_position = segms[0].global_position
+	fx.emitting = true
+	await get_tree().create_timer(windUpTime).timeout
+
+func _endAttack():
+	charging = false
+	if dead:
+		return
+	_sleep()
+
+func _sleep():
+	sleeping = true
+	damageable = true
+	stageDmg = 0.0
+	atkCd = attackGap
+	_setExposed(true)
+	if bossBar:
+		bossBar._setOpen(true)
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.set_trans(Tween.TRANS_SINE)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(segms[0],"rotation:z",bitePitch,.35)
+	tween.tween_property(jaw1,"rotation:y",jawBase1,.3)
+	tween.tween_property(jaw2,"rotation:y",jawBase2,.3)
+	for i in range(segms.size()):
+		tween.tween_property(segms[i],"global_position:y",orgY[i] - .3,.35)
+	await get_tree().create_timer(sleepTime).timeout
+	if dead:
+		return
+	_wake()
+
+func _wake():
+	if !sleeping or dead:
+		return
+	sleeping = false
+	damageable = false
+	_setExposed(false)
+	if bossBar:
+		bossBar._setOpen(false)
+	Audio.play("enemy_hit", .7, -8.0)
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.set_trans(Tween.TRANS_BACK)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(segms[0],"rotation:z",0.0,.25)
+	for i in range(segms.size()):
+		tween.tween_property(segms[i],"global_position:y",orgY[i],.25)
 
 func _fightLoop(delta : float):
 	if dead or player == null or _busy():
@@ -446,12 +572,12 @@ func _pickAttack():
 	var flat = Vector2(player.global_position.x - head.global_position.x,player.global_position.z - head.global_position.z)
 	var dist = flat.length()
 	var pool = []
-	if dist > venomRange:
+	if dist >= venomRange:
 		pool = ["venom","venom","charge"]
-	elif dist < spinRange:
-		pool = ["spin","spin","charge"]
-	else:
+	elif dist >= chargeMinRange:
 		pool = ["charge","charge","venom","spin"]
+	else:
+		pool = ["spin","spin","venom"]
 	pool.shuffle()
 	var pick = pool[0]
 	if pick == lastAtk and pool.size() > 1:
@@ -475,11 +601,15 @@ func _hitPlayer(dmg,para : int,force : float,from : Vector3):
 		player._applyForce(from,force,ringMaxRadius)
 
 func _spin():
-	if charging or launching or coiled or spinning:
+	if _busy():
 		return
 	charging = true
 	while moving:
 		await get_tree().process_frame
+	await _roar()
+	if dead:
+		charging = false
+		return
 	spinCenter = segms[0].global_position
 	spinCenter.y = orgY[0]
 	spinT = 0.0
@@ -510,7 +640,7 @@ func _spinStep(delta : float):
 	spinHitNow -= delta
 	if spinHitNow <= 0 and player != null:
 		var flat = Vector2(player.global_position.x - spinCenter.x,player.global_position.z - spinCenter.z)
-		if flat.length() < spinRadius and abs(player.global_position.y - spinCenter.y) < slamHeight:
+		if flat.length() < spinHitRadius and abs(player.global_position.y - spinCenter.y) < slamHeight:
 			spinHitNow = spinHitCd
 			if player.has_method("_addShake"):
 				player._addShake(.07)
@@ -540,7 +670,7 @@ func _tailWhip():
 	_groundSlam()
 	_bite()
 	_reform()
-	charging = false
+	_endAttack()
 
 func _groundSlam():
 	Audio.play("slam", .6, 0.0)
@@ -625,20 +755,22 @@ func _updateRings(delta : float):
 			rings.erase(ring)
 
 func _venom():
-	if charging or launching or coiled or spinning or player == null:
+	if _busy() or player == null:
 		return
 	charging = true
 	while moving:
 		await get_tree().process_frame
-	_openJaws()
-	await get_tree().create_timer(coilTime).timeout
+	await _roar()
+	if dead:
+		charging = false
+		return
 	for i in range(venomShots):
-		if player == null:
+		if player == null or dead:
 			break
 		_spitVenom()
 		await get_tree().create_timer(venomGap).timeout
 	_bite()
-	charging = false
+	_endAttack()
 
 func _spitVenom():
 	var head = segms[0]
