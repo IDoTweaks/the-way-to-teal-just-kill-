@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/venom_ball.gd" id="1_venom"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_venom"]
+radius = 0.22
+height = 0.44
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_venom"]
+albedo_color = Color(0.55, 0.15, 0.9, 1)
+emission_enabled = true
+emission = Color(0.6, 0.2, 1, 1)
+emission_energy_multiplier = 2.5
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_venom"]
+radius = 0.22
+
+[node name="VenomBall" type="CharacterBody3D"]
+script = ExtResource("1_venom")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+material_override = SubResource("StandardMaterial3D_venom")
+mesh = SubResource("SphereMesh_venom")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_venom")

@@ -29,13 +29,19 @@ extends CharacterBody3D
 @export var whipHeight : float = 3.2
 @export var whipUpTime : float = .35
 @export var whipDownTime : float = .12
-@export var ringSpeed : float = 13.0
+@export var ringSpeed : float = 11.7
 @export var ringWidth : float = 1.3
+@export var ringHeight : float = 1.0
 @export var ringDamage := 15
 @export var ringKb : float = 20.0
 @export var ringMaxRadius : float = 24.0
 @export var ringDoors : int = 3
 @export var doorWidth : float = .42
+@export var venomShots : int = 3
+@export var venomGap : float = .22
+@export var venomSpeed : float = 18.0
+@export var venomDamage := 10
+@export var venomKb : float = 8.0
 var coiled :=false
 var charging := false
 var spinning := false
@@ -60,6 +66,7 @@ var trail : Array[Vector3] = []
 @onready var slamParticles = preload("res://Particles/slamImpact.tscn")
 @onready var dustParticles = preload("res://Particles/landDust.tscn")
 @onready var trailParticles = preload("res://Particles/dashTrail.tscn")
+@onready var venomBall = preload("res://ObjectScenes/venomBall.tscn")
 var jawBase1 : float
 var jawBase2 : float
 var marks : Array = []
@@ -91,6 +98,8 @@ func _unhandled_input(event):
 		_charge()
 	if event is InputEventKey and event.pressed and event.keycode == KEY_V:
 		_spin()
+	if event is InputEventKey and event.pressed and event.keycode == KEY_B:
+		_venom()
 		
 
 func _charge():
@@ -471,7 +480,7 @@ func _updateRings(delta : float):
 			var center = ring["center"]
 			var flat = Vector2(player.global_position.x - center.x,player.global_position.z - center.z)
 			var dist = flat.length()
-			if abs(dist - r) < ringWidth and abs(player.global_position.y - center.y) < slamHeight:
+			if abs(dist - r) < ringWidth and abs(player.global_position.y - center.y) < ringHeight:
 				var pAng = wrapf(atan2(flat.y,flat.x),0,TAU)
 				if !_inDoor(pAng,ring["doors"]):
 					ring["hit"] = true
@@ -479,6 +488,44 @@ func _updateRings(delta : float):
 		if r >= ringMaxRadius:
 			holder.queue_free()
 			rings.erase(ring)
+
+func _venom():
+	if charging or launching or coiled or spinning or player == null:
+		return
+	charging = true
+	while moving:
+		await get_tree().process_frame
+	_openJaws()
+	await get_tree().create_timer(coilTime).timeout
+	for i in range(venomShots):
+		if player == null:
+			break
+		_spitVenom()
+		await get_tree().create_timer(venomGap).timeout
+	_bite()
+	charging = false
+
+func _spitVenom():
+	var head = segms[0]
+	var aim = player.global_position + Vector3(0,.4,0)
+	var dir = aim - head.global_position
+	dir.y = 0
+	if dir.length() > .01:
+		var yaw = atan2(dir.z,-dir.x)
+		head.rotation.y = head.rotation.y + wrapf(yaw - head.rotation.y,-PI,PI)
+	var forward = Vector3(-cos(head.rotation.y),0,sin(head.rotation.y))
+	var spit = venomBall.instantiate()
+	spit.dest = aim
+	spit.speed = venomSpeed
+	spit.damage = venomDamage
+	spit.knockback = venomKb
+	get_parent().add_child(spit)
+	spit.global_position = head.global_position + forward * .8 + Vector3(0,.2,0)
+	var fx = trailParticles.instantiate()
+	get_parent().add_child(fx)
+	fx.global_position = spit.global_position
+	fx.emitting = true
+	Audio.play("shotgun", .55, -7.0)
 
 func _reform():
 	var head = segms[0]
