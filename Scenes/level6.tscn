@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="4_fin"]
 [ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="5_pause"]
 [ext_resource type="PackedScene" uid="uid://bmjkfi53x6qdg" path="res://ObjectScenes/SniperEnemy.tscn" id="6_snip"]
-[ext_resource type="PackedScene" path="res://ObjectScenes/Charger.tscn" id="7_charg"]
+[ext_resource type="PackedScene" uid="uid://cl2hfw87wuyhg" path="res://ObjectScenes/Charger.tscn" id="7_charg"]
 [ext_resource type="PackedScene" uid="uid://du4s8p1pljnlb" path="res://ObjectScenes/jumpOrb.tscn" id="8_orb"]
 
 [sub_resource type="StandardMaterial3D" id="mat_level"]
@@ -18,128 +18,144 @@ fog_enabled = true
 fog_light_energy = 1.8
 fog_density = 0.004
 
-[node name="MainScene" type="Node3D"]
+[node name="MainScene" type="Node3D" unique_id=1738851900]
 script = ExtResource("1_lvl")
 levelIndex = 6
 
-[node name="Level" type="CSGCombiner3D" parent="."]
+[node name="Level" type="CSGCombiner3D" parent="." unique_id=661796942]
 material_override = SubResource("mat_level")
 use_collision = true
 collision_layer = 17
 
-[node name="Floor" type="CSGBox3D" parent="Level"]
+[node name="Floor" type="CSGBox3D" parent="Level" unique_id=1074424022]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -0.5, 0)
 size = Vector3(46, 1, 44)
 
-[node name="Ceiling" type="CSGBox3D" parent="Level"]
+[node name="Ceiling" type="CSGBox3D" parent="Level" unique_id=103772390]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 12.5, 0)
 size = Vector3(46, 1, 44)
 
-[node name="BackWall" type="CSGBox3D" parent="Level"]
+[node name="BackWall" type="CSGBox3D" parent="Level" unique_id=2013617827]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 6, 0)
 size = Vector3(1, 12, 44)
 
-[node name="EndWall" type="CSGBox3D" parent="Level"]
+[node name="EndWall" type="CSGBox3D" parent="Level" unique_id=1440392987]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43.5, 6, 0)
 size = Vector3(1, 12, 44)
 
-[node name="WallLeft" type="CSGBox3D" parent="Level"]
+[node name="WallLeft" type="CSGBox3D" parent="Level" unique_id=10817577]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 6, -21.5)
 size = Vector3(46, 12, 1)
 
-[node name="WallRight" type="CSGBox3D" parent="Level"]
+[node name="WallRight" type="CSGBox3D" parent="Level" unique_id=1555853110]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 6, 21.5)
 size = Vector3(46, 12, 1)
 
-[node name="SniperNest1" type="CSGBox3D" parent="Level"]
+[node name="SniperNest1" type="CSGBox3D" parent="Level" unique_id=267527680]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, -18)
 size = Vector3(9, 1, 7)
 
-[node name="SniperNest2" type="CSGBox3D" parent="Level"]
+[node name="SniperNest5" type="CSGBox3D" parent="Level" unique_id=1110379273]
+transform = Transform3D(-5.9604645e-08, 1, 0, -1, -5.9604645e-08, 0, 0, 0, 1, 7, 4, -18)
+size = Vector3(9, 1, 7)
+
+[node name="SniperNest6" type="CSGBox3D" parent="Level" unique_id=1143488828]
+transform = Transform3D(2.6054018e-15, -4.371139e-08, -1, -1, -5.9604645e-08, 0, -5.9604645e-08, 1, -4.371139e-08, 2, 4, 15)
+size = Vector3(9, 1, 7)
+
+[node name="SniperNest7" type="CSGBox3D" parent="Level" unique_id=2072597995]
+transform = Transform3D(-5.9604645e-08, 1, 0, -1, -5.9604645e-08, 0, 0, 0, 1, 34, 4, 18)
+size = Vector3(9, 1, 7)
+
+[node name="SniperNest8" type="CSGBox3D" parent="Level" unique_id=1469229562]
+transform = Transform3D(2.6054018e-15, -4.371139e-08, 1, -1, -5.9604645e-08, 0, 5.9604645e-08, -1, -4.371139e-08, 38, 4, -14)
+size = Vector3(9, 1, 7)
+
+[node name="SniperNest2" type="CSGBox3D" parent="Level" unique_id=642705691]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 4, -18)
 size = Vector3(9, 1, 7)
 
-[node name="SniperNest3" type="CSGBox3D" parent="Level"]
+[node name="SniperNest3" type="CSGBox3D" parent="Level" unique_id=1768251092]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 18)
 size = Vector3(9, 1, 7)
 
-[node name="SniperNest4" type="CSGBox3D" parent="Level"]
+[node name="SniperNest4" type="CSGBox3D" parent="Level" unique_id=783681163]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 4, 18)
 size = Vector3(9, 1, 7)
 
-[node name="Cover1" type="CSGBox3D" parent="Level"]
+[node name="Cover1" type="CSGBox3D" parent="Level" unique_id=2075945461]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1.5, -7)
 size = Vector3(9, 3, 1)
 
-[node name="Cover2" type="CSGBox3D" parent="Level"]
+[node name="Cover2" type="CSGBox3D" parent="Level" unique_id=698728564]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 1.5, 7)
 size = Vector3(9, 3, 1)
 
-[node name="Cover3" type="CSGBox3D" parent="Level"]
+[node name="Cover3" type="CSGBox3D" parent="Level" unique_id=544111307]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1.5, 4)
 size = Vector3(1, 3, 9)
 
-[node name="Cover4" type="CSGBox3D" parent="Level"]
+[node name="Cover4" type="CSGBox3D" parent="Level" unique_id=2031632825]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29, 1.5, -4)
 size = Vector3(1, 3, 9)
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1471203641]
 environment = SubResource("env")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=923116660]
 transform = Transform3D(1, 0, 0, 0, -0.37609485, 0.9265812, 0, -0.9265812, -0.37609485, 0, 18.215263, 0)
 
-[node name="Player" parent="." instance=ExtResource("2_pl")]
+[node name="Player" parent="." unique_id=1904058044 instance=ExtResource("2_pl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 dashBoost = 22.0
 shotGunDmg = 7.5
 
-[node name="Player2" parent="." instance=ExtResource("3_gh")]
+[node name="Player2" parent="." unique_id=2135973225 instance=ExtResource("3_gh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 
-[node name="SniperNW" parent="." node_paths=PackedStringArray("player") instance=ExtResource("6_snip")]
+[node name="SniperNW" parent="." unique_id=529914484 node_paths=PackedStringArray("player") instance=ExtResource("6_snip")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 5.5, -18)
 player = NodePath("../Player")
 wallLayer = 16
 
-[node name="SniperNE" parent="." node_paths=PackedStringArray("player") instance=ExtResource("6_snip")]
+[node name="SniperNE" parent="." unique_id=1283333207 node_paths=PackedStringArray("player") instance=ExtResource("6_snip")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 5.5, -18)
 player = NodePath("../Player")
 wallLayer = 16
 
-[node name="SniperSW" parent="." node_paths=PackedStringArray("player") instance=ExtResource("6_snip")]
+[node name="SniperSW" parent="." unique_id=2068106496 node_paths=PackedStringArray("player") instance=ExtResource("6_snip")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 5.5, 18)
 player = NodePath("../Player")
 wallLayer = 16
 
-[node name="SniperSE" parent="." node_paths=PackedStringArray("player") instance=ExtResource("6_snip")]
+[node name="SniperSE" parent="." unique_id=1209739179 node_paths=PackedStringArray("player") instance=ExtResource("6_snip")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 5.5, 18)
 player = NodePath("../Player")
 wallLayer = 16
 
-[node name="Charger1" parent="." instance=ExtResource("7_charg")]
+[node name="Charger1" parent="." unique_id=1585837176 instance=ExtResource("7_charg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 1.5, 0)
 wallLayer = 16
 
-[node name="Charger2" parent="." instance=ExtResource("7_charg")]
+[node name="Charger2" parent="." unique_id=444570767 instance=ExtResource("7_charg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 1.5, 0)
 wallLayer = 16
 
-[node name="OrbNW" parent="." instance=ExtResource("8_orb")]
+[node name="OrbNW" parent="." unique_id=878105796 instance=ExtResource("8_orb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, -13)
 
-[node name="OrbNE" parent="." instance=ExtResource("8_orb")]
+[node name="OrbNE" parent="." unique_id=207357821 instance=ExtResource("8_orb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 1, -13)
 
-[node name="OrbSW" parent="." instance=ExtResource("8_orb")]
+[node name="OrbSW" parent="." unique_id=522377978 instance=ExtResource("8_orb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, 13)
 
-[node name="OrbSE" parent="." instance=ExtResource("8_orb")]
+[node name="OrbSE" parent="." unique_id=1695614507 instance=ExtResource("8_orb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 1, 13)
 
-[node name="FinishOrb" parent="." node_paths=PackedStringArray("player") instance=ExtResource("4_fin")]
+[node name="FinishOrb" parent="." unique_id=1285491098 node_paths=PackedStringArray("player") instance=ExtResource("4_fin")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41, 1.5, 0)
 toLevel = 7
 player = NodePath("../Player")
 
-[node name="PauseMenu" parent="." instance=ExtResource("5_pause")]
+[node name="PauseMenu" parent="." unique_id=1441160247 instance=ExtResource("5_pause")]

@@ -15,7 +15,6 @@ var camKickPitch : float = 0.0
 @export var speedFovAdd : float = 18.0
 var _hitStopUntil : float = 0.0
 var _hurtFlash : float = 0.0
-var _lastRankIdx : int = 0
 var _crossDot : ColorRect
 var _hitMark : Label
 var _vignette : TextureRect
@@ -103,17 +102,22 @@ const KNOCKBACK_LOCK_TIME = 0.15
 @export var slamVeloc = 25.0
 var airTime :float = 0.0
 
-# style system
-var styleMeter : float = 0.0
-var styleDecay : float = 9.0
-var lastStyleAction : String = ""
-var styleTimeAccum : float = 0.0
-@export var comboWindow : float = 2.5
-var lastKillTime : float = -999.0
-var comboCount : int = 0
-@onready var styleLabel : Label = $HUD/StyleMeterUI/styleRankLabel
-@onready var styleBar : ProgressBar = $HUD/StyleMeterUI/styleBar
-@onready var styleFire : ColorRect = $HUD/StyleMeterUI/Fire
+# stamina system
+const DASH_COST = 100.0 / 3.0
+@export var wallJumpCost : float = 25.0
+@export var slamCost : float = 20.0
+@export var slideDrain : float = 22.0
+@export var staminaDelay : float = 1.0
+@export var staminaRegen : float = 45.0
+var stamina : float = 100.0
+var staminaIdle : float = 0.0
+const STAMINA_ORANGE = Color(1.0, 0.55, 0.08)
+const STAMINA_DIM = Color(0.3, 0.14, 0.02)
+var _staminaSegs : Array = []
+var _staminaMsg : Label
+@onready var staminaLabel : Label = $HUD/StyleMeterUI/styleRankLabel
+@onready var staminaBar : ProgressBar = $HUD/StyleMeterUI/styleBar
+@onready var staminaFire : ColorRect = $HUD/StyleMeterUI/Fire
 @onready var healthBar : ColorRect = $HUD/healthBar
 @onready var weaponSlots = [$HUD/WeaponIndicator/Slot0, $HUD/WeaponIndicator/Slot1, $HUD/WeaponIndicator/Slot2]
 
@@ -133,66 +137,91 @@ var _last_footprint_pos: Vector3 = Vector3.ZERO
 var _footprint_pool: Array[Node] = []
 var _footprint_tex: ImageTexture
 
-func _addStyle(action: String, amount: float):
-	var pts = amount if lastStyleAction != action else amount * 0.35
-	lastStyleAction = action
-	styleMeter = clamp(styleMeter + pts, 0.0, 100.0)
+func _useStamina(amount : float) -> bool:
+	if stamina < amount - 0.05:
+		return false
+	stamina = max(stamina - amount, 0.0)
+	staminaIdle = 0.0
+	return true
+
+func _drainStamina(amount : float):
+	stamina = max(stamina - amount, 0.0)
+	staminaIdle = 0.0
+
+func _staminaRegen():
+	return staminaRegen * clamp(1.0 - paraLevel * 0.09, 0.15, 1.0)
 
 func _onKill():
-	var amount := 12.0
-	if not is_on_floor():
-		amount += 14.0
-	var hspeed = Vector2(velocity.x, velocity.z).length()
-	if hspeed > SPEED * 1.3:
-		amount += clamp((hspeed - SPEED) * 1.2, 0.0, 16.0)
-	if currentGun == 2:
-		amount += 16.0
-	var now = Time.get_ticks_msec() / 1000.0
-	if now - lastKillTime <= comboWindow:
-		comboCount += 1
-		amount += float(comboCount) * 10.0
-	else:
-		comboCount = 0
-	lastKillTime = now
-	styleMeter = clamp(styleMeter + amount, 0.0, 100.0)
-	lastStyleAction = "kill"
 	_hitStop(0.05, 0.06)
 	_hitmarker(true)
-	Audio.play("pickup", 1.0 + min(comboCount, 8) * 0.07, -4.0)
+	Audio.play("pickup", 1.0, -4.0)
 
-func _getStyleRank() -> String:
-	if styleMeter >= 97.0: return "SSS"
-	if styleMeter >= 85.0: return "SS"
-	if styleMeter >= 70.0: return "S"
-	if styleMeter >= 55.0: return "A"
-	if styleMeter >= 40.0: return "B"
-	if styleMeter >= 22.0: return "C"
-	return "D"
+func _buildStaminaHud():
+	var ui = $HUD/StyleMeterUI
+	staminaBar.visible = false
+	staminaFire.visible = false
+	staminaLabel.visible = false
+	var segW := 88.0
+	var segH := 44.0
+	var gap := 12.0
+	var totalW := segW * 3.0 + gap * 2.0
+	var x0 := (300.0 - totalW) / 2.0
+	var y := 206.0
+	var cap = Label.new()
+	cap.text = "STAMINA"
+	cap.add_theme_font_size_override("font_size", 24)
+	cap.add_theme_color_override("font_color", STAMINA_ORANGE)
+	cap.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	cap.add_theme_constant_override("outline_size", 6)
+	cap.position = Vector2(x0, y - 36)
+	cap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ui.add_child(cap)
+	for i in 3:
+		var frame = Panel.new()
+		var sb = StyleBoxFlat.new()
+		sb.bg_color = Color(0.06, 0.03, 0.0, 0.85)
+		sb.border_color = Color(0, 0, 0)
+		sb.set_border_width_all(4)
+		sb.set_corner_radius_all(2)
+		frame.add_theme_stylebox_override("panel", sb)
+		frame.position = Vector2(x0 + i * (segW + gap), y)
+		frame.size = Vector2(segW, segH)
+		frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		ui.add_child(frame)
+		var fill = ColorRect.new()
+		fill.color = STAMINA_ORANGE
+		fill.position = Vector2(4, 4)
+		fill.size = Vector2(segW - 8, segH - 8)
+		fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		frame.add_child(fill)
+		_staminaSegs.append(fill)
+	_staminaMsg = Label.new()
+	_staminaMsg.text = "OUT OF STAMINA"
+	_staminaMsg.set_anchors_preset(Control.PRESET_CENTER)
+	_staminaMsg.add_theme_font_size_override("font_size", 34)
+	_staminaMsg.add_theme_color_override("font_color", STAMINA_ORANGE)
+	_staminaMsg.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	_staminaMsg.add_theme_constant_override("outline_size", 8)
+	_staminaMsg.position = Vector2(-120, 90)
+	_staminaMsg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_staminaMsg.modulate = Color(1, 1, 1, 0)
+	$HUD.add_child(_staminaMsg)
 
-const STYLE_RANKS = ["D", "C", "B", "A", "S", "SS", "SSS"]
+func _updateStaminaHud():
+	var full := 88.0 - 8.0
+	for i in _staminaSegs.size():
+		var frac = clamp((stamina - i * DASH_COST) / DASH_COST, 0.0, 1.0)
+		var seg = _staminaSegs[i]
+		seg.size.x = full * frac
+		seg.color = STAMINA_ORANGE if frac > 0.0 else STAMINA_DIM
 
-func _updateStyleHud():
-	var rank = _getStyleRank()
-	var rankIdx = STYLE_RANKS.find(rank)
-	if rankIdx > _lastRankIdx:
-		_rankPop(rankIdx)
-	_lastRankIdx = rankIdx
-	styleLabel.text = rank
-	styleBar.value = styleMeter
-	match rank:
-		"D":  styleLabel.modulate = Color(0.55, 0.55, 0.55)
-		"C":  styleLabel.modulate = Color(1.0, 1.0, 1.0)
-		"B":  styleLabel.modulate = Color(1.0, 0.9, 0.15)
-		"A":  styleLabel.modulate = Color(1.0, 0.5, 0.1)
-		"S":  styleLabel.modulate = Color(1.0, 0.2, 0.2)
-		"SS": styleLabel.modulate = Color(0.75, 0.2, 1.0)
-		"SSS": styleLabel.modulate = Color(1.0, 0.85, 0.0)
-	var fill = styleMeter / 100.0
-	if styleFire.material:
-		styleFire.material.set_shader_parameter("fill", fill)
-	styleLabel.pivot_offset = styleLabel.size / 2.0
-	var throb = 1.0 + 0.12 * fill * (sin(Time.get_ticks_msec() * 0.012) * 0.5 + 0.5)
-	styleLabel.scale = Vector2(throb, throb)
+func _staminaFail():
+	if _staminaMsg == null:
+		return
+	Audio.play("player_hurt", 1.4, -10.0)
+	_staminaMsg.modulate = Color(1, 1, 1, 1)
+	var tw = create_tween()
+	tw.tween_property(_staminaMsg, "modulate:a", 0.0, 0.9)
 
 func _make_teal_texture() -> ImageTexture:
 	var img = Image.create(64, 64, false, Image.FORMAT_RGBA8)
@@ -377,12 +406,10 @@ func _finishLevel():
 	var earnedScore = maxScore - _calcMaxScore()
 	var finalScore = clamp(earnedScore, 0, maxScore)
 	var scorePercent = float(finalScore) / maxScore if maxScore > 0 else 0.0
-	var avgStyle = styleTimeAccum / max(time, 1.0)
-	var stylePercent = clamp(avgStyle / 100.0, 0.0, 1.0)
 	var healthPercent = clamp(float(health) / 100.0, 0.0, 1.0)
-	var gradeRating = scorePercent * 0.5 + stylePercent * 0.3 + healthPercent * 0.2
+	var gradeRating = scorePercent * 0.65 + healthPercent * 0.35
 	var grade = _calcGrade(gradeRating * 100.0, 100.0)
-	var displayScore = int(finalScore * (1.0 + stylePercent * 0.5))
+	var displayScore = finalScore
 	var lvl = Global.currentLevel
 	Global._completeLevel(lvl)
 	Global._recordTime(lvl, time)
@@ -679,6 +706,7 @@ func _ready() -> void:
 	_updateHud()
 	_updateWeaponHud()
 	_buildJuiceHud()
+	_buildStaminaHud()
 	shotGunRestPos = shotGun.position
 	shotGunRestRot = shotGun.rotation
 
@@ -687,10 +715,12 @@ func _process(delta: float) -> void:
 	if count:
 		time +=  delta
 		timer.text = str(int(time))
-		styleMeter = clamp(styleMeter - styleDecay * delta, 0.0, 100.0)
-		styleTimeAccum += styleMeter * delta
+		if staminaIdle < staminaDelay:
+			staminaIdle += delta
+		else:
+			stamina = min(stamina + _staminaRegen() * delta, 100.0)
 	enemyCounter.text = "ENEMIES %d" % get_tree().get_nodes_in_group("enemies").size()
-	_updateStyleHud()
+	_updateStaminaHud()
 	#call input functions
 	_shootAnim()
 	_updateSniperView()
@@ -792,26 +822,28 @@ func _physics_process(delta: float) -> void:
 	
 	_paraChip(delta)
 	if knockbackTimer <= 0:
-		slide = Input.is_action_pressed("slide") and _canSlide()
+		slide = Input.is_action_pressed("slide") and _canSlide() and stamina > 0
 		if slide and not wasSliding:
-			_addStyle("slide", 6)
 			if is_on_floor():
 				animaPlayer.play("slide")
 				var currentDir = Vector3(velocity.x,0,velocity.z).normalized()
 				if currentDir.length() > 0.1:
 					velocity.x += currentDir.x * 6
 					velocity.z += currentDir.z * 6
-			elif slamming == false:
+			elif slamming == false and _useStamina(slamCost):
 				slamming = true
 				slamStartHeight = global_position.y
 				animaPlayer.play("slam")
+		if slide and is_on_floor():
+			_drainStamina(slideDrain * delta)
 		wasSliding = slide
 		if !slide:
 			if animaPlayer.current_animation == "inSlide":
 				animaPlayer.stop()
 	
-		if Input.is_action_just_pressed("dash") and dashCdTimer <= 0 and _canDash():
-			_addStyle("dash", 9)
+		if Input.is_action_just_pressed("dash") and dashCdTimer <= 0 and _canDash() and stamina < DASH_COST - 0.05:
+			_staminaFail()
+		if Input.is_action_just_pressed("dash") and dashCdTimer <= 0 and _canDash() and _useStamina(DASH_COST):
 			Audio.play("dash", 1.0, -3.0)
 			animaPlayer.play("dash")
 			_spawnParticleAt(dashParticles, global_position)
@@ -835,8 +867,7 @@ func _physics_process(delta: float) -> void:
 		if is_on_floor():
 			velocity += get_gravity()* delta;
 	if knockbackTimer <= 0:
-		if jumpBuffer > 0 and canWallJump and !is_on_floor() and wallJumpCd <= 0 and _canWallJump():
-			_addStyle("walljump", 13)
+		if jumpBuffer > 0 and canWallJump and !is_on_floor() and wallJumpCd <= 0 and _canWallJump() and _useStamina(wallJumpCost):
 			Audio.play("walljump", 1.0, -3.0)
 			_spawnParticleAt(wallJumpParticles, global_position)
 			var bounced = velocity.bounce(wallNormal)
@@ -1113,12 +1144,6 @@ func _showHitDir(source):
 	var tw = create_tween()
 	tw.tween_property(_hitDir, "modulate:a", 0.0, 0.9)
 
-func _rankPop(idx : int):
-	if styleLabel:
-		styleLabel.pivot_offset = styleLabel.size / 2.0
-		styleLabel.scale = Vector2(1.8, 1.8)
-	Audio.play("pickup", 0.9 + idx * 0.12, -2.0)
-
 func _updateJuice(delta : float):
 	if _hitStopUntil > 0.0 and Time.get_ticks_msec() >= _hitStopUntil:
 		Engine.time_scale = 1.0
@@ -1166,7 +1191,6 @@ func _spawnSlam():
 	_spawnParticleAt(slamParticles, feet.global_position)
 	var fallHeight = slamStartHeight - global_position.y
 	slam.damage = clamp(fallHeight * 3.0, 1.0, 60.0)
-	_addStyle("slam", clamp(fallHeight * 3.0, 0.0, 28.0))
 
 #func here so i can jump here fast
 func wallJump():pass

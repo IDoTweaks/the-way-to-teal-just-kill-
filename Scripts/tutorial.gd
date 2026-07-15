@@ -18,8 +18,8 @@ func _ready() -> void:
 	_setText("MOVE: W A S D      JUMP: SPACE\nHead right to begin")
 	phaseData = {
 		"Zone1": {"text":"MOVE: W A S D      JUMP: SPACE\nReach the next marker", "guns":1},
-		"Zone2": {"text":"SLIDE: CTRL while moving      DASH: SHIFT\nUse them to keep your speed", "guns":1},
-		"Zone3": {"text":"WALL-JUMP: JUMP into a wall      SLAM: SLIDE in mid-air\nGet down the drop", "guns":1},
+		"Zone2": {"text":"SLIDE: CTRL while moving      DASH: SHIFT\nWatch STAMINA (bottom-right): each dash spends a third, it refills when you stop", "guns":1},
+		"Zone3": {"text":"WALL-JUMP: JUMP into a wall      SLAM: SLIDE in mid-air\nThese drain STAMINA too - don't run dry mid-air", "guns":1},
 		"Zone4": {"text":"SHOOT: LEFT MOUSE\nKill the enemies", "guns":1, "enemies":["P4_1","P4_2"], "gate":"Gate4", "done":"NICE.  The gate is open - move on"},
 		"Zone5": {"text":"SWITCH WEAPON: SCROLL WHEEL  or  1 / 2 / 3\nGet close and use the SHOTGUN", "guns":2, "enemies":["P5_1","P5_2","P5_3"], "gate":"Gate5", "done":"BOOM.  Keep going"},
 		"Zone6": {"text":"Switch to the SNIPER      SCOPE: hold RIGHT MOUSE\nUnscoped shots are wild - scope to land them", "guns":3, "enemies":["P6_1","P6_2"], "gate":"Gate6", "done":"BULLSEYE.  Onward"},
