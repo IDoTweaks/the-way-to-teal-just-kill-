@@ -23,10 +23,11 @@ itch.io: https://idotweaks.itch.io/the-way-to-tealjust-kill
 - full windows support
 - full linux support
 - untested mac support
-- full web support
-- 6 levels + a boss fight
+- almost full web support
+- 9 levels + a boss fight
+- a understanding boss he even has a office!
 - scoring and grading system (S+ to F)
-- style rank system (SSS to D)
+- stamina system
 - a ghost of your best run
 - 3 weapon types (rifle, shotgun, sniper with lock-on laser)
 - 6 enemy types (walker, drone, charger, exploder, sniper, boss)
@@ -50,7 +51,7 @@ itch.io: https://idotweaks.itch.io/the-way-to-tealjust-kill
 
 - models - i dont remember who made each model but they're from sketchfab (sorry)
 - sound effects - all sfx by Kenney (CC0)
-- ai - thank you for debugging + making shaders + scripts to generate decals
+- ai - thank you for debugging + making shaders + scripts to generate decals + general use/refactoring
 - everything else - me (da goat)
 
 ## Gameplay
