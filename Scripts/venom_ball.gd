@@ -46,4 +46,5 @@ func _splat():
 	get_parent().add_child(p)
 	p.global_position = global_position
 	p.emitting = true
+	Audio.play("slam", 1.7, -17.0)
 	queue_free()

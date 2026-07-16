@@ -45,3 +45,5 @@ func _spawnImpact():
  
 func _bounce(collision : KinematicCollision3D):
 	dir = dir.bounce(collision.get_normal())
+	_spawnImpact()
+	Audio.play("enemy_hit", 1.5, -18.0)

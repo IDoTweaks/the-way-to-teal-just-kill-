@@ -1,4 +1,6 @@
 extends Node
+var _fade : ColorRect
+var _fading := false
 @onready var mainMenu = preload("res://Scenes/mainMenu.tscn")
 @onready var level1 = preload("res://Scenes/level1.tscn")
 @onready var level2 = preload("res://Scenes/level2.tscn")
@@ -182,6 +184,26 @@ func _ready() -> void:
 	bossNames = {levels.find(snakeBoss): "THE SNAKE"}
 	_localLoad()
 	_loadSettings()
+	_buildFade()
+
+func _buildFade():
+	var layer = CanvasLayer.new()
+	layer.layer = 128
+	layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(layer)
+	_fade = ColorRect.new()
+	_fade.color = Color(0, 0, 0, 0)
+	_fade.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fade.process_mode = Node.PROCESS_MODE_ALWAYS
+	layer.add_child(_fade)
+
+func _fadeTo(a : float, t : float):
+	if _fade == null:
+		return
+	var tw = _fade.create_tween()
+	tw.tween_property(_fade, "color:a", a, t)
+	await tw.finished
 
 func _isBoss(idx):
 	return bossLevels.has(idx)
@@ -232,13 +254,27 @@ func _recordTime(level, t):
 		bestTimes[level] = t
 
 func _goToLevel(idx):
+	if _fading:
+		return
+	_fading = true
 	currentLevel = idx
+	await _fadeTo(1.0, .2)
 	Audio.music_for_level(idx)
 	get_tree().change_scene_to_packed(levels[idx])
+	await get_tree().process_frame
+	_fading = false
+	await _fadeTo(0.0, .3)
 
 func _goToTutorial():
+	if _fading:
+		return
+	_fading = true
+	await _fadeTo(1.0, .2)
 	Audio.music_for_level(0)
 	get_tree().change_scene_to_packed(tutorial)
+	await get_tree().process_frame
+	_fading = false
+	await _fadeTo(0.0, .3)
 
 func _finishTutorial():
 	tutorialComplete = true

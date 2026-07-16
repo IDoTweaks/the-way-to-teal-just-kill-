@@ -4,6 +4,9 @@ var targScore = 0
 var upEach :float = 0
 var gradeFill : float = 0.0
 var currentLevel = 1
+var tickAccum : float = 0.0
+var revealed = false
+var revealScale : float = 1.0
 @onready var scoreShow = $UI/MainContainer/ScoreShow
 @onready var nextBtn = $UI/MainContainer/MenuButtons/nextBtn
 @onready var gradeShow = $UI/MainContainer/gradeShow
@@ -24,6 +27,9 @@ func _onVisibilityChanged() -> void:
 func _setScore(newScore:int):
 	targScore = newScore
 	upEach = newScore / 2.5
+	score = 0
+	revealed = false
+	revealScale = 1.0
 func _setGrade(newGrade: String):
 	gradeShow.text = newGrade
 	gradeShow.modulate = _gradeColor(newGrade)
@@ -39,12 +45,29 @@ func _setLevel(lvl):
 func _process(delta: float) -> void:
 	if targScore > score:
 		score += upEach * delta
+		if score >= targScore:
+			score = targScore
 		scoreShow.text = "SCORE\n%d" % int(score)
+		tickAccum += delta
+		if tickAccum >= 0.05:
+			tickAccum = 0.0
+			Audio.play("ui_hover", 1.7, -24.0)
+	elif !revealed:
+		_revealGrade()
 	if gradeFire.material:
 		gradeFire.material.set_shader_parameter("fill", gradeFill)
 	gradeShow.pivot_offset = gradeShow.size / 2.0
+	revealScale = lerp(revealScale, 1.0, clamp(delta * 7.0, 0.0, 1.0))
 	var throb = 1.0 + 0.08 * gradeFill * (sin(Time.get_ticks_msec() * 0.006) * 0.5 + 0.5)
-	gradeShow.scale = Vector2(throb, throb)
+	gradeShow.scale = Vector2(throb, throb) * revealScale
+
+func _revealGrade():
+	revealed = true
+	revealScale = 2.6
+	if gradeFill >= 1.0:
+		Audio.play("win", 1.0, -3.0)
+	else:
+		Audio.play("pickup", 0.9, -5.0)
 
 func _gradeFill(grade : String) -> float:
 	if grade.begins_with("S"):

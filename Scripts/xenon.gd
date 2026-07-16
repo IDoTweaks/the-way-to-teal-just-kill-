@@ -56,6 +56,7 @@ func _damage(dmg):
 	else:
 		_updateDmgTxt(dmg)
 	if health >= 0:
+		body._hitPunch()
 		body._updateMat(health / 50.0)
 	else:
 		_die()
@@ -72,6 +73,18 @@ func _die():
 	particleInstance.position = global_position
 	get_parent().add_child(particleInstance)
 	particleInstance.emitting = true
+	_deathAnim()
+func _deathAnim():
+	set_physics_process(false)
+	velocity = Vector3.ZERO
+	body._killTweens()
+	var tw = create_tween()
+	tw.set_parallel(true)
+	tw.set_trans(Tween.TRANS_BACK)
+	tw.set_ease(Tween.EASE_IN)
+	tw.tween_property(body, "scale", Vector3.ZERO, .22)
+	tw.tween_property(body, "rotation:z", body.rotation.z + PI * .7, .22)
+	await tw.finished
 	queue_free()
 func _canSeePlayer():
 	if player == null:
@@ -109,6 +122,7 @@ func _shootAt(targetPos : Vector3):
 		get_parent().add_child(muzzle)
 		muzzle.global_position = bulletSpawn.global_position
 		muzzle.emitting = true
+		Audio.play("rifle", 0.75, -9.0)
 		canAttack = false
 		attackTimer.start()
  
@@ -133,14 +147,14 @@ func _physics_process(delta: float) -> void:
 	if seesPlayer:
 		if canAttack:
 			_shootAt(player.global_position)
-			canAttack = false
-			attackTimer.start()
 	
 	
 
 	#if shouldMove:
 	move_and_slide()
 func _process(delta: float) -> void:
+	if dead:
+		return
 	animTime += delta
 	body.position.y = baseBodyY + sin(animTime * 2.4) * 0.09
 	var faceTarget = target if (target != null and is_instance_valid(target)) else player

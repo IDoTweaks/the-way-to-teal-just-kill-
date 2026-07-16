@@ -75,6 +75,19 @@ func _die():
 	particleInstance.position = global_position
 	get_parent().add_child(particleInstance)
 	particleInstance.emitting = true
+	_deathAnim()
+
+func _deathAnim():
+	set_physics_process(false)
+	velocity = Vector3.ZERO
+	body._killTweens()
+	var tw = create_tween()
+	tw.set_parallel(true)
+	tw.set_trans(Tween.TRANS_BACK)
+	tw.set_ease(Tween.EASE_IN)
+	tw.tween_property(body, "scale", Vector3.ZERO, .22)
+	tw.tween_property(body, "rotation:z", body.rotation.z + PI * .7, .22)
+	await tw.finished
 	queue_free()
 
 func _canSeePlayer():
@@ -134,6 +147,8 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func _process(delta: float) -> void:
+	if dead:
+		return
 	animTime += delta
 	body.position.y = baseBodyY + sin(animTime * 2.0) * 0.12
 	hoverRing.rotation.y += delta * 4.0

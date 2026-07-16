@@ -8,7 +8,6 @@
 [ext_resource type="Script" uid="uid://be2ahx4n0x8mp" path="res://Scripts/ray_container.gd" id="5_ij4ia"]
 [ext_resource type="PackedScene" uid="uid://cmf4i5g6obn3y" path="res://ObjectScenes/finishLevel.tscn" id="7_lvdpo"]
 [ext_resource type="Script" uid="uid://us4lk8xgjfay" path="res://Scripts/game_over.gd" id="8_rfol3"]
-[ext_resource type="Shader" uid="uid://c3ykk7lod3i32" path="res://shaders/styleFire.gdshader" id="9_fire"]
 [ext_resource type="Shader" uid="uid://bkra75bcwljf7" path="res://shaders/healthBar.gdshader" id="10_hp"]
 
 
@@ -768,13 +767,6 @@ shader_parameter/hurt_col = Color(0, 1, 0.45, 1)
 shader_parameter/back_col = Color(0.02, 0.05, 0.12, 0.85)
 shader_parameter/skew = 0.14
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_fire"]
-shader = ExtResource("9_fire")
-shader_parameter/fill = 0.0
-shader_parameter/ember = Color(0, 0.45, 0.42, 1)
-shader_parameter/flame = Color(0, 0.85, 0.7, 1)
-shader_parameter/hot = Color(0.55, 1, 0.92, 1)
-
 [node name="Player2" type="CharacterBody3D" unique_id=659499291]
 script = ExtResource("1_m8bbn")
 downForceDevide = 1.0
@@ -1037,34 +1029,6 @@ offset_left = 1600.0
 offset_top = 815.0
 offset_right = 1900.0
 offset_bottom = 1075.0
-
-[node name="Fire" type="ColorRect" parent="HUD/StyleMeterUI" unique_id=999444444]
-material = SubResource("ShaderMaterial_fire")
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-
-[node name="styleRankLabel" type="Label" parent="HUD/StyleMeterUI" unique_id=999222222]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-theme_override_colors/font_color = Color(0.55, 0.55, 0.55, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 10
-theme_override_font_sizes/font_size = 90
-text = "D"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="styleBar" type="ProgressBar" parent="HUD/StyleMeterUI" unique_id=999333333]
-layout_mode = 0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -16.0
-step = 0.1
-show_percentage = false
 
 [node name="WeaponIndicator" type="VBoxContainer" parent="HUD" unique_id=771500001]
 offset_left = 1648.0

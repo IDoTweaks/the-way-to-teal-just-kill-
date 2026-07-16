@@ -558,6 +558,8 @@ func _sleep():
 	stageDmg = 0.0
 	atkCd = attackGap
 	_setExposed(true)
+	Audio.play("enemy_death", 0.35, -3.0)
+	Audio.play("pickup", 0.5, -8.0)
 	if bossBar:
 		bossBar._setOpen(true)
 	var tween = create_tween()
@@ -642,6 +644,7 @@ func _pickAttack():
 func _hitPlayer(dmg,para : int,force : float,from : Vector3):
 	if player == null:
 		return
+	Audio.play("slam", 0.85, -7.0)
 	if player.has_method("_takeDamage"):
 		player._takeDamage(dmg,from)
 	if player.has_method("_paralyze"):

@@ -130,27 +130,6 @@ offset_top = 0.0
 offset_right = 300.0
 offset_bottom = 260.0
 
-[node name="Fire" parent="Node3D/Player/HUD/StyleMeterUI" index="0" unique_id=999444444]
-layout_mode = 0
-anchors_preset = 0
-anchor_right = 0.0
-anchor_bottom = 0.0
-
-[node name="styleRankLabel" parent="Node3D/Player/HUD/StyleMeterUI" index="1" unique_id=999222222]
-layout_mode = 0
-anchors_preset = 0
-anchor_right = 0.0
-anchor_bottom = 0.0
-
-[node name="styleBar" parent="Node3D/Player/HUD/StyleMeterUI" index="2" unique_id=999333333]
-layout_mode = 0
-anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
-offset_top = 0.0
-offset_right = 4.0
-offset_bottom = 27.0
-
 [node name="Sketchfab_Scene3" parent="Node3D" unique_id=1187064538 instance=ExtResource("4_wofhc")]
 transform = Transform3D(-0.049999177, 2.3826957e-05, -0.00028523288, -0.00028622636, -0.0041629407, 0.049825575, -4.4703485e-09, 0.049826395, 0.0041630086, -5.8104362, 66.27365, 55.31093)
 

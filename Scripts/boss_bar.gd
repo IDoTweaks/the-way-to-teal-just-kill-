@@ -8,6 +8,8 @@ var bar : ProgressBar
 var label : Label
 var fill : StyleBoxFlat
 var raging := false
+var barTween : Tween
+var rageTween : Tween
 
 func _ready() -> void:
 	layer = 50
@@ -53,8 +55,14 @@ func _build() -> void:
 	box.add_child(bar)
 
 func _setHealth(frac : float):
-	if bar:
-		bar.value = clamp(frac, 0.0, 1.0)
+	if bar == null:
+		return
+	if barTween:
+		barTween.kill()
+	barTween = create_tween()
+	barTween.set_trans(Tween.TRANS_CUBIC)
+	barTween.set_ease(Tween.EASE_OUT)
+	barTween.tween_property(bar, "value", clamp(frac, 0.0, 1.0), .25)
 
 func _setOpen(open : bool):
 	if label == null:
@@ -73,3 +81,10 @@ func _setRage():
 		label.add_theme_color_override("font_color", RAGE)
 	if fill:
 		fill.bg_color = RAGE
+	if rageTween:
+		rageTween.kill()
+	rageTween = create_tween()
+	rageTween.set_trans(Tween.TRANS_SINE)
+	for i in 3:
+		rageTween.tween_method(func(v): fill.bg_color = RAGE.lerp(Color.WHITE, v), 0.0, 1.0, .09)
+		rageTween.tween_method(func(v): fill.bg_color = Color.WHITE.lerp(RAGE, v), 0.0, 1.0, .09)

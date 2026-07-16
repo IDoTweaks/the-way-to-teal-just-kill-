@@ -51,6 +51,7 @@ func _damage(dmg):
 	else:
 		_updateDmgTxt(dmg)
 	if health >= 0:
+		body._hitPunch()
 		body._updateMat(health / 100.0)
 	else:
 		_die()
@@ -67,6 +68,20 @@ func _die():
 	particleInstance.position = global_position
 	get_parent().add_child(particleInstance)
 	particleInstance.emitting = true
+	_deathAnim()
+
+
+func _deathAnim():
+	set_physics_process(false)
+	velocity = Vector3.ZERO
+	body._killTweens()
+	var tw = create_tween()
+	tw.set_parallel(true)
+	tw.set_trans(Tween.TRANS_BACK)
+	tw.set_ease(Tween.EASE_IN)
+	tw.tween_property(body, "scale", Vector3.ZERO, .22)
+	tw.tween_property(body, "rotation:z", body.rotation.z + PI * .7, .22)
+	await tw.finished
 	queue_free()
 
 
@@ -93,6 +108,8 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func _process(delta: float) -> void:
+	if dead:
+		return
 	var spd = Vector3(velocity.x, 0, velocity.z).length()
 	animTime += delta * (1.0 + spd * 0.45)
 	body.position.y = baseBodyY + abs(sin(animTime * 3.0)) * 0.10

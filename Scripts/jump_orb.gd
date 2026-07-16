@@ -5,6 +5,12 @@ extends Node3D
 @export var keepHorizontal: bool = true
 var onCd := false
 @onready var pickupParticles = preload("res://Particles/pickupBurst.tscn")
+@onready var orbMeshes = [$MeshInstance3D, $MeshInstance3D2]
+var orgScales : Array = []
+
+func _ready() -> void:
+	for m in orbMeshes:
+		orgScales.append(m.scale)
 
 func _on_jump_area_body_entered(body: Node3D) -> void:
 	if onCd:
@@ -23,6 +29,21 @@ func _launch(body: Node3D) -> void:
 		body.velocity.y = jumpForce
 	else:
 		body.velocity = Vector3(0, jumpForce, 0)
+	_scaleOrb(0.3, .1)
 
 	await get_tree().create_timer(cooldown).timeout
+	if !is_inside_tree():
+		return
 	onCd = false
+	_scaleOrb(1.0, .25)
+	Audio.play("pickup", 1.9, -18.0)
+
+func _scaleOrb(mult : float, time : float):
+	if !is_inside_tree():
+		return
+	var tw = create_tween()
+	tw.set_parallel(true)
+	tw.set_trans(Tween.TRANS_BACK)
+	tw.set_ease(Tween.EASE_OUT)
+	for i in orbMeshes.size():
+		tw.tween_property(orbMeshes[i], "scale", orgScales[i] * mult, time)

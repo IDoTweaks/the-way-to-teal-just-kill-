@@ -32,12 +32,14 @@ func _pause() -> void:
 	root.visible = true
 	settings.visible = false
 	buttons.visible = true
+	Audio.play("ui_click", 0.7, -4.0)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _resume() -> void:
 	isPaused = false
 	get_tree().paused = false
 	root.visible = false
+	Audio.play("ui_click", 1.15, -4.0)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _on_settings() -> void:

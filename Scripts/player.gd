@@ -110,15 +110,13 @@ const DASH_COST = 100.0 / 3.0
 var stamina : float = 100.0
 var staminaIdle : float = 0.0
 var _lastStamina : float = -1.0
+var _hudHealth : float = 100.0
 var _lastSecond : int = -1
 var _lastEnemyCount : int = -1
 const STAMINA_ORANGE = Color(1.0, 0.55, 0.08)
 const STAMINA_DIM = Color(0.3, 0.14, 0.02)
 var _staminaSegs : Array = []
 var _staminaMsg : Label
-@onready var staminaLabel : Label = $HUD/StyleMeterUI/styleRankLabel
-@onready var staminaBar : ProgressBar = $HUD/StyleMeterUI/styleBar
-@onready var staminaFire : ColorRect = $HUD/StyleMeterUI/Fire
 @onready var healthBar : ColorRect = $HUD/healthBar
 @onready var weaponSlots = [$HUD/WeaponIndicator/Slot0, $HUD/WeaponIndicator/Slot1, $HUD/WeaponIndicator/Slot2]
 
@@ -155,13 +153,11 @@ func _staminaRegen():
 func _onKill():
 	_hitStop(0.05, 0.06)
 	_hitmarker(true)
-	Audio.play("pickup", 1.0, -4.0)
+	Audio.play("pickup", 1.35, -6.0)
+	Audio.play("enemy_hit", 0.65, -3.0)
 
 func _buildStaminaHud():
 	var ui = $HUD/StyleMeterUI
-	staminaBar.visible = false
-	staminaFire.visible = false
-	staminaLabel.visible = false
 	var segW := 88.0
 	var segH := 44.0
 	var gap := 12.0
@@ -211,6 +207,7 @@ func _buildStaminaHud():
 func _updateStaminaHud():
 	if is_equal_approx(stamina, _lastStamina):
 		return
+	var wasFull = _lastStamina >= 100.0 or _lastStamina < 0.0
 	_lastStamina = stamina
 	var full := 88.0 - 8.0
 	for i in _staminaSegs.size():
@@ -218,6 +215,8 @@ func _updateStaminaHud():
 		var seg = _staminaSegs[i]
 		seg.size.x = full * frac
 		seg.color = STAMINA_ORANGE if frac > 0.0 else STAMINA_DIM
+	if stamina >= 100.0 and !wasFull:
+		Audio.play("pickup", 1.7, -20.0)
 
 func _staminaFail():
 	if _staminaMsg == null:
@@ -317,6 +316,7 @@ var shotGunRestRot : Vector3
 
 var slamming = false
 var slamStartHeight : float = 0.0
+var weaponPunchTween : Tween
 
 func _showGunModels():
 	gun.visible = currentGun == 0
@@ -334,18 +334,37 @@ func _updateRayGating():
 
 func _switchGuns():
 	if Input.is_action_just_pressed("gun1") and unlockedGuns > 0:
-		currentGun = 0
-		_showGunModels()
+		_selectGun(0)
 	elif Input.is_action_just_pressed("gun2") and unlockedGuns > 1:
-		currentGun = 1
-		_showGunModels()
+		_selectGun(1)
 	elif Input.is_action_just_pressed("gun3") and unlockedGuns > 2:
-		currentGun = 2
-		_showGunModels()
+		_selectGun(2)
 
 func _cycleGun(dir: int):
-	currentGun = (currentGun + dir + unlockedGuns) % unlockedGuns
+	_selectGun((currentGun + dir + unlockedGuns) % unlockedGuns)
+
+func _selectGun(idx):
+	if idx == currentGun:
+		return
+	currentGun = idx
+	Audio.play("ui_click", 1.45, -9.0)
 	_showGunModels()
+	_punchWeaponSlot()
+
+func _punchWeaponSlot():
+	if weaponSlots == null or currentGun >= weaponSlots.size():
+		return
+	var slot = weaponSlots[currentGun]
+	if slot == null:
+		return
+	slot.pivot_offset = slot.size / 2.0
+	if weaponPunchTween:
+		weaponPunchTween.kill()
+	slot.scale = Vector2(1.45, 1.45)
+	weaponPunchTween = create_tween()
+	weaponPunchTween.set_trans(Tween.TRANS_BACK)
+	weaponPunchTween.set_ease(Tween.EASE_OUT)
+	weaponPunchTween.tween_property(slot, "scale", Vector2(1.15, 1.15), .18)
 
 func _setUnlockedGuns(n):
 	unlockedGuns = clamp(n, 1, 3)
@@ -401,11 +420,18 @@ func _updateSniperView():
 			sniperGun.rotation = sniperRestRot + (gun.rotation - GUN_REST_ROT)
 
 func _die():
+	if !count:
+		return
 	count = false
+	Audio.play("lose")
+	_addShake(.25)
+	_hitStop(0.15, 0.35)
+	await get_tree().create_timer(0.5, true, false, true).timeout
 	Engine.time_scale = 1.0
+	if !is_inside_tree():
+		return
 	$GameOver.visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	Audio.play("lose")
 	
 	
 
@@ -988,7 +1014,7 @@ func _physics_process(delta: float) -> void:
 
 func _updateHud():
 	if healthBar.material:
-		healthBar.material.set_shader_parameter("health", clamp(health / 100.0, 0.0, 1.0))
+		healthBar.material.set_shader_parameter("health", clamp(_hudHealth / 100.0, 0.0, 1.0))
 
 
 func _takeDamage(damage, source = null):
@@ -1168,6 +1194,8 @@ func _updateJuice(delta : float):
 		_hitStopUntil = 0.0
 	_hurtFlash = move_toward(_hurtFlash, 0.0, delta * 1.8)
 	paraFlash = move_toward(paraFlash, 0.0, delta * 1.4)
+	_hudHealth = lerp(_hudHealth, float(health), clamp(delta * 9.0, 0.0, 1.0))
+	_updateHud()
 	if _vignette:
 		var lowHp = clamp((40.0 - health) / 40.0, 0.0, 1.0) * 0.45
 		var pulse = (sin(Time.get_ticks_msec() * 0.008) * 0.5 + 0.5) * 0.2 if health < 25 else 0.0
@@ -1206,6 +1234,7 @@ func _spawnSlam():
 	var slam = groundSlam.instantiate()
 	get_parent().add_child(slam)
 	slam.global_position = feet.global_position
+	slam.source = self
 	_spawnParticleAt(slamParticles, feet.global_position)
 	var fallHeight = slamStartHeight - global_position.y
 	slam.damage = clamp(fallHeight * 3.0, 1.0, 60.0)
