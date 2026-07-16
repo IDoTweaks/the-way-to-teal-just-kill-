@@ -37,12 +37,9 @@ void fragment() {
     // Комбинирование шумов и нормализация
     float combined_noise = clamp((noise1 * 0.6 + noise2 * 0.3 + noise3 * 0.1), 0.0, 1.0);
     
-    // Получение цвета из Color Ramp
-    vec3 fire_color = texture(color_ramp, vec2(combined_noise, 0.0)).rgb;
-    
     // Усиление контраста
     float ramp_pos = smoothstep(0.2, 0.8, combined_noise);
-    fire_color = texture(color_ramp, vec2(ramp_pos, 0.0)).rgb;
+    vec3 fire_color = texture(color_ramp, vec2(ramp_pos, 0.0)).rgb;
     
     // Эффект "языков пламени"
     float flame_mask = step(0.5, combined_noise);

@@ -18,6 +18,10 @@ var currentLevel = 1
 var maxUnlocked = 1
 var tutorialComplete := false
 
+const GHOST_FILE = "user://ghosts.dat"
+const GHOST_VERSION = 1
+const GHOST_HZ = 20.0
+
 var ghostPos : Dictionary = {}
 var ghostRot : Dictionary = {}
 var ghostCamPos : Dictionary = {}
@@ -120,12 +124,7 @@ func _localLoad():
 		tutorialComplete = config.get_value("player", "tutorialComplete", tutorialComplete)
 		bestTimes = config.get_value("player", "bestTimes", bestTimes)
 		levelTries = config.get_value("player", "levelTries", levelTries)
-		ghostPos = config.get_value("ghost", "ghostPos", ghostPos)
-		ghostRot = config.get_value("ghost", "ghostRot", ghostRot)
-		ghostCamPos = config.get_value("ghost", "ghostCamPos", ghostCamPos)
-		ghostCamRot = config.get_value("ghost", "ghostCamRot", ghostCamRot)
-		ghostWeapon = config.get_value("ghost", "ghostWeapon", ghostWeapon)
-		ghostScore = config.get_value("ghost", "ghostScore", ghostScore)
+	_loadGhosts()
 
 func _localSave():
 	var config = ConfigFile.new()
@@ -135,13 +134,37 @@ func _localSave():
 	config.set_value("player", "tutorialComplete", tutorialComplete)
 	config.set_value("player", "bestTimes", bestTimes)
 	config.set_value("player", "levelTries", levelTries)
-	config.set_value("ghost", "ghostPos", ghostPos)
-	config.set_value("ghost", "ghostRot", ghostRot)
-	config.set_value("ghost", "ghostCamPos", ghostCamPos)
-	config.set_value("ghost", "ghostCamRot", ghostCamRot)
-	config.set_value("ghost", "ghostWeapon", ghostWeapon)
-	config.set_value("ghost", "ghostScore", ghostScore)
 	config.save("user://save.cfg")
+
+func _loadGhosts():
+	var f = FileAccess.open(GHOST_FILE, FileAccess.READ)
+	if f == null:
+		return
+	var data = f.get_var()
+	f.close()
+	if typeof(data) != TYPE_DICTIONARY or data.get("v", 0) != GHOST_VERSION:
+		return
+	ghostPos = data.get("pos", {})
+	ghostRot = data.get("rot", {})
+	ghostCamPos = data.get("camPos", {})
+	ghostCamRot = data.get("camRot", {})
+	ghostWeapon = data.get("weapon", {})
+	ghostScore = data.get("score", {})
+
+func _saveGhosts():
+	var f = FileAccess.open(GHOST_FILE, FileAccess.WRITE)
+	if f == null:
+		return
+	f.store_var({
+		"v": GHOST_VERSION,
+		"pos": ghostPos,
+		"rot": ghostRot,
+		"camPos": ghostCamPos,
+		"camRot": ghostCamRot,
+		"weapon": ghostWeapon,
+		"score": ghostScore,
+	})
+	f.close()
 
 func _ready() -> void:
 	levels.append(mainMenu)
@@ -180,7 +203,7 @@ func _saveGhost(level, pos, rot, camPos, camRot, weapon, score):
 	ghostCamRot[level] = camRot
 	ghostWeapon[level] = weapon
 	ghostScore[level] = score
-	_localSave()
+	_saveGhosts()
 
 func _ghostScore(level):
 	return ghostScore.get(level, -1)
@@ -191,7 +214,6 @@ func _hasNextLevel(level):
 func _completeLevel(level):
 	if level + 1 > maxUnlocked:
 		maxUnlocked = level + 1
-		_localSave()
 
 func _isUnlocked(level):
 	return level <= maxUnlocked
@@ -204,12 +226,10 @@ func _tries(level):
 
 func _addTry(level):
 	levelTries[level] = _tries(level) + 1
-	_localSave()
 
 func _recordTime(level, t):
 	if not bestTimes.has(level) or t < bestTimes[level]:
 		bestTimes[level] = t
-		_localSave()
 
 func _goToLevel(idx):
 	currentLevel = idx
@@ -225,5 +245,3 @@ func _finishTutorial():
 	_localSave()
 	_goToLevel(1)
 
-func _process(delta: float) -> void:
-	pass

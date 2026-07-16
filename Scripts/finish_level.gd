@@ -10,7 +10,16 @@ var currentLevel = 1
 @onready var gradeFire = $UI/MainContainer/GradeFire
 @onready var ui = $UI
 func _ready() -> void:
-	pass
+	ui.visible = visible
+	set_process(visible)
+	visibility_changed.connect(_onVisibilityChanged)
+
+func _onVisibilityChanged() -> void:
+	ui.visible = visible
+	set_process(visible)
+	if visible:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		_forceVisible(ui)
 
 func _setScore(newScore:int):
 	targScore = newScore
@@ -28,12 +37,6 @@ func _setLevel(lvl):
 		nextBtn.text = "MENU"
 
 func _process(delta: float) -> void:
-	if self.visible == false:
-		ui.visible = false
-	else:
-		ui.visible = true
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		_forceVisible(ui)
 	if targScore > score:
 		score += upEach * delta
 		scoreShow.text = "SCORE\n%d" % int(score)

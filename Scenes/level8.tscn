@@ -15,7 +15,7 @@
 albedo_color = Color(0.13, 0.22, 0.19, 1)
 
 [sub_resource type="Environment" id="env"]
-ssao_enabled = true
+ssao_enabled = false
 fog_enabled = true
 fog_light_energy = 1.7
 fog_density = 0.006

@@ -12,8 +12,6 @@ func _ready() -> void:
 	randomizeRays()
 
 
-func _process(delta: float) -> void:
-	pass
 
 func randomizeRays():
 	var i : int = 0

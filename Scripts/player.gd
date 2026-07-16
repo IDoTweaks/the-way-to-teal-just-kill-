@@ -27,15 +27,13 @@ var count = true
 
 #ghost
 func ghost():pass
-var positionSaves : Array[Vector3]
-var posI : int
-var rotationSaves : Array[Vector3]
-var rotI : int
-var camPositionSaves : Array[Vector3]
-var camPosI : int
-var camRotationSaves : Array[Vector3]
-var camRotI : int
-var weaponSaves : Array[int]
+@onready var ghostStep : float = 1.0 / Global.GHOST_HZ
+var positionSaves : PackedVector3Array
+var rotationSaves : PackedVector3Array
+var camPositionSaves : PackedVector3Array
+var camRotationSaves : PackedVector3Array
+var weaponSaves : PackedInt32Array
+var ghostAccum : float = 0.0
 
 #sliding
 var wasSliding: bool = false
@@ -88,7 +86,7 @@ var paraVignette : TextureRect
 @onready var timer :Label = $HUD/timer
 @onready var enemyCounter :Label = $HUD/enemyCounter
 @onready var slamFrom = $body/slamFrom
-var particleInstance
+var muzzleParticles
 
 #general movement
 var airAccel = 8
@@ -111,6 +109,9 @@ const DASH_COST = 100.0 / 3.0
 @export var staminaRegen : float = 45.0
 var stamina : float = 100.0
 var staminaIdle : float = 0.0
+var _lastStamina : float = -1.0
+var _lastSecond : int = -1
+var _lastEnemyCount : int = -1
 const STAMINA_ORANGE = Color(1.0, 0.55, 0.08)
 const STAMINA_DIM = Color(0.3, 0.14, 0.02)
 var _staminaSegs : Array = []
@@ -208,6 +209,9 @@ func _buildStaminaHud():
 	$HUD.add_child(_staminaMsg)
 
 func _updateStaminaHud():
+	if is_equal_approx(stamina, _lastStamina):
+		return
+	_lastStamina = stamina
 	var full := 88.0 - 8.0
 	for i in _staminaSegs.size():
 		var frac = clamp((stamina - i * DASH_COST) / DASH_COST, 0.0, 1.0)
@@ -319,7 +323,14 @@ func _showGunModels():
 	shotGun.visible = currentGun == 1
 	sniperGun.visible = currentGun == 2
 	shotgunDemo.visible = false
+	_updateRayGating()
 	_updateWeaponHud()
+
+func _updateRayGating():
+	gunRay.enabled = currentGun == 0
+	for ray in rayContainer.get_children():
+		if ray is RayCast3D:
+			ray.enabled = currentGun == 1
 
 func _switchGuns():
 	if Input.is_action_just_pressed("gun1") and unlockedGuns > 0:
@@ -413,6 +424,7 @@ func _finishLevel():
 	var lvl = Global.currentLevel
 	Global._completeLevel(lvl)
 	Global._recordTime(lvl, time)
+	Global._localSave()
 	if displayScore > Global._ghostScore(lvl):
 		Global._saveGhost(lvl, positionSaves.duplicate(), rotationSaves.duplicate(), camPositionSaves.duplicate(), camRotationSaves.duplicate(), weaponSaves.duplicate(), displayScore)
 	levelEnd._setScore(displayScore)
@@ -529,10 +541,6 @@ func _shootAnim():
 			shotGun.visible = false
 			gun.visible = true
 			animaPlayer.play("shootingAnim")
-			particleInstance = shootingParticles.instantiate()
-			particleInstance.position = gunParticleSpawn.global_position
-			get_parent().add_child(particleInstance)
-			particleInstance.emitting = true
 		elif currentGun == 1:
 			if !shotGunCd:
 				shotGun.visible = true
@@ -554,6 +562,7 @@ func _shoot():
 	if currentGun == 0:
 		_addShake(.01)
 		Audio.play("rifle", 1.0, -5.0)
+		muzzleParticles.restart()
 		playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
 		if gunRay.is_colliding():
 			var target = gunRay.get_collider()
@@ -703,8 +712,13 @@ func _ready() -> void:
 	_footprint_tex = _make_teal_texture()
 	_last_footprint_pos = global_position
 	_bullet_tex = _make_bullet_texture()
+	muzzleParticles = shootingParticles.instantiate()
+	muzzleParticles.finished.disconnect(Callable(muzzleParticles, "_on_finished"))
+	gunParticleSpawn.add_child(muzzleParticles)
+	muzzleParticles.position = Vector3()
 	_updateHud()
 	_updateWeaponHud()
+	_updateRayGating()
 	_buildJuiceHud()
 	_buildStaminaHud()
 	shotGunRestPos = shotGun.position
@@ -714,12 +728,17 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if count:
 		time +=  delta
-		timer.text = str(int(time))
+		if int(time) != _lastSecond:
+			_lastSecond = int(time)
+			timer.text = str(_lastSecond)
 		if staminaIdle < staminaDelay:
 			staminaIdle += delta
 		else:
 			stamina = min(stamina + _staminaRegen() * delta, 100.0)
-	enemyCounter.text = "ENEMIES %d" % get_tree().get_nodes_in_group("enemies").size()
+	var enemiesLeft = get_tree().get_node_count_in_group("enemies")
+	if enemiesLeft != _lastEnemyCount:
+		_lastEnemyCount = enemiesLeft
+		enemyCounter.text = "ENEMIES %d" % enemiesLeft
 	_updateStaminaHud()
 	#call input functions
 	_shootAnim()
@@ -784,15 +803,14 @@ func _calcDownForce():
 
 func _physics_process(delta: float) -> void:
 	#THIS IS FOR THE GHOST DO NOT PUT CODE BEFORE
-	positionSaves.insert(posI,global_position)
-	posI+=1
-	rotationSaves.insert(rotI,global_rotation)
-	rotI+=1
-	camPositionSaves.insert(camPosI,playerCam.global_position)
-	camPosI+=1
-	camRotationSaves.insert(camRotI,playerCam.global_rotation)
-	camRotI+=1
-	weaponSaves.append(currentGun)
+	ghostAccum += delta
+	if ghostAccum >= ghostStep:
+		ghostAccum -= ghostStep
+		positionSaves.append(global_position)
+		rotationSaves.append(global_rotation)
+		camPositionSaves.append(playerCam.global_position)
+		camRotationSaves.append(playerCam.global_rotation)
+		weaponSaves.append(currentGun)
 	
 	if knockbackTimer > 0:
 		knockbackTimer -= delta

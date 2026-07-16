@@ -23,7 +23,7 @@ albedo_texture = ExtResource("3_r8hce")
 uv1_triplanar = true
 
 [sub_resource type="Environment" id="Environment_52fb6"]
-ssao_enabled = true
+ssao_enabled = false
 fog_enabled = true
 fog_light_energy = 2.15
 fog_density = 0.005

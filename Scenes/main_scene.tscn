@@ -12,7 +12,7 @@ albedo_color = Color(0, 0.5294118, 0, 1)
 size = Vector3(1, 0.5, 0.027008057)
 
 [sub_resource type="Environment" id="Environment_52fb6"]
-ssao_enabled = true
+ssao_enabled = false
 fog_enabled = true
 fog_light_energy = 2.15
 fog_density = 0.005

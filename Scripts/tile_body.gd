@@ -7,7 +7,3 @@ func _ready() -> void:
 
 func _activate(type : int):
 	deathArea._activate(type)
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass

@@ -25,6 +25,9 @@ var particleInstance
 @export var lifeTime : float = 0.0
 var target
 var mode : String = "idle"
+const LOS_INTERVAL = 0.1
+var losAccum : float = 0.0
+var seesPlayer : bool = false
 var gotShot = false
 var shouldMove = false
 var canAttack : bool = true
@@ -123,7 +126,11 @@ func _physics_process(delta: float) -> void:
 			if !hit:
 				velocity.x = 0
 				velocity.z = 0
-	if _canSeePlayer():
+	losAccum += delta
+	if losAccum >= LOS_INTERVAL:
+		losAccum = 0.0
+		seesPlayer = _canSeePlayer()
+	if seesPlayer:
 		if canAttack:
 			_shootAt(player.global_position)
 			canAttack = false
@@ -146,9 +153,6 @@ func _process(delta: float) -> void:
 		body.rotation.y = sin(animTime * 1.3) * 0.12
 	if txt == null:
 		textActive = false
-	if not gotShot:
-		if body.has_method("player"):
-			mode = "chase"
 func _updateDmgTxt(moreDamage:int):
 	if txt != null:
 		txt.damage += moreDamage

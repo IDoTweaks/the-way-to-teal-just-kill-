@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" format=3 uid="uid://bmenuenergy01"]
 
-[ext_resource type="Shader" path="res://shaders/uiEnergy.gdshader" id="1"]
+[ext_resource type="Shader" path="res://shaders/bossFloor.gdshader" id="1"]
 
 [resource]
 shader = ExtResource("1")

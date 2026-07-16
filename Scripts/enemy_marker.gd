@@ -1,10 +1,14 @@
 extends Sprite3D
 
+static var _sharedTex : ImageTexture
+
 var baseY : float = 0.0
 var basePixel : float = 0.0012
 
 func _ready() -> void:
-	texture = _makeTriangle()
+	if _sharedTex == null:
+		_sharedTex = _makeTriangle()
+	texture = _sharedTex
 	billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	no_depth_test = true
 	fixed_size = true

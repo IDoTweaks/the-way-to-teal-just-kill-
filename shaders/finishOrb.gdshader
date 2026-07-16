@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix, depth_draw_always, cull_disabled, unshaded;
+render_mode blend_mix, depth_draw_always, cull_back, unshaded;
 uniform vec4 core_color : source_color = vec4(0.0, 0.15, 0.65, 1.0);    // saturated blue core
 uniform vec4 mid_color  : source_color = vec4(0.0, 0.40, 1.0, 1.0);     // pure bright blue body
 uniform vec4 rim_color  : source_color = vec4(0.4, 0.85, 1.0, 1.0);     // bright cyan rim
