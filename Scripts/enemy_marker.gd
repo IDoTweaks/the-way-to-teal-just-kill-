@@ -1,5 +1,7 @@
 extends Sprite3D
 
+func _enemyMarker(): pass
+
 static var _sharedTex : ImageTexture
 
 var baseY : float = 0.0

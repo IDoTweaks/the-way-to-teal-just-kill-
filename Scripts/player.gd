@@ -147,6 +147,9 @@ func _drainStamina(amount : float):
 	stamina = max(stamina - amount, 0.0)
 	staminaIdle = 0.0
 
+func _giveStamina(amount : float):
+	stamina = min(stamina + amount, 100.0)
+
 func _staminaRegen():
 	return staminaRegen * clamp(1.0 - paraLevel * 0.09, 0.15, 1.0)
 
@@ -878,6 +881,8 @@ func _physics_process(delta: float) -> void:
 				slamming = true
 				slamStartHeight = global_position.y
 				animaPlayer.play("slam")
+		if Input.is_action_just_pressed("slide") and !is_on_floor() and !slamming and _canSlide() and stamina < slamCost - 0.05:
+			_staminaFail()
 		if slide and is_on_floor():
 			_drainStamina(slideDrain * delta)
 		wasSliding = slide

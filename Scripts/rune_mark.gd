@@ -4,6 +4,9 @@ extends Node3D
 @export var damage : int = 14
 @export var knockback : float = 11.0
 @export var growTime : float = .18
+@export var drain : float = 0.0
+
+const DRAIN_COL = Color(1.0, .55, .08)
 
 var t : float = 0.0
 var fired = false
@@ -27,6 +30,11 @@ func _ready() -> void:
 	if fill.material_override:
 		fill.material_override = fill.material_override.duplicate()
 		fillMat = fill.material_override
+	if drain > 0.0:
+		for m in [ringMat, fillMat]:
+			if m != null:
+				m.albedo_color = DRAIN_COL
+				m.emission = DRAIN_COL
 	fill.scale = Vector3(.02, 1, .02)
 	var tw = create_tween()
 	tw.set_trans(Tween.TRANS_BACK)
@@ -64,7 +72,10 @@ func _erupt():
 	for b in inside:
 		if !is_instance_valid(b):
 			continue
-		if b.has_method("_takeDamage"):
+		if drain > 0.0:
+			if b.has_method("_drainStamina"):
+				b._drainStamina(drain)
+		elif b.has_method("_takeDamage"):
 			b._takeDamage(damage, global_position)
 		if b.has_method("_applyForce"):
 			b._applyForce(global_position, knockback, 8.0)

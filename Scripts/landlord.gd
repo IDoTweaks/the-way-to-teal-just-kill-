@@ -5,6 +5,17 @@ func _enemy():pass
 const OPEN_COL = Color(0,1,.85)
 const SHUT_COL = Color(.62,.25,1)
 const CAST_COL = Color(1,.55,.08)
+const SPELL_NAMES = {
+	"repossession": "REPOSSESSION",
+	"notices": "EVICTION NOTICE",
+	"hike": "RENT HIKE",
+	"tenants": "SUBLETTING",
+	"blink": "RELOCATION",
+	"foreclosure": "FORECLOSURE",
+	"audit": "AUDIT",
+	"sweep": "CLEARANCE",
+	"deposit": "DEPOSIT WITHHELD",
+}
 
 @export var player : Node3D
 @export var walls : Array[NodePath] = []
@@ -30,6 +41,16 @@ const CAST_COL = Color(1,.55,.08)
 @export var tenantCount : int = 2
 @export var tenantMax : int = 4
 @export var blinkRange : float = 9.0
+@export var auditCount : int = 3
+@export var auditSpeed : float = 16.0
+@export var auditDamage := 12
+@export var auditStep : float = .18
+@export var sweepCount : int = 10
+@export var sweepRadius : float = 8.0
+@export var sweepWarn : float = .9
+@export var sweepStep : float = .1
+@export var depositDrain : float = 35.0
+@export var depositWarn : float = 1.15
 
 @onready var body = $body
 @onready var shieldMesh = $shield/shieldMesh
@@ -74,6 +95,7 @@ var bossBar
 var bossIntro
 var gone : Array = []
 var tenants : Array = []
+var lastSpell : String = ""
 
 func _onIntroDone():
 	if dead:
@@ -192,6 +214,7 @@ func _physics_process(delta: float) -> void:
 				if away.length() < .5:
 					away = Vector3.BACK
 				away = away.normalized() * 7.0 + Vector3(0, 7.5, 0)
+				bossIntro.camFocus = 0.1
 				bossIntro._play("THE LANDLORD", "SNEK & CO. PROPERTIES", self, away, 0)
 			else:
 				_onIntroDone()
@@ -275,9 +298,10 @@ func _beginCast():
 	Audio.play("pickup", .7, -8.0)
 	Audio.play("ui_hover", .5, -14.0)
 	_spawnParticleAt(burstParticles, staffOrb.global_position)
-	if bossBar:
-		bossBar._setStatus("CASTING", OPEN_COL, true)
 	var spell = _pickSpell()
+	lastSpell = spell
+	if bossBar:
+		bossBar._setStatus(SPELL_NAMES.get(spell, "CASTING"), OPEN_COL, true)
 	match spell:
 		"foreclosure":
 			await _foreclosure()
@@ -289,6 +313,12 @@ func _beginCast():
 			await _summonTenants()
 		"blink":
 			await _blink()
+		"audit":
+			await _audit()
+		"sweep":
+			await _sweep()
+		"deposit":
+			await _deposit()
 		_:
 			await _repossession()
 	if dead or !is_instance_valid(self):
@@ -307,9 +337,10 @@ func _pickSpell() -> String:
 	if castCount > 0 and castCount % foreclosureEvery == 0 and _liveWalls().size() > 0:
 		return "foreclosure"
 	_pruneTenants()
-	var pool = ["repossession", "notices", "hike", "blink"]
+	var pool = ["repossession", "notices", "hike", "blink", "audit", "sweep", "deposit"]
 	if tenants.size() + tenantCount <= tenantMax:
 		pool.append("tenants")
+	pool.erase(lastSpell)
 	return pool[randi() % pool.size()]
 
 func _pruneTenants():
@@ -363,6 +394,26 @@ func _summonTenants():
 		await get_tree().create_timer(.25).timeout
 	await get_tree().create_timer(.3).timeout
 
+func _blocked(from : Vector3, to : Vector3) -> bool:
+	var space = get_world_3d().direct_space_state
+	var ray = PhysicsRayQueryParameters3D.create(from, to)
+	ray.exclude = _rayIgnore()
+	return space.intersect_ray(ray).size() > 0
+
+func _blinkDest():
+	for i in 20:
+		var r = blinkRange if i < 12 else blinkRange * .55
+		var ang = randf() * TAU
+		var at = player.global_position + Vector3(cos(ang) * r, 0, sin(ang) * r)
+		var pnt = _floorPoint(at)
+		if pnt == null or abs(pnt.y - floorY) > 1.2:
+			continue
+		var dest = Vector3(at.x, floorY + hoverHeight, at.z)
+		if _blocked(player.global_position + Vector3(0, 1, 0), dest):
+			continue
+		return dest
+	return null
+
 func _blink():
 	_staffRaise()
 	Audio.play("dash", .8, -6.0)
@@ -378,9 +429,10 @@ func _blink():
 		m.global_position = pnt
 		m.warnTime = runeWarn * .8
 		m.damage = runeDamage
-	var ang = randf() * TAU
-	var dest = player.global_position + Vector3(cos(ang) * blinkRange, 0, sin(ang) * blinkRange)
-	dest.y = floorY + hoverHeight
+	var dest = _blinkDest()
+	if dest == null:
+		await get_tree().create_timer(.35).timeout
+		return
 	_spawnParticleAt(burstParticles, oldPos)
 	for i in 6:
 		_spawnParticleAt(trailParticles, oldPos.lerp(dest, float(i) / 6.0))
@@ -460,6 +512,64 @@ func _notices():
 			return
 	await get_tree().create_timer(.3).timeout
 
+func _audit():
+	_staffRaise()
+	for i in auditCount:
+		if player == null or !is_instance_valid(player):
+			return
+		Audio.play("rifle", .85, -9.0)
+		var n = noticeScene.instantiate()
+		get_parent().add_child(n)
+		n.global_position = noticeSpawn.global_position
+		n.target = null
+		n.speed = auditSpeed
+		n.turnRate = 0.0
+		n.damage = auditDamage
+		n.dir = noticeSpawn.global_position.direction_to(player.global_position + Vector3(0, .8, 0))
+		add_collision_exception_with(n)
+		n.add_collision_exception_with(self)
+		_spawnParticleAt(muzzleParticles, noticeSpawn.global_position)
+		await get_tree().create_timer(auditStep).timeout
+		if dead or !is_instance_valid(self):
+			return
+	await get_tree().create_timer(.3).timeout
+
+func _sweep():
+	_staffRaise()
+	Audio.play("rifle", .3, -9.0)
+	var ang0 = randf() * TAU
+	var spin = 1.0 if randf() < .5 else -1.0
+	for i in sweepCount:
+		if dead or !is_instance_valid(self):
+			return
+		var ang = ang0 + spin * (TAU / float(sweepCount)) * float(i)
+		var at = global_position + Vector3(cos(ang) * sweepRadius, 0, sin(ang) * sweepRadius)
+		var pnt = _floorPoint(at)
+		if pnt != null:
+			var m = runeScene.instantiate()
+			get_parent().add_child(m)
+			m.global_position = pnt
+			m.warnTime = sweepWarn
+			m.damage = runeDamage
+		await get_tree().create_timer(sweepStep).timeout
+	await get_tree().create_timer(sweepWarn).timeout
+
+func _deposit():
+	_staffRaise()
+	Audio.play("ui_click", .6, -9.0)
+	if player == null or !is_instance_valid(player):
+		return
+	var pnt = _floorPoint(player.global_position)
+	if pnt == null:
+		await get_tree().create_timer(.3).timeout
+		return
+	var m = runeScene.instantiate()
+	m.drain = depositDrain
+	get_parent().add_child(m)
+	m.global_position = pnt
+	m.warnTime = depositWarn
+	await get_tree().create_timer(depositWarn + .25).timeout
+
 func _liveWalls() -> Array:
 	var live = []
 	for w in walls:
@@ -496,10 +606,19 @@ func _foreclosure():
 		player._addShake(.14)
 	wall.queue_free()
 
+func _rayIgnore() -> Array[RID]:
+	var skip : Array[RID] = [self.get_rid()]
+	if player != null and is_instance_valid(player):
+		skip.append(player.get_rid())
+	for t in tenants:
+		if is_instance_valid(t) and t is CollisionObject3D:
+			skip.append(t.get_rid())
+	return skip
+
 func _floorPoint(from : Vector3):
 	var space = get_world_3d().direct_space_state
 	var ray = PhysicsRayQueryParameters3D.create(from + Vector3(0, 3, 0), from + Vector3(0, -8, 0))
-	ray.exclude = [self.get_rid()]
+	ray.exclude = _rayIgnore()
 	var hit = space.intersect_ray(ray)
 	if hit:
 		return hit.position + Vector3(0, .05, 0)

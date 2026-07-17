@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://bk3ttlground1"]
 
 [ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="1_ktg"]
-[ext_resource type="PackedScene" path="res://ObjectScenes/kettle.tscn" id="2_ktg"]
+[ext_resource type="PackedScene" uid="uid://bk3ttlboss01" path="res://ObjectScenes/kettle.tscn" id="2_ktg"]
 [ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="3_ktg"]
-[ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="5_ktg"]
 [ext_resource type="Shader" uid="uid://gs1w87wuiau3" path="res://shaders/bossFloor.gdshader" id="4_ktg"]
+[ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="5_ktg"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ktgout"]
 render_priority = 0
@@ -18,13 +18,13 @@ shader_parameter/fade_end = 40.0
 next_pass = SubResource("ShaderMaterial_ktgout")
 albedo_color = Color(0, 0.8666667, 0, 1)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ktgwall"]
-next_pass = SubResource("ShaderMaterial_ktgout")
-albedo_color = Color(0, 0.45, 0.12, 1)
-
 [sub_resource type="BoxMesh" id="BoxMesh_ktg"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ktg"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ktgwall"]
+next_pass = SubResource("ShaderMaterial_ktgout")
+albedo_color = Color(0, 0.45, 0.12, 1)
 
 [sub_resource type="Environment" id="Environment_ktg"]
 background_mode = 1
@@ -36,6 +36,7 @@ background_color = Color(0.84313726, 1, 1, 1)
 transform = Transform3D(40, 0, 0, 0, 1, 0, 0, 0, 40, 0, -0.5, 0)
 
 [node name="Mesh" type="MeshInstance3D" parent="Floor" unique_id=6611002]
+transform = Transform3D(0.99999976, 0, 0, 0, 1, 0, 0, 0, 0.99999976, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_ktgfloor")
 mesh = SubResource("BoxMesh_ktg")
 
@@ -119,4 +120,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 207, 971, 378)
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=6611024]
 environment = SubResource("Environment_ktg")
 
-[node name="PauseMenu" parent="." instance=ExtResource("3_ktg")]
+[node name="PauseMenu" parent="." unique_id=598058488 instance=ExtResource("3_ktg")]

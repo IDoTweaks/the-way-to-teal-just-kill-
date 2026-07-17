@@ -19,6 +19,7 @@ const WARN_COL = Color(1,.55,.08)
 @export var slamBounce : float = 13.0
 @export var ventLaunch : float = 12.0
 @export var launchRadius : float = 8.0
+@export var ventStamina : float = 100.0
 @export var phase2At : float = .5
 @export var acidRadius : float = 5.0
 @export var acidCount : int = 8
@@ -405,7 +406,14 @@ func _vent():
 	_spawnParticleAt(dustParticles, global_position)
 	_spawnParticleAt(steamParticles, vent.global_position)
 	_spawnAcid()
+	_refillPlayer()
 	_launchPlayer()
+
+func _refillPlayer():
+	if player == null or !is_instance_valid(player):
+		return
+	if player.has_method("_giveStamina"):
+		player._giveStamina(ventStamina)
 
 func _launchPlayer():
 	if !_playerNear(launchRadius) or player == null:
