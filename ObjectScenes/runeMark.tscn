@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://bk3ttlrune01"]
+
+[ext_resource type="Script" path="res://Scripts/rune_mark.gd" id="1_rune"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_runering"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.72, 0.3, 1, 0.55)
+emission_enabled = true
+emission = Color(0.72, 0.3, 1, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="TorusMesh" id="TorusMesh_rune"]
+inner_radius = 2.4
+outer_radius = 2.6
+ring_segments = 8
+rings = 32
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_runefill"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.3, 0.3, 0.35)
+emission_enabled = true
+emission = Color(1, 0.3, 0.25, 1)
+emission_energy_multiplier = 1.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_runefill"]
+top_radius = 2.5
+bottom_radius = 2.5
+height = 0.03
+radial_segments = 32
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_rune"]
+height = 3.0
+radius = 2.5
+
+[node name="RuneMark" type="Node3D" unique_id=1211001]
+script = ExtResource("1_rune")
+
+[node name="ringMesh" type="MeshInstance3D" parent="." unique_id=1211002]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
+material_override = SubResource("StandardMaterial3D_runering")
+mesh = SubResource("TorusMesh_rune")
+
+[node name="fillMesh" type="MeshInstance3D" parent="." unique_id=1211003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
+material_override = SubResource("StandardMaterial3D_runefill")
+mesh = SubResource("CylinderMesh_runefill")
+
+[node name="Area3D" type="Area3D" parent="." unique_id=1211004]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=1211005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("CylinderShape3D_rune")
+
+[connection signal="body_entered" from="Area3D" to="." method="_on_area_3d_body_entered"]
+[connection signal="body_exited" from="Area3D" to="." method="_on_area_3d_body_exited"]

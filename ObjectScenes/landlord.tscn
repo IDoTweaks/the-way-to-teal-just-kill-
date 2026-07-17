@@ -1,0 +1,101 @@
+[gd_scene format=3 uid="uid://bk3ttllord01"]
+
+[ext_resource type="Script" path="res://Scripts/landlord.gd" id="1_lord"]
+[ext_resource type="Shader" uid="uid://bloi2q6drjuc1" path="res://Scripts/enemy.gdshader" id="2_lord"]
+[ext_resource type="Script" uid="uid://4gxcy6cx0q1m" path="res://Scripts/meshInstanceBody.gd" id="3_lord"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/enemyMarker.tscn" id="4_lord"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lordbody"]
+render_priority = 0
+shader = ExtResource("2_lord")
+shader_parameter/base_color = Color(0.1, 0.06, 0.2, 1)
+shader_parameter/fill_color = Color(0.62, 0.25, 1, 1)
+shader_parameter/fill_percent = 1.0
+shader_parameter/min_y = -0.9
+shader_parameter/max_y = 0.9
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_lord"]
+radius = 0.55
+height = 1.8
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_lord"]
+radius = 0.55
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lordtie"]
+albedo_color = Color(0.85, 0.1, 0.15, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_lordtie"]
+size = Vector3(0.16, 0.5, 0.06)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lordshield"]
+transparency = 1
+albedo_color = Color(0.62, 0.25, 1, 0.28)
+emission_enabled = true
+emission = Color(0.62, 0.25, 1, 1)
+emission_energy_multiplier = 1.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_lordshield"]
+radius = 1.15
+height = 2.3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lordstaff"]
+albedo_color = Color(0.24, 0.16, 0.1, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_lordstaff"]
+top_radius = 0.05
+bottom_radius = 0.05
+height = 1.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lordorb"]
+albedo_color = Color(0.62, 0.25, 1, 1)
+emission_enabled = true
+emission = Color(0.62, 0.25, 1, 1)
+emission_energy_multiplier = 1.2
+
+[sub_resource type="SphereMesh" id="SphereMesh_lordorb"]
+radius = 0.19
+height = 0.38
+
+[node name="Landlord" type="CharacterBody3D" unique_id=8811001]
+script = ExtResource("1_lord")
+
+[node name="body" type="MeshInstance3D" parent="." unique_id=8811002]
+material_override = SubResource("ShaderMaterial_lordbody")
+mesh = SubResource("CapsuleMesh_lord")
+script = ExtResource("3_lord")
+
+[node name="tie" type="MeshInstance3D" parent="body" unique_id=8811003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, -0.5)
+material_override = SubResource("StandardMaterial3D_lordtie")
+mesh = SubResource("BoxMesh_lordtie")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=8811004]
+shape = SubResource("CapsuleShape3D_lord")
+
+[node name="shield" type="Node3D" parent="." unique_id=8811005]
+
+[node name="shieldMesh" type="MeshInstance3D" parent="shield" unique_id=8811006]
+material_override = SubResource("StandardMaterial3D_lordshield")
+mesh = SubResource("SphereMesh_lordshield")
+
+[node name="staff" type="Node3D" parent="body" unique_id=8811009]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0, -0.15)
+
+[node name="staffMesh" type="MeshInstance3D" parent="body/staff" unique_id=8811010]
+material_override = SubResource("StandardMaterial3D_lordstaff")
+mesh = SubResource("CylinderMesh_lordstaff")
+
+[node name="orb" type="MeshInstance3D" parent="body/staff" unique_id=8811011]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+material_override = SubResource("StandardMaterial3D_lordorb")
+mesh = SubResource("SphereMesh_lordorb")
+
+[node name="noticeSpawn" type="Node3D" parent="." unique_id=8811007]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.9)
+
+[node name="textSpawn" type="Node3D" parent="." unique_id=8811008]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="EnemyMarker" parent="." instance=ExtResource("4_lord")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)

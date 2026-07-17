@@ -1,0 +1,89 @@
+[gd_scene format=3 uid="uid://bk3ttlboss01"]
+
+[ext_resource type="Script" path="res://Scripts/kettle.gd" id="1_kett"]
+[ext_resource type="Shader" uid="uid://bloi2q6drjuc1" path="res://Scripts/enemy.gdshader" id="2_kett"]
+[ext_resource type="Script" uid="uid://4gxcy6cx0q1m" path="res://Scripts/meshInstanceBody.gd" id="3_kett"]
+[ext_resource type="Script" path="res://Scripts/kettle_vent.gd" id="4_kett"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/enemyMarker.tscn" id="5_kett"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kettbody"]
+render_priority = 0
+shader = ExtResource("2_kett")
+shader_parameter/base_color = Color(0.08, 0.3, 0.16, 1)
+shader_parameter/fill_color = Color(0, 1, 0.35, 1)
+shader_parameter/fill_percent = 1.0
+shader_parameter/min_y = -1.3
+shader_parameter/max_y = 1.3
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_kettbody"]
+top_radius = 1.05
+bottom_radius = 1.3
+height = 2.6
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_kettbody"]
+height = 2.6
+radius = 1.25
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kettvent"]
+albedo_color = Color(0.11, 0.11, 0.12, 1)
+metallic = 0.7
+roughness = 0.35
+emission_enabled = true
+emission = Color(1, 0.38, 0, 1)
+emission_energy_multiplier = 0.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_kettvent"]
+top_radius = 0.52
+bottom_radius = 0.62
+height = 0.34
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_kettvent"]
+height = 0.34
+radius = 0.6
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kettslam"]
+size = Vector3(2.8, 2.2, 2.8)
+
+[node name="Kettle" type="CharacterBody3D" unique_id=4411001]
+script = ExtResource("1_kett")
+
+[node name="body" type="MeshInstance3D" parent="." unique_id=4411002]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+material_override = SubResource("ShaderMaterial_kettbody")
+mesh = SubResource("CylinderMesh_kettbody")
+script = ExtResource("3_kett")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=4411003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+shape = SubResource("CylinderShape3D_kettbody")
+
+[node name="vent" type="StaticBody3D" parent="." unique_id=4411004]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.72, 0)
+script = ExtResource("4_kett")
+
+[node name="ventMesh" type="MeshInstance3D" parent="vent" unique_id=4411005]
+material_override = SubResource("StandardMaterial3D_kettvent")
+mesh = SubResource("CylinderMesh_kettvent")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="vent" unique_id=4411006]
+shape = SubResource("CylinderShape3D_kettvent")
+
+[node name="beacon" type="OmniLight3D" parent="vent" unique_id=4411010]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+light_color = Color(0, 1, 0.85, 1)
+light_energy = 0.0
+omni_range = 9.0
+
+[node name="slamArea" type="Area3D" parent="." unique_id=4411007]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="slamArea" unique_id=4411008]
+shape = SubResource("BoxShape3D_kettslam")
+
+[node name="textSpawn" type="Node3D" parent="." unique_id=4411009]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3, 0)
+
+[node name="EnemyMarker" parent="." instance=ExtResource("5_kett")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+
+[connection signal="body_entered" from="slamArea" to="." method="_on_slam_area_body_entered"]

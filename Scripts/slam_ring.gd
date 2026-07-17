@@ -23,7 +23,17 @@ func _expand(delta):
 
 
 func _on_area_3d_body_entered(body: Node3D) -> void:
-	if body.has_method("_damage") and !body.has_method("player"):
+	if body == source:
+		return
+	var fromPlayer = source == null or source.has_method("player")
+	if body.has_method("player"):
+		if fromPlayer:
+			return
+		if body.has_method("_takeDamage"):
+			body._takeDamage(damage, global_position)
+	elif body.has_method("_damage"):
+		if !fromPlayer:
+			return
 		if source != null and body.has_method("_makeTarg"):
 			body._makeTarg(source)
 		body._damage(damage)

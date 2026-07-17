@@ -10,6 +10,8 @@ var fill : StyleBoxFlat
 var raging := false
 var barTween : Tween
 var rageTween : Tween
+var bossName := "THE SNAKE"
+var statusTween : Tween
 
 func _ready() -> void:
 	layer = 50
@@ -31,7 +33,7 @@ func _build() -> void:
 	root.add_child(box)
 
 	label = Label.new()
-	label.text = "THE SNAKE"
+	label.text = bossName
 	label.add_theme_font_size_override("font_size", 20)
 	label.add_theme_color_override("font_color", PURPLE)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -64,21 +66,35 @@ func _setHealth(frac : float):
 	barTween.set_ease(Tween.EASE_OUT)
 	barTween.tween_property(bar, "value", clamp(frac, 0.0, 1.0), .25)
 
-func _setOpen(open : bool):
+func _setName(n : String):
+	bossName = n
+	if label:
+		label.text = bossName
+
+func _setStatus(txt : String, col : Color, pulse : bool = false):
 	if label == null:
 		return
+	label.text = bossName if txt == "" else bossName + " - " + txt
+	label.add_theme_color_override("font_color", col)
+	if statusTween:
+		statusTween.kill()
+	if !pulse:
+		label.modulate.a = 1.0
+		return
+	statusTween = create_tween()
+	statusTween.set_loops()
+	statusTween.tween_property(label, "modulate:a", .35, .28)
+	statusTween.tween_property(label, "modulate:a", 1.0, .28)
+
+func _setOpen(open : bool):
 	if open:
-		label.text = "THE SNAKE - EXPOSED"
-		label.add_theme_color_override("font_color", TEAL)
+		_setStatus("EXPOSED", TEAL)
 	else:
-		label.text = "THE SNAKE - ENRAGED" if raging else "THE SNAKE"
-		label.add_theme_color_override("font_color", RAGE if raging else PURPLE)
+		_setStatus("ENRAGED" if raging else "", RAGE if raging else PURPLE)
 
 func _setRage():
 	raging = true
-	if label:
-		label.text = "THE SNAKE - ENRAGED"
-		label.add_theme_color_override("font_color", RAGE)
+	_setStatus("ENRAGED", RAGE)
 	if fill:
 		fill.bg_color = RAGE
 	if rageTween:
