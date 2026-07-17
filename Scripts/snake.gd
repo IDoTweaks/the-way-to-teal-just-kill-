@@ -97,8 +97,28 @@ var trail : Array[Vector3] = []
 @onready var dmgTxt = preload("res://ObjectScenes/damageText.tscn")
 @onready var explodeParticles = preload("res://Particles/enemyExplode.tscn")
 @onready var barScript = preload("res://Scripts/boss_bar.gd")
+@onready var introScript = preload("res://Scripts/boss_intro.gd")
 @onready var dealScript = preload("res://Scripts/office_deal.gd")
 var bossBar
+var bossIntro
+var introPlaying = false
+
+func _startIntro():
+	await get_tree().create_timer(.6, true, false, true).timeout
+	if dead or !is_instance_valid(self) or bossIntro == null:
+		introPlaying = false
+		return
+	bossIntro.camDist = 16.0
+	bossIntro.camHeight = 5.0
+	bossIntro._play("THE SNAKE", "SNEK & CO.", segms[0] if segms.size() > 0 else self)
+
+func _onIntroDone():
+	introPlaying = false
+	if dead:
+		return
+	atkCd = attackGap
+	if bossBar:
+		bossBar.visible = true
 var jawBase1 : float
 var jawBase2 : float
 var marks : Array = []
@@ -126,6 +146,13 @@ func _ready() -> void:
 	bossBar = CanvasLayer.new()
 	bossBar.set_script(barScript)
 	add_child(bossBar)
+	bossBar.visible = false
+	bossIntro = CanvasLayer.new()
+	bossIntro.set_script(introScript)
+	add_child(bossIntro)
+	bossIntro.done.connect(_onIntroDone)
+	introPlaying = true
+	_startIntro()
 	stepTimer = Timer.new()
 	stepTimer.wait_time = tickTime
 	stepTimer.autostart = true
@@ -137,6 +164,8 @@ func _ready() -> void:
 	#_atkCharge()
 
 func _onTick():
+	if introPlaying:
+		return
 	if !dead and !moving and !coiled and !launching and !charging and !spinning and !sleeping:
 		_step()
 	#if tick < 10:
@@ -611,7 +640,7 @@ func _offerDeal():
 	atkCd = attackGap
 
 func _fightLoop(delta : float):
-	if dead or player == null or _busy():
+	if dead or player == null or introPlaying or _busy():
 		return
 	atkCd -= delta
 	if atkCd <= 0:

@@ -18,6 +18,7 @@ func _ready() -> void:
 	tw.set_trans(Tween.TRANS_BACK)
 	tw.set_ease(Tween.EASE_OUT)
 	tw.tween_property(self, "scale", orgScale, growTime)
+	Audio.play("shotgun", 1.9, -24.0)
 
 func _process(delta: float) -> void:
 	if fading:

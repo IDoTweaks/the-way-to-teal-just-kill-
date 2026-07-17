@@ -10,7 +10,9 @@ func _eviction():pass
 var target
 var dir = Vector3.FORWARD
 var spun : float = 0.0
+var trailCd : float = 0.0
 @onready var impactParticles = preload("res://Particles/enemyBulletImpact.tscn")
+@onready var trailParticles = preload("res://Particles/dashTrail.tscn")
 @onready var mesh = $MeshInstance3D
 
 func _process(delta: float) -> void:
@@ -21,6 +23,13 @@ func _process(delta: float) -> void:
 	spun += delta
 	mesh.rotation.y = spun * 5.0
 	mesh.rotation.z = sin(spun * 3.0) * .35
+	trailCd -= delta
+	if trailCd <= 0.0:
+		trailCd = .07
+		var t = trailParticles.instantiate()
+		get_parent().add_child(t)
+		t.global_position = global_position
+		t.emitting = true
 
 func _physics_process(delta: float) -> void:
 	if target != null and is_instance_valid(target):
