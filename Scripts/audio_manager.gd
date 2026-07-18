@@ -20,7 +20,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	for name in ["rifle", "shotgun", "enemy_hit", "enemy_death", "player_hurt",
 			"jump", "dash", "walljump", "slam", "footstep1", "footstep2",
-			"pickup", "ui_hover", "ui_click", "win", "lose"]:
+			"ui_hover", "ui_click", "win", "lose"]:
 		_sfx[name] = load(SFX_DIR + name + ".wav")
 	for i in _poolSize:
 		var p := AudioStreamPlayer.new()

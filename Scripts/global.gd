@@ -40,16 +40,22 @@ var masterVol := 1.0
 var musicVol := 1.0
 var sfxVol := 1.0
 var displayMode := 1
-var resIndex := 0
+var resIndex := 1
 var sensitivity := 0.005
 var scopedSens := 0.0022
 var fov := 75.0
+var screenShake := 1.0
+var reducedFlash := false
 
 const SETTINGS_RES : Array[Vector2i] = [
+	Vector2i(2560, 1440),
 	Vector2i(1920, 1080),
 	Vector2i(1600, 900),
+	Vector2i(1366, 768),
 	Vector2i(1280, 720),
 	Vector2i(1152, 648),
+	Vector2i(1024, 576),
+	Vector2i(960, 540),
 ]
 
 func _loadSettings():
@@ -63,6 +69,8 @@ func _loadSettings():
 		sensitivity = config.get_value("controls", "sensitivity", sensitivity)
 		scopedSens = config.get_value("controls", "scopedSens", scopedSens)
 		fov = config.get_value("display", "fov", fov)
+		screenShake = config.get_value("display", "screenShake", screenShake)
+		reducedFlash = config.get_value("display", "reducedFlash", reducedFlash)
 	_applySettings()
 
 func _saveSettings():
@@ -75,6 +83,8 @@ func _saveSettings():
 	config.set_value("controls", "sensitivity", sensitivity)
 	config.set_value("controls", "scopedSens", scopedSens)
 	config.set_value("display", "fov", fov)
+	config.set_value("display", "screenShake", screenShake)
+	config.set_value("display", "reducedFlash", reducedFlash)
 	config.save("user://settings.cfg")
 
 func _resetDefaults():
@@ -86,6 +96,9 @@ func _resetDefaults():
 	sensitivity = 0.005
 	scopedSens = 0.0022
 	fov = 75.0
+	screenShake = 1.0
+	reducedFlash = false
+	resIndex = 1
 	_applySettings()
 	_saveSettings()
 
@@ -106,15 +119,28 @@ func _applyDisplay():
 		0:
 			DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-			var sz = SETTINGS_RES[clamp(resIndex, 0, SETTINGS_RES.size() - 1)]
+			var scr = DisplayServer.window_get_current_screen()
+			var sz = _windowedSize(SETTINGS_RES[clamp(resIndex, 0, SETTINGS_RES.size() - 1)])
 			DisplayServer.window_set_size(sz)
-			DisplayServer.window_set_position((DisplayServer.screen_get_size() - sz) / 2)
+			DisplayServer.window_set_position(DisplayServer.screen_get_position(scr) + (DisplayServer.screen_get_size(scr) - sz) / 2)
 		1:
 			DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 		2:
 			DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
+
+func _windowedSize(sz : Vector2i) -> Vector2i:
+	var scr = DisplayServer.window_get_current_screen()
+	var avail = DisplayServer.screen_get_size(scr)
+	if avail.x <= 0 or avail.y <= 0:
+		return sz
+	var maxW = int(avail.x * 0.95)
+	var maxH = int(avail.y * 0.90)
+	if sz.x <= maxW and sz.y <= maxH:
+		return sz
+	var ratio = min(float(maxW) / float(sz.x), float(maxH) / float(sz.y))
+	return Vector2i(int(sz.x * ratio), int(sz.y * ratio))
 
 func _localLoad():
 	var config = ConfigFile.new()

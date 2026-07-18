@@ -9,6 +9,8 @@ signal closed
 @onready var sensSlider : HSlider = $Center/Panel/Margin/VBox/SensSlider
 @onready var scopeSensSlider : HSlider = $Center/Panel/Margin/VBox/ScopeSensSlider
 @onready var fovSlider : HSlider = $Center/Panel/Margin/VBox/FovSlider
+@onready var shakeSlider : HSlider = $Center/Panel/Margin/VBox/ShakeSlider
+@onready var flashCheck : CheckButton = $Center/Panel/Margin/VBox/FlashCheck
 @onready var resetBtn : Button = $Center/Panel/Margin/VBox/ResetBtn
 @onready var backBtn : Button = $Center/Panel/Margin/VBox/BackBtn
 
@@ -22,6 +24,9 @@ func _ready() -> void:
 		s.min_value = 0.0
 		s.max_value = 1.0
 		s.step = 0.01
+	resOption.clear()
+	for res in Global.SETTINGS_RES:
+		resOption.add_item("%d x %d" % [res.x, res.y])
 	_syncVolumes()
 	volumeSlider.value_changed.connect(_on_volume_changed)
 	musicSlider.value_changed.connect(_on_music_changed)
@@ -31,6 +36,8 @@ func _ready() -> void:
 	sensSlider.value_changed.connect(_on_sens_changed)
 	scopeSensSlider.value_changed.connect(_on_scope_sens_changed)
 	fovSlider.value_changed.connect(_on_fov_changed)
+	shakeSlider.value_changed.connect(_on_shake_changed)
+	flashCheck.toggled.connect(_on_flash_toggled)
 	resetBtn.pressed.connect(_on_reset_pressed)
 	backBtn.pressed.connect(_on_back_pressed)
 	_syncDisplay()
@@ -46,6 +53,8 @@ func _syncControls() -> void:
 	sensSlider.set_value_no_signal(Global.sensitivity)
 	scopeSensSlider.set_value_no_signal(Global.scopedSens)
 	fovSlider.set_value_no_signal(Global.fov)
+	shakeSlider.set_value_no_signal(Global.screenShake)
+	flashCheck.set_pressed_no_signal(Global.reducedFlash)
 
 func _on_sens_changed(value : float) -> void:
 	Global.sensitivity = value
@@ -57,6 +66,14 @@ func _on_scope_sens_changed(value : float) -> void:
 
 func _on_fov_changed(value : float) -> void:
 	Global.fov = value
+	Global._saveSettings()
+
+func _on_shake_changed(value : float) -> void:
+	Global.screenShake = value
+	Global._saveSettings()
+
+func _on_flash_toggled(pressed : bool) -> void:
+	Global.reducedFlash = pressed
 	Global._saveSettings()
 
 func _on_reset_pressed() -> void:

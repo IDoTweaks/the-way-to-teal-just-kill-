@@ -2,7 +2,9 @@ extends Node3D
 
 
 func _ready() -> void:
-	pass
+	var mat = $MeshInstance3D.material_override
+	if mat:
+		mat.set_shader_parameter("emission_intensity", 1.4 if Global.reducedFlash else 2.5)
 
 
 

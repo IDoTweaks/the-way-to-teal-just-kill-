@@ -16,8 +16,12 @@ albedo_color = Color(0.13, 0.22, 0.19, 1)
 
 [sub_resource type="Environment" id="env"]
 ssao_enabled = false
+tonemap_mode = 2
+glow_enabled = true
+glow_intensity = 0.5
+glow_hdr_threshold = 1.1
 fog_enabled = true
-fog_light_energy = 1.7
+fog_light_energy = 1.4
 fog_density = 0.006
 
 [node name="MainScene" type="Node3D"]

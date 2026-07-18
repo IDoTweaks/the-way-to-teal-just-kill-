@@ -20,7 +20,7 @@ const JUMP_VELOCITY = 4.5
 @onready var bulletSpawn =$body/wand/bulletSpawn
 var particleInstance
 @export var navAgent : NavigationAgent3D
-@export var damage = 20
+@export var damage = 14
 @export var accelaration = 10
 @export var lifeTime : float = 0.0
 var target

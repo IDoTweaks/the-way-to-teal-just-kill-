@@ -1,7 +1,7 @@
 
 # THE WAY TO TEAL(just kill)
 
-this project is a 3d movement shooter made in godot 4.7 for the stardance competition here is the link: https://stardance.hackclub.com/projects/15256
+this project is a 3d movement shooter made in godot 4.6 for the stardance competition here is the link: https://stardance.hackclub.com/projects/15256
 
 all of its code is written by me except for a few ai generated scripts that all they do is generating shaders or textures (you can find them in player.gd)
 
@@ -50,7 +50,7 @@ itch.io: https://idotweaks.itch.io/the-way-to-tealjust-kill
 ## Credits
 
 - models - i dont remember who made each model but they're from sketchfab (sorry)
-- sound effects - all sfx by Kenney (CC0)
+- sound effects - all CC0 (public domain) from [Freesound.org](https://freesound.org), no attribution required but thanks to: rifle (cabled_mess), shotgun (CraftyIndividual), enemy_hit (G40X), enemy_death (mrickey13), player_hurt (aruscio28), jump (Bastianhallo), dash (florianreichelt), walljump (vacuumfan7072), slam (Kneeling), footstep1 (Fission9), footstep2 (Yoyodaman234), ui_hover (Jofae), ui_click (benzix2), win (ggSqRed), lose (jivatma07)
 - ai - thank you for debugging + making shaders + scripts to generate decals + general use/refactoring
 - everything else - me (da goat)
 

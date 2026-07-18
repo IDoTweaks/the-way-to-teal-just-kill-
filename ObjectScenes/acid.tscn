@@ -11,7 +11,7 @@ shader_parameter/light_lava_color = Color(0, 1, 0, 1)
 shader_parameter/speed = 1.506000071535
 shader_parameter/scale = 13.43300063480762
 shader_parameter/sharpness = 6.4150002572125
-shader_parameter/emission_intensity = 5.806000275785
+shader_parameter/emission_intensity = 2.5
 
 [sub_resource type="BoxMesh" id="BoxMesh_5r388"]
 

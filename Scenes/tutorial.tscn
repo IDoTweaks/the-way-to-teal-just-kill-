@@ -12,8 +12,12 @@ albedo_color = Color(0.16, 0.26, 0.18, 1)
 
 [sub_resource type="Environment" id="env"]
 ssao_enabled = false
+tonemap_mode = 2
+glow_enabled = true
+glow_intensity = 0.5
+glow_hdr_threshold = 1.1
 fog_enabled = true
-fog_light_energy = 2.0
+fog_light_energy = 1.4
 fog_density = 0.003
 
 [sub_resource type="BoxShape3D" id="gateShape"]
@@ -86,8 +90,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 1.5, 0)
 size = Vector3(4, 3, 8)
 
 [node name="Plat2a" type="CSGBox3D" parent="Level" unique_id=2134110812]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 1, 0)
-size = Vector3(6, 2, 8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.5, 1, 0)
+size = Vector3(9, 2, 8)
 
 [node name="Plat2b" type="CSGBox3D" parent="Level" unique_id=177967956]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 1, 0)
@@ -229,7 +233,7 @@ shape = SubResource("zoneShape")
 
 [node name="Sign1" type="Label3D" parent="Signs" unique_id=1500918140]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 3.4, 0)
-pixel_size = 0.018
+pixel_size = 0.011
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
 outline_modulate = Color(0, 0.1, 0.09, 1)
@@ -241,7 +245,7 @@ outline_size = 24
 
 [node name="Sign2" type="Label3D" parent="Signs" unique_id=1084059350]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 3.4, 0)
-pixel_size = 0.018
+pixel_size = 0.011
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
 outline_modulate = Color(0, 0.1, 0.09, 1)
@@ -253,7 +257,7 @@ outline_size = 24
 
 [node name="Sign3" type="Label3D" parent="Signs" unique_id=1492235912]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 3.4, 0)
-pixel_size = 0.018
+pixel_size = 0.011
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
 outline_modulate = Color(0, 0.1, 0.09, 1)
@@ -265,7 +269,7 @@ outline_size = 24
 
 [node name="Sign4" type="Label3D" parent="Signs" unique_id=991128867]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, 3.4, 0)
-pixel_size = 0.018
+pixel_size = 0.011
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
 outline_modulate = Color(0, 0.1, 0.09, 1)
@@ -277,7 +281,7 @@ outline_size = 24
 
 [node name="Sign5" type="Label3D" parent="Signs" unique_id=1317899682]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74, 3.4, 0)
-pixel_size = 0.018
+pixel_size = 0.011
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
 outline_modulate = Color(0, 0.1, 0.09, 1)
@@ -289,7 +293,7 @@ outline_size = 24
 
 [node name="Sign6" type="Label3D" parent="Signs" unique_id=137473331]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, 3.4, 0)
-pixel_size = 0.018
+pixel_size = 0.011
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
 outline_modulate = Color(0, 0.1, 0.09, 1)
@@ -301,7 +305,7 @@ outline_size = 24
 
 [node name="Sign7" type="Label3D" parent="Signs" unique_id=1954424709]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 104, 3.4, 0)
-pixel_size = 0.018
+pixel_size = 0.011
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
 outline_modulate = Color(0, 0.1, 0.09, 1)
@@ -313,7 +317,7 @@ outline_size = 24
 
 [node name="SignExit" type="Label3D" parent="Signs" unique_id=686990147]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 122, 3.6, 0)
-pixel_size = 0.02
+pixel_size = 0.016
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
 outline_modulate = Color(0, 0.1, 0.09, 1)
@@ -339,10 +343,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -620.0
-offset_top = -236.0
-offset_right = 620.0
-offset_bottom = -120.0
+offset_left = -470.0
+offset_top = -204.0
+offset_right = 470.0
+offset_bottom = -108.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
@@ -363,7 +367,7 @@ theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
 theme_override_colors/font_outline_color = Color(0, 0.1, 0.09, 1)
 theme_override_constants/outline_size = 6
 theme_override_fonts/font = ExtResource("6_orb")
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 26
 text = "MOVE: W A S D      JUMP: SPACE"
 horizontal_alignment = 1
 vertical_alignment = 1

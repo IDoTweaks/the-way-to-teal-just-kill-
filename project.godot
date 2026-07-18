@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="the way to teal(just kill)"
-run/main_scene="res://Scenes/enemyTest.tscn"
+run/main_scene="uid://j8hvxp3rsema"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -25,6 +25,7 @@ Audio="*res://Scripts/audio_manager.gd"
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/subwindows/embed_subwindows=false
+window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
@@ -115,6 +116,7 @@ scope={
 [physics]
 
 3d/physics_engine="Jolt Physics"
+common/physics_interpolation=true
 
 [rendering]
 

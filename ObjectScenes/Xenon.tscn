@@ -217,6 +217,7 @@ shape = SubResource("BoxShape3D_p5c4o")
 libraries/ = SubResource("AnimationLibrary_nv1fp")
 
 [node name="attackCd" type="Timer" parent="." unique_id=289675594]
+wait_time = 1.0
 
 [connection signal="body_entered" from="attack" to="." method="_on_attack_body_entered"]
 [connection signal="body_exited" from="attack" to="." method="_on_attack_body_exited"]

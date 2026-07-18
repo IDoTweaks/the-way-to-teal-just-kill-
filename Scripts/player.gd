@@ -7,6 +7,7 @@ const JUMP_VELOCITY = 4.5
 const MAXCAMSHAKE = 0.03
 var shakeAmount : float = 0.0
 var shakeDecay : float = 8.0
+var recoilOffset : Vector3 = Vector3.ZERO
 # juice
 var camPitch : float = 0.0
 var camRoll : float = 0.0
@@ -21,6 +22,7 @@ var _vignette : TextureRect
 var _hitDir : Control
 var _hitArrow : Label
 @export var health = 100
+@export var killHeal : float = 5.0
 var time = 0.0;
 var count = true
 @onready var maxScore = 0
@@ -156,6 +158,7 @@ func _staminaRegen():
 func _onKill():
 	_hitStop(0.05, 0.06)
 	_hitmarker(true)
+	health = min(health + killHeal, 100)
 	Audio.play("pickup", 1.35, -6.0)
 	Audio.play("enemy_hit", 0.65, -3.0)
 
@@ -290,9 +293,9 @@ func _spawn_footprint(pos: Vector3) -> void:
 @export var damage : float = 10
 @export var bullet_hole_size: float = 0.15
 @export var max_bullet_holes: int = 100
-@export var shotGunDmg : float = 4
+@export var shotGunDmg : float = 6
 @export var sniperDmg : float = 150
-@export var sniperCooldown : float = 1.6
+@export var sniperCooldown : float = 2.2
 @onready var shotGunCdTimer = $shotGunCd
 @onready var sniperGun = $playerCam/sniperGun
 var sniperCdTimer : float = 0.0
@@ -307,6 +310,8 @@ const GUN_REST_ROT = Vector3(-0.15707964, -3.2637658, 0.15707964)
 
 var _bullet_pool: Array[Node] = []
 var _bullet_tex: ImageTexture
+var _laser_line_mat : StandardMaterial3D
+var _laser_beam_mat : StandardMaterial3D
 var currentGun : int = 0
 var unlockedGuns : int = 3
 var shotGunCd = false
@@ -584,7 +589,6 @@ func _shootAnim():
 				animaPlayer.play("sniperShoot")
 				_spawnParticleAt(shotgunBlast, sniperGun.global_position)
 	else:
-		playerCam.position = Vector3();
 		if animaPlayer.current_animation == "shootingAnim":
 			animaPlayer.stop()
 func _shoot():
@@ -592,7 +596,7 @@ func _shoot():
 		_addShake(.01)
 		Audio.play("rifle", 1.0, -5.0)
 		muzzleParticles.restart()
-		playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
+		recoilOffset = Vector3(randf_range(-MAXCAMSHAKE, MAXCAMSHAKE), randf_range(-MAXCAMSHAKE, MAXCAMSHAKE), 0)
 		if gunRay.is_colliding():
 			var target = gunRay.get_collider()
 			if target and target.has_method("_makeTarg"):
@@ -612,7 +616,7 @@ func _shoot():
 		if !shotGunCd:
 			_addShake(.04)
 			Audio.play("shotgun", 1.0, -2.0)
-			playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
+			recoilOffset = Vector3(randf_range(-MAXCAMSHAKE, MAXCAMSHAKE), randf_range(-MAXCAMSHAKE, MAXCAMSHAKE), 0)
 			shotGunCd = true
 			shotGunCdTimer.start()
 			rayContainer.randomizeRays()
@@ -632,13 +636,13 @@ func _shoot():
 				else:
 					var end_point = ray.to_global(ray.target_position)
 					_draw_laser_line(gunParticleSpawn.global_position, end_point, 0.5)
-			_applyForce(shotgunForcePnt.global_position,10)
+			_applyForce(shotgunForcePnt.global_position,10,10,false)
 	elif currentGun == 2:
 		if sniperCdTimer <= 0:
 			Audio.play("shotgun", 0.7, -1.0)
 			sniperCdTimer = sniperCooldown
 			_addShake(.05 if scoped else .13)
-			playerCam.position = lerp(playerCam.position, Vector3(randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), randf_range(MAXCAMSHAKE, -MAXCAMSHAKE), 0), 0.5)
+			recoilOffset = Vector3(randf_range(-MAXCAMSHAKE, MAXCAMSHAKE), randf_range(-MAXCAMSHAKE, MAXCAMSHAKE), 0)
 			var camXform = playerCam.global_transform
 			var origin = camXform.origin
 			var forward = -camXform.basis.z
@@ -666,7 +670,7 @@ func _shoot():
 				_draw_laser_beam(beamStart, far_point, 0.35)
 
 
-func _applyForce(point :Vector3,force , maxRange:float = 10):
+func _applyForce(point :Vector3,force , maxRange:float = 10, lockInput : bool = true):
 	var dir = global_position - point
 	var dist = dir.length()
 	if dist > maxRange:
@@ -674,20 +678,17 @@ func _applyForce(point :Vector3,force , maxRange:float = 10):
 	dir = dir.normalized()
 	var fallOff = clamp(1 - (dist/ maxRange),0,1)
 	velocity += dir * force * fallOff
-	knockbackTimer = KNOCKBACK_LOCK_TIME
+	if lockInput:
+		knockbackTimer = KNOCKBACK_LOCK_TIME
 
 
 func _draw_laser_line(from_pos: Vector3, to_pos: Vector3, duration: float = 0.1):
 	var line_instance = MeshInstance3D.new()
 	var imm_mesh = ImmediateMesh.new()
-	var material = StandardMaterial3D.new()
-	
+
 	line_instance.mesh = imm_mesh
-	
-	material.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
-	material.albedo_color = Color(0, 0.5, 1)
-	line_instance.material_override = material
-	
+	line_instance.material_override = _laser_line_mat
+
 	imm_mesh.surface_begin(Mesh.PRIMITIVE_LINES)
 	imm_mesh.surface_add_vertex(from_pos)
 	imm_mesh.surface_add_vertex(to_pos)
@@ -705,13 +706,7 @@ func _draw_laser_beam(from_pos: Vector3, to_pos: Vector3, duration: float = 0.35
 	mesh.bottom_radius = 0.05
 	mesh.height = dist
 	mesh.radial_segments = 10
-	var mat = StandardMaterial3D.new()
-	mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
-	mat.transparency = StandardMaterial3D.TRANSPARENCY_ALPHA
-	mat.albedo_color = Color(0.2, 0.6, 1.0, 0.9)
-	mat.emission_enabled = true
-	mat.emission = Color(0.25, 0.65, 1.0)
-	mat.emission_energy_multiplier = 6.0
+	var mat = _laser_beam_mat.duplicate()
 	beam.mesh = mesh
 	beam.material_override = mat
 	get_parent().add_child(beam)
@@ -741,10 +736,22 @@ func _ready() -> void:
 	_footprint_tex = _make_teal_texture()
 	_last_footprint_pos = global_position
 	_bullet_tex = _make_bullet_texture()
+	playerCam.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	_laser_line_mat = StandardMaterial3D.new()
+	_laser_line_mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+	_laser_line_mat.albedo_color = Color(0, 0.5, 1)
+	_laser_beam_mat = StandardMaterial3D.new()
+	_laser_beam_mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+	_laser_beam_mat.transparency = StandardMaterial3D.TRANSPARENCY_ALPHA
+	_laser_beam_mat.albedo_color = Color(0.2, 0.6, 1.0, 0.9)
+	_laser_beam_mat.emission_enabled = true
+	_laser_beam_mat.emission = Color(0.25, 0.65, 1.0)
+	_laser_beam_mat.emission_energy_multiplier = 6.0
 	muzzleParticles = shootingParticles.instantiate()
 	muzzleParticles.finished.disconnect(Callable(muzzleParticles, "_on_finished"))
 	gunParticleSpawn.add_child(muzzleParticles)
 	muzzleParticles.position = Vector3()
+	_prewarmFx.call_deferred()
 	_updateHud()
 	_updateWeaponHud()
 	_updateRayGating()
@@ -773,9 +780,12 @@ func _process(delta: float) -> void:
 	_shootAnim()
 	_updateSniperView()
 
+	recoilOffset = recoilOffset.lerp(Vector3.ZERO, clamp(delta * 10.0, 0.0, 1.0))
+	var shakeOffset = Vector3.ZERO
 	if shakeAmount > 0:
-		playerCam.position += Vector3(randf_range(-shakeAmount,shakeAmount),randf_range(-shakeAmount,shakeAmount),0)
+		shakeOffset = Vector3(randf_range(-shakeAmount,shakeAmount),randf_range(-shakeAmount,shakeAmount),0)
 		shakeAmount = move_toward(shakeAmount,0,shakeDecay * delta)
+	playerCam.position = recoilOffset + shakeOffset
 	var strafe = Input.get_axis("left", "right")
 	var rollMul = 0.25 if scoped else 1.0
 	camRoll = lerp(camRoll, -strafe * maxRoll * rollMul, delta * 8.0)
@@ -1026,7 +1036,7 @@ func _takeDamage(damage, source = null):
 	if count:
 		_addShake(.06)
 		_spawnParticleAt(hurtParticles, global_position)
-		Audio.play("player_hurt")
+		Audio.play("player_hurt", 1.0, -13.0)
 		health -= damage
 		_hurtFlash = 0.6
 		if source != null:
@@ -1201,13 +1211,14 @@ func _updateJuice(delta : float):
 	paraFlash = move_toward(paraFlash, 0.0, delta * 1.4)
 	_hudHealth = lerp(_hudHealth, float(health), clamp(delta * 9.0, 0.0, 1.0))
 	_updateHud()
+	var flashMul = 0.5 if Global.reducedFlash else 1.0
 	if _vignette:
 		var lowHp = clamp((40.0 - health) / 40.0, 0.0, 1.0) * 0.45
 		var pulse = (sin(Time.get_ticks_msec() * 0.008) * 0.5 + 0.5) * 0.2 if health < 25 else 0.0
-		_vignette.modulate.a = clamp(lowHp + pulse + _hurtFlash, 0.0, 0.85)
+		_vignette.modulate.a = clamp(lowHp + pulse + _hurtFlash, 0.0, 0.85) * flashMul
 	if paraVignette:
 		var f = float(paraLevel) / float(MAX_PARA)
-		paraVignette.modulate.a = clamp(f * 0.6 + paraFlash, 0.0, 0.85)
+		paraVignette.modulate.a = clamp(f * 0.6 + paraFlash, 0.0, 0.85) * flashMul
 
 func _make_vignette_texture() -> ImageTexture:
 	var s = 128
@@ -1248,13 +1259,21 @@ func _spawnSlam():
 func wallJump():pass
 
 func _addShake(amount : float):
-	shakeAmount = max(shakeAmount, amount)
+	shakeAmount = max(shakeAmount, amount * Global.screenShake)
 
 func _spawnParticleAt(scene, pos : Vector3):
 	var p = scene.instantiate()
 	get_parent().add_child(p)
 	p.global_position = pos
 	p.emitting = true
+
+func _prewarmFx():
+	var pos = global_position + Vector3(0, -400, 0)
+	for scene in [bulletImpactParticles, shotgunBlast, dashParticles, wallJumpParticles, hurtParticles, jumpParticles, landParticles, finishParticles, slamParticles]:
+		_spawnParticleAt(scene, pos)
+	_spawn_bullet_hole(pos, Vector3.UP)
+	_draw_laser_line(pos, pos + Vector3.UP, 0.1)
+	_draw_laser_beam(pos, pos + Vector3.UP, 0.1)
 
 func _checkWall():
 	if is_on_floor():

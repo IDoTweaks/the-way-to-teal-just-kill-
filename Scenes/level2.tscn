@@ -24,8 +24,12 @@ uv1_triplanar = true
 
 [sub_resource type="Environment" id="Environment_52fb6"]
 ssao_enabled = false
+tonemap_mode = 2
+glow_enabled = true
+glow_intensity = 0.5
+glow_hdr_threshold = 1.1
 fog_enabled = true
-fog_light_energy = 2.15
+fog_light_energy = 1.4
 fog_density = 0.005
 
 [sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_vn2uo"]
