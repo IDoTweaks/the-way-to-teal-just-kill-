@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://ctoceg007wby5"]
 
+[ext_resource type="Material" path="res://shaders/toonOutline.tres" id="90_out"]
 [ext_resource type="Script" uid="uid://d34tfk8i4ub6t" path="res://Scripts/xenon.gd" id="1_71j8v"]
-[ext_resource type="Shader" uid="uid://bloi2q6drjuc1" path="res://Scripts/enemy.gdshader" id="2_qdbhb"]
+[ext_resource type="Shader" path="res://shaders/toonEnemy.gdshader" id="2_qdbhb"]
 [ext_resource type="Script" uid="uid://4gxcy6cx0q1m" path="res://Scripts/meshInstanceBody.gd" id="3_2kqh0"]
 [ext_resource type="PackedScene" uid="uid://bh1l15fos7vvv" path="res://Models/tylized-poison-serpent-staff-game-ready/source/model.glb" id="4_qdbhb"]
 [ext_resource type="PackedScene" path="res://ObjectScenes/enemyMarker.tscn" id="5_mark"]
@@ -9,16 +10,19 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nv1fp"]
 render_priority = 0
 shader = ExtResource("2_qdbhb")
-shader_parameter/base_color = Color(0, 0.36, 0.13, 1)
-shader_parameter/fill_color = Color(0, 1, 0.27, 1)
+shader_parameter/base_color = Color(0.35, 1, 0.86, 1)
+shader_parameter/fill_color = Color(0.16, 0.86, 0.32, 1)
 shader_parameter/fill_percent = 0.0
 shader_parameter/min_y = -0.9
 shader_parameter/max_y = 0.9
+next_pass = ExtResource("90_out")
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_d7swv"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_58yt4"]
-albedo_color = Color(0.17641911, 0.17641908, 0.17641908, 1)
+shading_mode = 0
+albedo_color = Color(0.08, 0.42, 0.3, 1)
+next_pass = ExtResource("90_out")
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_bbfly"]
 

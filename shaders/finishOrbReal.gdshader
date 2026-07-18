@@ -58,6 +58,8 @@ void fragment() {
     float combined_noise = mix(n1, n2, 0.5);
     float bands = sin((local_pos.y + combined_noise * distort_strength * 8.0) * band_count + t * 1.3);
     bands = bands * 0.5 + 0.5;
+	bands = floor(bands * 4.0) / 3.0;
+	bands = clamp(bands, 0.0, 1.0);
     float core_mix = smoothstep(0.2, 0.55, bands) * smoothstep(0.0, 0.4, combined_noise + 0.3);
     vec4 base = mix(core_color, mid_color, core_mix);
     float wisp_mask = smoothstep(0.55, 0.95, combined_noise) * smoothstep(0.3, 0.7, bands);

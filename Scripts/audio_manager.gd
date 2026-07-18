@@ -20,7 +20,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	for name in ["rifle", "shotgun", "enemy_hit", "enemy_death", "player_hurt",
 			"jump", "dash", "walljump", "slam", "footstep1", "footstep2",
-			"ui_hover", "ui_click", "win", "lose"]:
+			"ui_hover", "ui_click", "win", "lose", "boing"]:
 		_sfx[name] = load(SFX_DIR + name + ".wav")
 	for i in _poolSize:
 		var p := AudioStreamPlayer.new()
@@ -38,6 +38,36 @@ func _on_node_added(node : Node) -> void:
 	if node is BaseButton:
 		node.mouse_entered.connect(func(): play("ui_hover", 1.0, -7.0))
 		node.pressed.connect(func(): play("ui_click", 1.0, -3.0))
+		node.mouse_entered.connect(_juiceIn.bind(node))
+		node.mouse_exited.connect(_juiceOut.bind(node))
+		node.button_down.connect(_juiceSquash.bind(node))
+		node.button_up.connect(_juiceIn.bind(node))
+
+func _juicePivot(node : Control) -> void:
+	node.pivot_offset = node.size / 2.0
+
+func _juiceTo(node : Control, target : Vector2, time : float, trans : int, ease_t : int) -> void:
+	if not is_instance_valid(node) or node.disabled:
+		return
+	_juicePivot(node)
+	if node.has_meta("_juiceTw"):
+		var old = node.get_meta("_juiceTw")
+		if old != null and is_instance_valid(old):
+			old.kill()
+	var tw
+	tw = node.create_tween()
+	tw.set_trans(trans).set_ease(ease_t)
+	tw.tween_property(node, "scale", target, time)
+	node.set_meta("_juiceTw", tw)
+
+func _juiceIn(node : Control) -> void:
+	_juiceTo(node, Vector2(1.09, 1.09), 0.22, Tween.TRANS_ELASTIC, Tween.EASE_OUT)
+
+func _juiceOut(node : Control) -> void:
+	_juiceTo(node, Vector2.ONE, 0.18, Tween.TRANS_BACK, Tween.EASE_OUT)
+
+func _juiceSquash(node : Control) -> void:
+	_juiceTo(node, Vector2(0.93, 0.86), 0.07, Tween.TRANS_QUAD, Tween.EASE_OUT)
 
 func play(name : String, pitch : float = 1.0, vol_db : float = 0.0) -> void:
 	var stream = _sfx.get(name)

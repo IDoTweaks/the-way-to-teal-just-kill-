@@ -2,9 +2,10 @@ extends CanvasLayer
 
 signal done
 
-const TEAL = Color(0, 1, .85)
-const RED = Color(1, .15, .3)
-const BLUE = Color(.2, .5, 1)
+const TEAL = Color(0, .85, .78)
+const RED = Color(1, .35, .35)
+const BLUE = Color(.24, .6, 1)
+const INK = Color(.03, .13, .15)
 
 @export var barHeight : float = 110.0
 @export var holdTime : float = 1.9
@@ -31,7 +32,7 @@ var nameBlue : Label
 var subLbl : Label
 var skipLbl : Label
 
-var font = preload("res://Fonts/Orbitron.tres")
+var font = preload("res://Fonts/LilitaOne.tres")
 var titleShader = preload("res://shaders/bossTitle.gdshader")
 var nameFont : FontVariation
 var subFont : FontVariation
@@ -95,14 +96,14 @@ func _build() -> void:
 	root.add_child(band)
 
 	topBar = ColorRect.new()
-	topBar.color = Color(0, 0, 0, 1)
+	topBar.color = INK
 	topBar.set_anchors_preset(Control.PRESET_TOP_WIDE)
 	topBar.offset_bottom = 0.0
 	topBar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(topBar)
 
 	botBar = ColorRect.new()
-	botBar.color = Color(0, 0, 0, 1)
+	botBar.color = INK
 	botBar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	botBar.offset_top = 0.0
 	botBar.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -119,7 +120,7 @@ func _build() -> void:
 	nameMain = _makeName(TEAL)
 
 	line = ColorRect.new()
-	line.color = TEAL
+	line.color = Color(0, .85, .78)
 	line.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	line.size = Vector2(0, 3)
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -127,10 +128,10 @@ func _build() -> void:
 
 	subLbl = Label.new()
 	subLbl.add_theme_font_override("font", subFont)
-	subLbl.add_theme_font_size_override("font_size", 22)
-	subLbl.add_theme_color_override("font_color", Color(.75, .95, .92))
-	subLbl.add_theme_color_override("font_outline_color", Color(0, 0, 0))
-	subLbl.add_theme_constant_override("outline_size", 6)
+	subLbl.add_theme_font_size_override("font_size", 30)
+	subLbl.add_theme_color_override("font_color", Color(.35, 1, .86))
+	subLbl.add_theme_color_override("font_outline_color", INK)
+	subLbl.add_theme_constant_override("outline_size", 9)
 	subLbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	subLbl.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	subLbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -139,10 +140,10 @@ func _build() -> void:
 
 	skipLbl = Label.new()
 	skipLbl.add_theme_font_override("font", font)
-	skipLbl.add_theme_font_size_override("font_size", 14)
-	skipLbl.add_theme_color_override("font_color", Color(.6, .7, .7))
-	skipLbl.add_theme_color_override("font_outline_color", Color(0, 0, 0))
-	skipLbl.add_theme_constant_override("outline_size", 5)
+	skipLbl.add_theme_font_size_override("font_size", 20)
+	skipLbl.add_theme_color_override("font_color", Color(.6, .84, .82))
+	skipLbl.add_theme_color_override("font_outline_color", INK)
+	skipLbl.add_theme_constant_override("outline_size", 6)
 	skipLbl.text = "PRESS ANY KEY TO SKIP"
 	skipLbl.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	skipLbl.offset_left = -260
@@ -157,13 +158,13 @@ func _build() -> void:
 func _makeName(col : Color) -> Label:
 	var l = Label.new()
 	l.add_theme_font_override("font", nameFont)
-	l.add_theme_font_size_override("font_size", 104)
+	l.add_theme_font_size_override("font_size", 118)
 	l.add_theme_color_override("font_color", col)
-	l.add_theme_color_override("font_outline_color", Color(0, 0, 0))
-	l.add_theme_constant_override("outline_size", 12)
-	l.add_theme_color_override("font_shadow_color", Color(0, 0, 0, .85))
-	l.add_theme_constant_override("shadow_offset_x", 5)
-	l.add_theme_constant_override("shadow_offset_y", 6)
+	l.add_theme_color_override("font_outline_color", INK)
+	l.add_theme_constant_override("outline_size", 34)
+	l.add_theme_color_override("font_shadow_color", Color(.03, .13, .15, .9))
+	l.add_theme_constant_override("shadow_offset_x", 0)
+	l.add_theme_constant_override("shadow_offset_y", 10)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE

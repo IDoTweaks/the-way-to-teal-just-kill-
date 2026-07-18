@@ -89,7 +89,7 @@ offset_right = 150.0
 offset_bottom = -200.0
 theme_override_colors/font_color = Color(0.82, 0.93, 1, 1)
 theme_override_colors/font_outline_color = Color(0.02, 0.05, 0.12, 1)
-theme_override_font_sizes/font_size = 48
+theme_type_variation = &"H1"
 
 [node name="MenuButtons" parent="Node3D/Player/GameOver/MainContainer" parent_id_path=PackedInt32Array(659499291, 1252809543) index="1" unique_id=1438979862]
 offset_left = -100.0
@@ -99,16 +99,16 @@ offset_bottom = 120.0
 
 [node name="retry" parent="Node3D/Player/GameOver/MainContainer/MenuButtons" index="0" unique_id=79681632]
 custom_minimum_size = Vector2(0, 0)
-theme_override_font_sizes/font_size = 18
+theme_type_variation = &"SmallBtn"
 text = "RETRY
 "
 
 [node name="SettingsBtn" parent="Node3D/Player/GameOver/MainContainer/MenuButtons" index="2" unique_id=1682905405]
-theme_override_font_sizes/font_size = 18
+theme_type_variation = &"SmallBtn"
 
 [node name="QuitBtn" parent="Node3D/Player/GameOver/MainContainer/MenuButtons" index="3" unique_id=206990400]
 custom_minimum_size = Vector2(0, 0)
-theme_override_font_sizes/font_size = 18
+theme_type_variation = &"SmallBtn"
 
 [node name="gun" parent="Node3D/Player/playerCam" parent_id_path=PackedInt32Array(659499291, 1441979209) index="5" unique_id=1487719564]
 transform = Transform3D(-0.088497795, 0.012279481, 0.010833219, 0.013905769, 0.08779762, 0.014079109, -0.0086471755, 0.015517939, -0.0882294, 0.388, -0.31, -0.652)

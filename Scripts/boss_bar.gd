@@ -1,8 +1,9 @@
 extends CanvasLayer
 
-const PURPLE = Color(0.62, 0.25, 1.0)
-const RAGE = Color(0.9, 0.25, 0.3)
-const TEAL = Color(0.0, 0.85, 0.72)
+const PURPLE = Color(0.0, 0.85, 0.78)
+const RAGE = Color(1.0, 0.35, 0.35)
+const TEAL = Color(0.35, 1.0, 0.86)
+const INK = Color(0.03, 0.13, 0.15)
 
 var bar : ProgressBar
 var label : Label
@@ -30,25 +31,32 @@ func _build() -> void:
 	box.offset_top = 22
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_theme_constant_override("separation", 5)
+	box.theme = load("res://UI/funkyTheme.tres")
 	root.add_child(box)
 
 	label = Label.new()
 	label.text = bossName
-	label.add_theme_font_size_override("font_size", 20)
+	label.theme_type_variation = "H2"
 	label.add_theme_color_override("font_color", PURPLE)
+	label.add_theme_color_override("font_outline_color", INK)
+	label.add_theme_constant_override("outline_size", 12)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(label)
 
 	var back = StyleBoxFlat.new()
-	back.bg_color = Color(0.05, 0.05, 0.06, 0.9)
-	back.border_color = PURPLE
-	back.set_border_width_all(2)
+	back.bg_color = INK
+	back.border_color = INK
+	back.set_border_width_all(5)
+	back.set_corner_radius_all(16)
+	back.corner_detail = 10
 
 	fill = StyleBoxFlat.new()
 	fill.bg_color = PURPLE
+	fill.set_corner_radius_all(12)
+	fill.corner_detail = 10
 
 	bar = ProgressBar.new()
-	bar.custom_minimum_size = Vector2(0, 16)
+	bar.custom_minimum_size = Vector2(0, 30)
 	bar.show_percentage = false
 	bar.max_value = 1.0
 	bar.value = 1.0

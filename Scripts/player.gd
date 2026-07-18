@@ -114,6 +114,7 @@ var slideCount := 0
 var wallJumpCount := 0
 var slamCount := 0
 var shotCount := 0
+var orbCount := 0
 
 func _setAbilities(j, d, s, w, sl, sh):
 	abJump = j
@@ -195,10 +196,10 @@ func _buildStaminaHud():
 	var y := 206.0
 	var cap = Label.new()
 	cap.text = "STAMINA"
-	cap.add_theme_font_size_override("font_size", 24)
+	cap.add_theme_font_size_override("font_size", 26)
 	cap.add_theme_color_override("font_color", STAMINA_ORANGE)
-	cap.add_theme_color_override("font_outline_color", Color(0, 0, 0))
-	cap.add_theme_constant_override("outline_size", 6)
+	cap.add_theme_color_override("font_outline_color", Color(0.03, 0.13, 0.15))
+	cap.add_theme_constant_override("outline_size", 8)
 	cap.position = Vector2(x0, y - 36)
 	cap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ui.add_child(cap)
@@ -224,10 +225,10 @@ func _buildStaminaHud():
 	_staminaMsg = Label.new()
 	_staminaMsg.text = "OUT OF STAMINA"
 	_staminaMsg.set_anchors_preset(Control.PRESET_CENTER)
-	_staminaMsg.add_theme_font_size_override("font_size", 34)
+	_staminaMsg.add_theme_font_size_override("font_size", 40)
 	_staminaMsg.add_theme_color_override("font_color", STAMINA_ORANGE)
-	_staminaMsg.add_theme_color_override("font_outline_color", Color(0, 0, 0))
-	_staminaMsg.add_theme_constant_override("outline_size", 8)
+	_staminaMsg.add_theme_color_override("font_outline_color", Color(0.03, 0.13, 0.15))
+	_staminaMsg.add_theme_constant_override("outline_size", 14)
 	_staminaMsg.position = Vector2(-120, 90)
 	_staminaMsg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_staminaMsg.modulate = Color(1, 1, 1, 0)
@@ -343,6 +344,8 @@ var sniperCdTimer : float = 0.0
 @export var hipfireSpread : float = 7.0
 @export var scopedFov : float = 28.0
 var scoped : bool = false
+var scopeHeld : bool = false
+var slideHeld : bool = false
 var fovTween : Tween
 const SNIPER_REST_POS = Vector3(0.50524026, -0.12744474, -1.0080254)
 const GUN_REST_POS = Vector3(0.388, -0.31, -0.652)
@@ -357,6 +360,7 @@ var _tracerPool : Array[Node3D] = []
 var _tracerLife : Array[float] = []
 var _tracerLen : Array[float] = []
 var _tracerIdx : int = 0
+var _toonPost : MeshInstance3D
 const TRACER_POOL_SIZE = 24
 const TRACER_LIFE = 0.085
 var currentGun : int = 0
@@ -463,7 +467,13 @@ func _tweenFov(target):
 	fovTween.tween_property(playerCam, "fov", target, 0.16).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 func _updateSniperView():
-	var wantScope = currentGun == 2 and Input.is_action_pressed("scope")
+	if Global.toggleScope and Input.is_action_just_pressed("scope"):
+		scopeHeld = not scopeHeld
+	elif not Global.toggleScope:
+		scopeHeld = Input.is_action_pressed("scope")
+	if currentGun != 2:
+		scopeHeld = false
+	var wantScope = currentGun == 2 and scopeHeld
 	if wantScope != scoped:
 		scoped = wantScope
 		scopeOverlay.visible = scoped
@@ -518,6 +528,9 @@ func _finishLevel():
 	var displayScore = finalScore
 	var lvl = Global.currentLevel
 	var prevBest = Global._bestTime(lvl)
+	var prevScore = Global._ghostScore(lvl)
+	var newBestTime = prevBest < 0.0 or time < prevBest
+	var newBestScore = displayScore > prevScore
 	Global._completeLevel(lvl)
 	Global._recordTime(lvl, time)
 	Global._localSave()
@@ -526,6 +539,7 @@ func _finishLevel():
 	levelEnd._setScore(displayScore)
 	levelEnd._setGrade(grade)
 	levelEnd._setTime(time, parTime, prevBest)
+	levelEnd._setRecords(newBestTime, newBestScore)
 	levelEnd._setLevel(lvl)
 	levelEnd.visible = true
 
@@ -764,6 +778,23 @@ func _applyForce(point :Vector3,force , maxRange:float = 10, lockInput : bool = 
 		knockbackTimer = KNOCKBACK_LOCK_TIME
 
 
+func _buildToonPost():
+	if not Global.toonOutlines:
+		return
+	var quad = MeshInstance3D.new()
+	var m = QuadMesh.new()
+	m.size = Vector2(2, 2)
+	quad.mesh = m
+	var mat = ShaderMaterial.new()
+	mat.shader = load("res://shaders/toonPost.gdshader")
+	mat.render_priority = 127
+	quad.material_override = mat
+	quad.extra_cull_margin = 16384.0
+	quad.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	playerCam.add_child(quad)
+	quad.position = Vector3(0, 0, -0.5)
+	_toonPost = quad
+
 func _buildTracerPool():
 	var coreMesh = CylinderMesh.new()
 	coreMesh.top_radius = 0.016
@@ -897,6 +928,7 @@ func _ready() -> void:
 	_laser_beam_mat.emission = Color(0, 0.95, 0.85)
 	_laser_beam_mat.emission_energy_multiplier = 8.0
 	_buildTracerPool.call_deferred()
+	_buildToonPost()
 	muzzleParticles = shootingParticles.instantiate()
 	muzzleParticles.finished.disconnect(Callable(muzzleParticles, "_on_finished"))
 	gunParticleSpawn.add_child(muzzleParticles)
@@ -960,7 +992,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		var sens = Global.scopedSens if scoped else Global.sensitivity
 		rotate_y(-event.relative.x * sens)
-		camPitch = clamp(camPitch - event.relative.y * sens, deg_to_rad(-90), deg_to_rad(90))
+		var pitchDir = 1.0 if Global.invertY else -1.0
+		camPitch = clamp(camPitch + pitchDir * event.relative.y * sens, deg_to_rad(-90), deg_to_rad(90))
 		
 	if Input.is_action_just_pressed("jump"):
 		jumpBuffer = JUMP_BUFFER_TIME
@@ -1030,7 +1063,14 @@ func _physics_process(delta: float) -> void:
 	
 	_paraChip(delta)
 	if knockbackTimer <= 0:
-		slide = Input.is_action_pressed("slide") and _canSlide() and stamina > 0
+		if Global.toggleSlide:
+			if Input.is_action_just_pressed("slide"):
+				slideHeld = not slideHeld
+			if stamina <= 0 or not _canSlide():
+				slideHeld = false
+		else:
+			slideHeld = Input.is_action_pressed("slide")
+		slide = slideHeld and _canSlide() and stamina > 0
 		if slide and not wasSliding:
 			if is_on_floor():
 				animaPlayer.play("slide"); slideCount += 1
@@ -1314,7 +1354,9 @@ func _buildJuiceHud():
 	_hitMark = Label.new()
 	_hitMark.text = "X"
 	_hitMark.set_anchors_preset(Control.PRESET_CENTER)
-	_hitMark.add_theme_font_size_override("font_size", 26)
+	_hitMark.add_theme_font_size_override("font_size", 30)
+	_hitMark.add_theme_color_override("font_outline_color", Color(0.03, 0.13, 0.15))
+	_hitMark.add_theme_constant_override("outline_size", 10)
 	_hitMark.position = Vector2(-9, -18)
 	_hitMark.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hitMark.modulate = Color(1, 1, 1, 0)
@@ -1326,7 +1368,9 @@ func _buildJuiceHud():
 	hud.add_child(_hitDir)
 	_hitArrow = Label.new()
 	_hitArrow.text = "^"
-	_hitArrow.add_theme_font_size_override("font_size", 40)
+	_hitArrow.add_theme_font_size_override("font_size", 44)
+	_hitArrow.add_theme_color_override("font_outline_color", Color(0.03, 0.13, 0.15))
+	_hitArrow.add_theme_constant_override("outline_size", 12)
 	_hitArrow.add_theme_color_override("font_color", Color(1, 0.2, 0.2))
 	_hitArrow.position = Vector2(-12, -140)
 	_hitDir.add_child(_hitArrow)

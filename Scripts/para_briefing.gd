@@ -2,10 +2,10 @@ extends CanvasLayer
 
 func _paraBriefing(): pass
 
-const PURPLE = Color(0.62, 0.25, 1.0)
-const TEXT = Color(0.86, 0.86, 0.88)
-const DIM = Color(0.55, 0.55, 0.58)
-const DANGER = Color(0.9, 0.25, 0.3)
+const PURPLE = Color(0.35, 1.0, 0.86)
+const TEXT = Color(1.0, 0.99, 0.94)
+const DIM = Color(0.6, 0.84, 0.82)
+const DANGER = Color(1.0, 0.42, 0.38)
 
 const LEVELS = [
 	["1", "dash goes flat, half strength"],
@@ -41,13 +41,16 @@ func _build() -> void:
 
 	var center = CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.theme = load("res://UI/funkyTheme.tres")
 	add_child(center)
 
 	var frame = PanelContainer.new()
 	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0.04, 0.04, 0.05, 1)
+	style.bg_color = Color(0.06, 0.19, 0.22, 1)
 	style.border_color = PURPLE
-	style.set_border_width_all(2)
+	style.set_border_width_all(6)
+	style.set_corner_radius_all(28)
+	style.corner_detail = 12
 	style.set_content_margin_all(28)
 	frame.add_theme_stylebox_override("panel", style)
 	center.add_child(frame)
@@ -58,13 +61,13 @@ func _build() -> void:
 
 	var title = Label.new()
 	title.text = "PARALYSIS"
-	title.add_theme_font_size_override("font_size", 36)
+	title.add_theme_font_size_override("font_size", 44)
 	title.add_theme_color_override("font_color", PURPLE)
 	box.add_child(title)
 
 	var sub = Label.new()
 	sub.text = "every hit from the snake adds a level. it does not wear off."
-	sub.add_theme_font_size_override("font_size", 15)
+	sub.add_theme_font_size_override("font_size", 20)
 	sub.add_theme_color_override("font_color", DIM)
 	box.add_child(sub)
 
@@ -77,7 +80,7 @@ func _build() -> void:
 
 	var cure = Label.new()
 	cure.text = "a cure drop takes a level off. it costs health."
-	cure.add_theme_font_size_override("font_size", 15)
+	cure.add_theme_font_size_override("font_size", 20)
 	cure.add_theme_color_override("font_color", DIM)
 	box.add_child(cure)
 
@@ -87,7 +90,7 @@ func _build() -> void:
 	btn.text = "READ IT"
 	btn.disabled = true
 	btn.custom_minimum_size = Vector2(0, 40)
-	btn.add_theme_font_size_override("font_size", 18)
+	btn.add_theme_font_size_override("font_size", 24)
 	box.add_child(btn)
 	btn.pressed.connect(_dismiss)
 
@@ -104,7 +107,7 @@ func _row(num : String, effect : String) -> Control:
 	var lvl = Label.new()
 	lvl.text = num
 	lvl.custom_minimum_size = Vector2(34, 0)
-	lvl.add_theme_font_size_override("font_size", 18)
+	lvl.add_theme_font_size_override("font_size", 24)
 	lvl.add_theme_color_override("font_color", DANGER if last else PURPLE)
 	lvl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	row.add_child(lvl)
@@ -112,7 +115,7 @@ func _row(num : String, effect : String) -> Control:
 	var txt = Label.new()
 	txt.text = effect
 	txt.custom_minimum_size = Vector2(400, 0)
-	txt.add_theme_font_size_override("font_size", 18)
+	txt.add_theme_font_size_override("font_size", 24)
 	txt.add_theme_color_override("font_color", DANGER if last else TEXT)
 	row.add_child(txt)
 	return row

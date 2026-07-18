@@ -27,6 +27,10 @@ func _ready() -> void:
 		brief.set_script(briefingScript)
 		add_child(brief)
 
+func _unhandled_input(event: InputEvent) -> void:
+	if Input.is_action_just_pressed("restart"):
+		Global._restartCurrent()
+
 func _makeBounds():
 	if floor == null or floor.size() == 0 or player == null:
 		return

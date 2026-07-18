@@ -20,7 +20,9 @@ func _on_jump_area_body_entered(body: Node3D) -> void:
 
 func _launch(body: Node3D) -> void:
 	onCd = true
-	Audio.play("jump", 1.25, -4.0)
+	if "orbCount" in body:
+		body.orbCount += 1
+	Audio.play("boing", 1.0, -4.0)
 	var burst = pickupParticles.instantiate()
 	get_parent().add_child(burst)
 	burst.global_position = global_position

@@ -6,6 +6,8 @@ uniform vec3 primary_color : source_color = vec3(1.0);
 uniform vec3 secondary_color : source_color = vec3(1.0, 0.8, 0.4);
 uniform float emission = 2.0;
 uniform float emission_mult = 1.0;
+uniform int cel_bands : hint_range(2, 6) = 3;
+uniform float core_cut : hint_range(0.0, 1.0) = 0.62;
 
 group_uniforms Shape;
 uniform bool alpha_as_factor = false;
@@ -66,7 +68,12 @@ void fragment() {
 	float r_edge = mix(1.0, edge_position + 0.01, edge_hardness);
 	value = smoothstep(l_edge,r_edge,value);
 	
-	ALBEDO = (mix(secondary_color, primary_color, value) * COLOR.rgb) * emission * COLOR.a * emission_mult;
-	
-	ALPHA = value;
+	// flat stepped bands + a hard white-hot core = painted, not glowy
+	float banded = floor(value * float(cel_bands)) / float(cel_bands - 1);
+	banded = clamp(banded, 0.0, 1.0);
+	vec3 col = mix(secondary_color, primary_color, banded);
+	col = mix(col, vec3(1.0), step(core_cut, value) * 0.55);
+	ALBEDO = (col * COLOR.rgb) * emission * COLOR.a * emission_mult;
+
+	ALPHA = step(0.08, value) * banded;
 }

@@ -1,17 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://bbr7awrcekmkp"]
+[gd_scene load_steps=3 format=3 uid="uid://bbr7awrcekmkp"]
 
 [ext_resource type="Script" path="res://Scripts/settings_menu.gd" id="1_set"]
 
-
 [ext_resource type="Theme" uid="uid://bfunkytheme01" path="res://UI/funkyTheme.tres" id="4_theme"]
-
-[sub_resource type="StyleBoxFlat" id="Panel_sb"]
-bg_color = Color(0.012, 0.018, 0.022, 0.96)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0, 0.85, 0.78, 1)
 
 [node name="SettingsMenu" type="Control"]
 layout_mode = 3
@@ -20,6 +11,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("4_theme")
 script = ExtResource("1_set")
 
 [node name="Dim" type="ColorRect" parent="."]
@@ -29,76 +21,59 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.02, 0.03, 0.04, 0.92)
+color = Color(0.043, 0.129, 0.149, 0.98)
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="Root" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 90
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 90
+theme_override_constants/margin_bottom = 40
 
-[node name="Panel" type="PanelContainer" parent="Center"]
-custom_minimum_size = Vector2(600, 760)
+[node name="VBox" type="VBoxContainer" parent="Root"]
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_styles/panel = SubResource("Panel_sb")
+theme_override_constants/separation = 14
 
-[node name="Margin" type="MarginContainer" parent="Center/Panel"]
+[node name="TitleLabel" type="Label" parent="Root/VBox"]
 layout_mode = 2
-theme_override_constants/margin_left = 38
-theme_override_constants/margin_top = 26
-theme_override_constants/margin_right = 38
-theme_override_constants/margin_bottom = 26
-
-[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin"]
-layout_mode = 2
-theme = ExtResource("4_theme")
-theme_override_constants/separation = 10
-
-[node name="TitleLabel" type="Label" parent="Center/Panel/Margin/VBox"]
-custom_minimum_size = Vector2(0, 58)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
-theme_override_colors/font_outline_color = Color(0, 0.5, 0.46, 1)
-theme_override_constants/outline_size = 0
-theme_override_font_sizes/font_size = 48
+theme_type_variation = &"Display"
 text = "SETTINGS"
-vertical_alignment = 1
+horizontal_alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="Center/Panel/Margin/VBox"]
+[node name="Tabs" type="HBoxContainer" parent="Root/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="HSepTop" type="HSeparator" parent="Root/VBox"]
 layout_mode = 2
 
-[node name="Scroll" type="ScrollContainer" parent="Center/Panel/Margin/VBox"]
+[node name="Pages" type="PanelContainer" parent="Root/VBox"]
 layout_mode = 2
-size_flags_horizontal = 3
 size_flags_vertical = 3
-follow_focus = true
-horizontal_scroll_mode = 0
 
-[node name="List" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Scroll"]
-custom_minimum_size = Vector2(480, 0)
+[node name="PageAudio" type="ScrollContainer" parent="Root/VBox/Pages"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+follow_focus = true
+
+[node name="List" type="VBoxContainer" parent="Root/VBox/Pages/PageAudio"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 14
 
-[node name="AudioHeader" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="VolLabel" type="Label" parent="Root/VBox/Pages/PageAudio/List"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 20
-text = "— AUDIO —"
-
-[node name="VolLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
-theme_override_font_sizes/font_size = 26
+theme_type_variation = &"H2"
 text = "MASTER VOLUME"
 
-[node name="VolumeSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
-modulate = Color(0.3, 0.95, 0.95, 1)
-custom_minimum_size = Vector2(0, 26)
+[node name="VolumeSlider" type="HSlider" parent="Root/VBox/Pages/PageAudio/List"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 scrollable = false
 min_value = 0.0
@@ -106,15 +81,13 @@ max_value = 1.0
 step = 0.01
 value = 1.0
 
-[node name="MusicLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="MusicLabel" type="Label" parent="Root/VBox/Pages/PageAudio/List"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
-theme_override_font_sizes/font_size = 26
+theme_type_variation = &"H2"
 text = "MUSIC"
 
-[node name="MusicSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
-modulate = Color(0.3, 0.95, 0.95, 1)
-custom_minimum_size = Vector2(0, 26)
+[node name="MusicSlider" type="HSlider" parent="Root/VBox/Pages/PageAudio/List"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 scrollable = false
 min_value = 0.0
@@ -122,15 +95,13 @@ max_value = 1.0
 step = 0.01
 value = 1.0
 
-[node name="SfxLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="SfxLabel" type="Label" parent="Root/VBox/Pages/PageAudio/List"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
-theme_override_font_sizes/font_size = 26
+theme_type_variation = &"H2"
 text = "SFX"
 
-[node name="SfxSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
-modulate = Color(0.3, 0.95, 0.95, 1)
-custom_minimum_size = Vector2(0, 26)
+[node name="SfxSlider" type="HSlider" parent="Root/VBox/Pages/PageAudio/List"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 scrollable = false
 min_value = 0.0
@@ -138,24 +109,24 @@ max_value = 1.0
 step = 0.01
 value = 1.0
 
-[node name="HSeparatorA" type="HSeparator" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="PageDisplay" type="ScrollContainer" parent="Root/VBox/Pages"]
 layout_mode = 2
+horizontal_scroll_mode = 0
+follow_focus = true
 
-[node name="DisplayHeader" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="List" type="VBoxContainer" parent="Root/VBox/Pages/PageDisplay"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 20
-text = "— DISPLAY —"
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
 
-[node name="DispLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="DispLabel" type="Label" parent="Root/VBox/Pages/PageDisplay/List"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
-theme_override_font_sizes/font_size = 26
+theme_type_variation = &"H2"
 text = "DISPLAY MODE"
 
-[node name="DisplayOption" type="OptionButton" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="DisplayOption" type="OptionButton" parent="Root/VBox/Pages/PageDisplay/List"]
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
 selected = 1
 item_count = 3
 popup/item_0/text = "WINDOWED"
@@ -165,26 +136,23 @@ popup/item_1/id = 1
 popup/item_2/text = "FULLSCREEN"
 popup/item_2/id = 2
 
-[node name="ResLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="ResLabel" type="Label" parent="Root/VBox/Pages/PageDisplay/List"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
-theme_override_font_sizes/font_size = 26
+theme_type_variation = &"H2"
 text = "RESOLUTION"
 
-[node name="ResOption" type="OptionButton" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="ResOption" type="OptionButton" parent="Root/VBox/Pages/PageDisplay/List"]
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
 disabled = true
 
-[node name="FovLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="FovLabel" type="Label" parent="Root/VBox/Pages/PageDisplay/List"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
-theme_override_font_sizes/font_size = 26
+theme_type_variation = &"H2"
 text = "FIELD OF VIEW"
 
-[node name="FovSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
-modulate = Color(0.3, 0.95, 0.95, 1)
-custom_minimum_size = Vector2(0, 26)
+[node name="FovSlider" type="HSlider" parent="Root/VBox/Pages/PageDisplay/List"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 scrollable = false
 min_value = 60.0
@@ -192,15 +160,13 @@ max_value = 110.0
 step = 1.0
 value = 75.0
 
-[node name="ShakeLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="ShakeLabel" type="Label" parent="Root/VBox/Pages/PageDisplay/List"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
-theme_override_font_sizes/font_size = 26
+theme_type_variation = &"H2"
 text = "SCREEN SHAKE"
 
-[node name="ShakeSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
-modulate = Color(0.3, 0.95, 0.95, 1)
-custom_minimum_size = Vector2(0, 26)
+[node name="ShakeSlider" type="HSlider" parent="Root/VBox/Pages/PageDisplay/List"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 scrollable = false
 min_value = 0.0
@@ -208,29 +174,27 @@ max_value = 1.0
 step = 0.05
 value = 1.0
 
-[node name="FlashCheck" type="CheckButton" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="FlashCheck" type="CheckButton" parent="Root/VBox/Pages/PageDisplay/List"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
 text = "REDUCED FLASH"
 
-[node name="HSeparator3" type="HSeparator" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="PageGraphics" type="ScrollContainer" parent="Root/VBox/Pages"]
 layout_mode = 2
+horizontal_scroll_mode = 0
+follow_focus = true
 
-[node name="GraphicsHeader" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="List" type="VBoxContainer" parent="Root/VBox/Pages/PageGraphics"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 20
-text = "— GRAPHICS —"
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
 
-[node name="QualityLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="QualityLabel" type="Label" parent="Root/VBox/Pages/PageGraphics/List"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
-theme_override_font_sizes/font_size = 26
-text = "RENDER SCALE  (lower = faster)"
+theme_type_variation = &"H2"
+text = "RENDER SCALE   (lower = faster)"
 
-[node name="ScaleSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
-modulate = Color(0.3, 0.95, 0.95, 1)
-custom_minimum_size = Vector2(0, 26)
+[node name="ScaleSlider" type="HSlider" parent="Root/VBox/Pages/PageGraphics/List"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 scrollable = false
 min_value = 0.5
@@ -238,15 +202,13 @@ max_value = 1.0
 step = 0.05
 value = 1.0
 
-[node name="DecalLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="DecalLabel" type="Label" parent="Root/VBox/Pages/PageGraphics/List"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
-theme_override_font_sizes/font_size = 26
+theme_type_variation = &"H2"
 text = "DECAL DENSITY"
 
-[node name="DecalSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
-modulate = Color(0.3, 0.95, 0.95, 1)
-custom_minimum_size = Vector2(0, 26)
+[node name="DecalSlider" type="HSlider" parent="Root/VBox/Pages/PageGraphics/List"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 scrollable = false
 min_value = 0.0
@@ -254,41 +216,46 @@ max_value = 1.0
 step = 0.1
 value = 1.0
 
-[node name="FpsLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="FpsLabel" type="Label" parent="Root/VBox/Pages/PageGraphics/List"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
-theme_override_font_sizes/font_size = 26
+theme_type_variation = &"H2"
 text = "FPS CAP"
 
-[node name="FpsOption" type="OptionButton" parent="Center/Panel/Margin/VBox/Scroll/List"]
-custom_minimum_size = Vector2(0, 48)
+[node name="FpsOption" type="OptionButton" parent="Root/VBox/Pages/PageGraphics/List"]
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
 
-[node name="GlowCheck" type="CheckButton" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="GlowCheck" type="CheckButton" parent="Root/VBox/Pages/PageGraphics/List"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
-button_pressed = true
 text = "GLOW"
 
-[node name="HSeparatorB" type="HSeparator" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="ToonCheck" type="CheckButton" parent="Root/VBox/Pages/PageGraphics/List"]
 layout_mode = 2
+text = "TOON OUTLINES  (experimental)"
 
-[node name="ControlsHeader" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="ToonHint" type="Label" parent="Root/VBox/Pages/PageGraphics/List"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 20
-text = "— CONTROLS —"
+theme_type_variation = &"Micro"
+autowrap_mode = 2
+text = "screen-space ink outlines on the world. experimental - takes effect on the next level load, and needs the Forward+ renderer"
 
-[node name="SensLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="PageControls" type="ScrollContainer" parent="Root/VBox/Pages"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
-theme_override_font_sizes/font_size = 26
+horizontal_scroll_mode = 0
+follow_focus = true
+
+[node name="List" type="VBoxContainer" parent="Root/VBox/Pages/PageControls"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="SensLabel" type="Label" parent="Root/VBox/Pages/PageControls/List"]
+layout_mode = 2
+theme_type_variation = &"H2"
 text = "SENSITIVITY"
 
-[node name="SensSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
-modulate = Color(0.3, 0.95, 0.95, 1)
-custom_minimum_size = Vector2(0, 26)
+[node name="SensSlider" type="HSlider" parent="Root/VBox/Pages/PageControls/List"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 scrollable = false
 min_value = 0.0005
@@ -296,15 +263,13 @@ max_value = 0.02
 step = 0.0005
 value = 0.005
 
-[node name="ScopeSensLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+[node name="ScopeSensLabel" type="Label" parent="Root/VBox/Pages/PageControls/List"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
-theme_override_font_sizes/font_size = 26
+theme_type_variation = &"H2"
 text = "SCOPED SENSITIVITY"
 
-[node name="ScopeSensSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
-modulate = Color(0.3, 0.95, 0.95, 1)
-custom_minimum_size = Vector2(0, 26)
+[node name="ScopeSensSlider" type="HSlider" parent="Root/VBox/Pages/PageControls/List"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 scrollable = false
 min_value = 0.0005
@@ -312,19 +277,91 @@ max_value = 0.02
 step = 0.0005
 value = 0.0022
 
-[node name="HSeparator2" type="HSeparator" parent="Center/Panel/Margin/VBox"]
+[node name="InvertCheck" type="CheckButton" parent="Root/VBox/Pages/PageControls/List"]
+layout_mode = 2
+text = "INVERT Y"
+
+[node name="ScopeToggleCheck" type="CheckButton" parent="Root/VBox/Pages/PageControls/List"]
+layout_mode = 2
+text = "TOGGLE SCOPE"
+
+[node name="SlideToggleCheck" type="CheckButton" parent="Root/VBox/Pages/PageControls/List"]
+layout_mode = 2
+text = "TOGGLE SLIDE"
+
+[node name="PageKeybinds" type="ScrollContainer" parent="Root/VBox/Pages"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+follow_focus = true
+
+[node name="List" type="VBoxContainer" parent="Root/VBox/Pages/PageKeybinds"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="BindsHint" type="Label" parent="Root/VBox/Pages/PageKeybinds/List"]
+layout_mode = 2
+theme_type_variation = &"Small"
+text = "click a bind, then press a key   (ESC cancels)"
+
+[node name="BindList" type="VBoxContainer" parent="Root/VBox/Pages/PageKeybinds/List"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ResetBindsBtn" type="Button" parent="Root/VBox/Pages/PageKeybinds/List"]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_type_variation = &"SmallBtn"
+text = "RESET KEYBINDS"
+
+[node name="PageGame" type="ScrollContainer" parent="Root/VBox/Pages"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+follow_focus = true
+
+[node name="List" type="VBoxContainer" parent="Root/VBox/Pages/PageGame"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="GhostCheck" type="CheckButton" parent="Root/VBox/Pages/PageGame/List"]
+layout_mode = 2
+text = "SHOW GHOST"
+
+[node name="GhostHint" type="Label" parent="Root/VBox/Pages/PageGame/List"]
+layout_mode = 2
+theme_type_variation = &"Small"
+text = "the ghost replays your best run for this level - race it"
+
+[node name="HSepBot" type="HSeparator" parent="Root/VBox"]
 layout_mode = 2
 
-[node name="ResetBtn" type="Button" parent="Center/Panel/Margin/VBox"]
-custom_minimum_size = Vector2(0, 52)
+[node name="Footer" type="HBoxContainer" parent="Root/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "RESET TO DEFAULT"
-alignment = 0
+theme_override_constants/separation = 16
 
-[node name="BackBtn" type="Button" parent="Center/Panel/Margin/VBox"]
-custom_minimum_size = Vector2(0, 52)
+[node name="DirtyLabel" type="Label" parent="Root/VBox/Footer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_type_variation = &"Small"
+text = ""
+vertical_alignment = 1
+
+[node name="ResetBtn" type="Button" parent="Root/VBox/Footer"]
+custom_minimum_size = Vector2(300, 66)
+layout_mode = 2
+theme_type_variation = &"BigBtn"
+text = "DEFAULTS"
+
+[node name="SaveBtn" type="Button" parent="Root/VBox/Footer"]
+custom_minimum_size = Vector2(240, 66)
+layout_mode = 2
+theme_type_variation = &"BigBtn"
+text = "SAVE"
+
+[node name="BackBtn" type="Button" parent="Root/VBox/Footer"]
+custom_minimum_size = Vector2(240, 66)
+layout_mode = 2
+theme_type_variation = &"BigBtn"
 text = "◀ BACK"
-alignment = 0

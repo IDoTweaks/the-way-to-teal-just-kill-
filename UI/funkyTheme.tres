@@ -1,45 +1,339 @@
 [gd_resource type="Theme" format=3 uid="uid://bfunkytheme01"]
 
+[ext_resource type="FontVariation" path="res://Fonts/LilitaOne.tres" id="1_font"]
+
+[sub_resource type="StyleBoxFlat" id="disabled"]
+content_margin_left = 34.0
+content_margin_top = 16.0
+content_margin_right = 34.0
+content_margin_bottom = 20.0
+bg_color = Color(0.24, 0.32, 0.33, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.06, 0.13, 0.14, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+corner_detail = 12
+shadow_color = Color(0.03, 0.13, 0.15, 1)
+shadow_offset = Vector2(0, 5)
+anti_aliasing_size = 0.4
+
 [sub_resource type="StyleBoxFlat" id="hover"]
-content_margin_left = 30.0
-content_margin_top = 14.0
-content_margin_right = 22.0
-content_margin_bottom = 14.0
-bg_color = Color(0, 0.85, 0.78, 1)
-border_width_left = 3
-border_color = Color(0.9, 1, 0.98, 1)
+content_margin_left = 34.0
+content_margin_top = 13.0
+content_margin_right = 34.0
+content_margin_bottom = 23.0
+bg_color = Color(0.35, 1, 0.86, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.03, 0.13, 0.15, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+corner_detail = 12
+shadow_color = Color(0.03, 0.13, 0.15, 1)
+shadow_offset = Vector2(0, 10)
+anti_aliasing_size = 0.4
 
 [sub_resource type="StyleBoxFlat" id="normal"]
-content_margin_left = 30.0
-content_margin_top = 14.0
-content_margin_right = 22.0
-content_margin_bottom = 14.0
-bg_color = Color(0.015, 0.02, 0.025, 0.94)
-border_width_left = 3
-border_color = Color(0, 0.85, 0.78, 1)
+content_margin_left = 34.0
+content_margin_top = 16.0
+content_margin_right = 34.0
+content_margin_bottom = 20.0
+bg_color = Color(0.05, 0.78, 0.72, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.03, 0.13, 0.15, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+corner_detail = 12
+shadow_color = Color(0.03, 0.13, 0.15, 1)
+shadow_offset = Vector2(0, 7)
+anti_aliasing_size = 0.4
 
 [sub_resource type="StyleBoxFlat" id="pressed"]
-content_margin_left = 30.0
-content_margin_top = 14.0
-content_margin_right = 22.0
-content_margin_bottom = 14.0
-bg_color = Color(0.92, 1, 0.98, 1)
+content_margin_left = 34.0
+content_margin_top = 21.0
+content_margin_right = 34.0
+content_margin_bottom = 15.0
+bg_color = Color(0.79, 1, 0.96, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.03, 0.13, 0.15, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+corner_detail = 12
+shadow_color = Color(0.03, 0.13, 0.15, 1)
+shadow_offset = Vector2(0, 2)
+anti_aliasing_size = 0.4
+
+[sub_resource type="StyleBoxFlat" id="scroll_grab"]
+bg_color = Color(0.05, 0.78, 0.72, 1)
 border_width_left = 3
-border_color = Color(0, 0.85, 0.78, 1)
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.03, 0.13, 0.15, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="scroll_grab_hl"]
+bg_color = Color(0.35, 1, 0.86, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.03, 0.13, 0.15, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="scroll_bg"]
+bg_color = Color(0.03, 0.13, 0.15, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxLine" id="sep_line"]
+color = Color(0.05, 0.78, 0.72, 0.5)
+thickness = 4
+
+[sub_resource type="StyleBoxFlat" id="grabber"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.79, 1, 0.96, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.03, 0.13, 0.15, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+corner_detail = 12
+
+[sub_resource type="StyleBoxFlat" id="slider_fill"]
+content_margin_top = 9.0
+content_margin_bottom = 9.0
+bg_color = Color(0, 0.85, 0.78, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.03, 0.13, 0.15, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 10
+
+[sub_resource type="StyleBoxFlat" id="grabber_hl"]
+content_margin_left = 14.0
+content_margin_top = 14.0
+content_margin_right = 14.0
+content_margin_bottom = 14.0
+bg_color = Color(0.35, 1, 0.86, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.03, 0.13, 0.15, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+corner_detail = 12
+
+[sub_resource type="StyleBoxFlat" id="slider_track"]
+content_margin_top = 9.0
+content_margin_bottom = 9.0
+bg_color = Color(0.03, 0.13, 0.15, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 10
+
+[sub_resource type="StyleBoxFlat" id="panel_bg"]
+content_margin_left = 34.0
+content_margin_top = 30.0
+content_margin_right = 34.0
+content_margin_bottom = 30.0
+bg_color = Color(0.06, 0.19, 0.22, 0.98)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0.03, 0.13, 0.15, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+corner_detail = 14
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 10
+shadow_offset = Vector2(0, 10)
+anti_aliasing_size = 0.4
+
+[sub_resource type="StyleBoxFlat" id="item_hover"]
+bg_color = Color(0.05, 0.78, 0.72, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="popup_bg"]
+content_margin_left = 14.0
+content_margin_top = 14.0
+content_margin_right = 14.0
+content_margin_bottom = 14.0
+bg_color = Color(0.06, 0.19, 0.22, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.03, 0.13, 0.15, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+corner_detail = 12
 
 [resource]
-Button/colors/font_color = Color(0.92, 1, 0.99, 1)
-Button/colors/font_focus_color = Color(0.92, 1, 0.99, 1)
-Button/colors/font_hover_color = Color(0.01, 0.04, 0.04, 1)
-Button/colors/font_pressed_color = Color(0.01, 0.04, 0.04, 1)
+default_font = ExtResource("1_font")
+default_font_size = 26
+Accent/base_type = &"Label"
+Accent/colors/font_color = Color(0.35, 1, 0.86, 1)
+Accent/colors/font_outline_color = Color(0.03, 0.13, 0.15, 1)
+Accent/constants/outline_size = 7
+Accent/font_sizes/font_size = 26
+BigBtn/base_type = &"Button"
+BigBtn/font_sizes/font_size = 32
+Button/colors/font_color = Color(1, 0.99, 0.94, 1)
+Button/colors/font_disabled_color = Color(0.5, 0.58, 0.58, 1)
+Button/colors/font_focus_color = Color(0.03, 0.13, 0.15, 1)
+Button/colors/font_hover_color = Color(0.03, 0.13, 0.15, 1)
+Button/colors/font_outline_color = Color(0.03, 0.13, 0.15, 1)
+Button/colors/font_pressed_color = Color(0.03, 0.13, 0.15, 1)
+Button/constants/outline_size = 8
+Button/font_sizes/font_size = 26
+Button/styles/disabled = SubResource("disabled")
 Button/styles/focus = SubResource("hover")
 Button/styles/hover = SubResource("hover")
 Button/styles/normal = SubResource("normal")
 Button/styles/pressed = SubResource("pressed")
-OptionButton/colors/font_color = Color(0.92, 1, 0.99, 1)
-OptionButton/colors/font_hover_color = Color(0.01, 0.04, 0.04, 1)
-OptionButton/colors/font_pressed_color = Color(0.01, 0.04, 0.04, 1)
+CheckBox/colors/font_color = Color(1, 0.99, 0.94, 1)
+CheckBox/colors/font_hover_color = Color(0.35, 1, 0.86, 1)
+CheckBox/colors/font_outline_color = Color(0.03, 0.13, 0.15, 1)
+CheckBox/constants/outline_size = 8
+CheckBox/font_sizes/font_size = 26
+CheckButton/colors/font_color = Color(1, 0.99, 0.94, 1)
+CheckButton/colors/font_hover_color = Color(0.35, 1, 0.86, 1)
+CheckButton/colors/font_outline_color = Color(0.03, 0.13, 0.15, 1)
+CheckButton/constants/outline_size = 8
+CheckButton/font_sizes/font_size = 26
+Danger/base_type = &"Label"
+Danger/colors/font_color = Color(1, 0.42, 0.38, 1)
+Danger/colors/font_outline_color = Color(0.03, 0.13, 0.15, 1)
+Danger/constants/outline_size = 7
+Danger/font_sizes/font_size = 26
+Display/base_type = &"Label"
+Display/colors/font_color = Color(1, 0.99, 0.94, 1)
+Display/colors/font_outline_color = Color(0.03, 0.13, 0.15, 1)
+Display/constants/outline_size = 16
+Display/font_sizes/font_size = 68
+H1/base_type = &"Label"
+H1/colors/font_color = Color(0.79, 1, 0.96, 1)
+H1/colors/font_outline_color = Color(0.03, 0.13, 0.15, 1)
+H1/constants/outline_size = 12
+H1/font_sizes/font_size = 44
+H2/base_type = &"Label"
+H2/colors/font_color = Color(0.35, 1, 0.86, 1)
+H2/colors/font_outline_color = Color(0.03, 0.13, 0.15, 1)
+H2/constants/outline_size = 9
+H2/font_sizes/font_size = 30
+HScrollBar/styles/grabber = SubResource("scroll_grab")
+HScrollBar/styles/grabber_highlight = SubResource("scroll_grab_hl")
+HScrollBar/styles/grabber_pressed = SubResource("scroll_grab_hl")
+HScrollBar/styles/scroll = SubResource("scroll_bg")
+HSeparator/constants/separation = 10
+HSeparator/styles/separator = SubResource("sep_line")
+HSlider/styles/grabber = SubResource("grabber")
+HSlider/styles/grabber_area = SubResource("slider_fill")
+HSlider/styles/grabber_area_highlight = SubResource("slider_fill")
+HSlider/styles/grabber_highlight = SubResource("grabber_hl")
+HSlider/styles/slider = SubResource("slider_track")
+Hero/base_type = &"Label"
+Hero/colors/font_color = Color(0.35, 1, 0.86, 1)
+Hero/colors/font_outline_color = Color(0.03, 0.13, 0.15, 1)
+Hero/constants/outline_size = 26
+Hero/font_sizes/font_size = 180
+Label/colors/font_color = Color(1, 0.99, 0.94, 1)
+Label/colors/font_outline_color = Color(0.03, 0.13, 0.15, 1)
+Label/constants/outline_size = 8
+Label/font_sizes/font_size = 26
+MenuBtn/base_type = &"Button"
+MenuBtn/font_sizes/font_size = 44
+Micro/base_type = &"Label"
+Micro/colors/font_color = Color(0.6, 0.84, 0.82, 1)
+Micro/colors/font_outline_color = Color(0.03, 0.13, 0.15, 1)
+Micro/constants/outline_size = 5
+Micro/font_sizes/font_size = 16
+OptionButton/colors/font_color = Color(1, 0.99, 0.94, 1)
+OptionButton/colors/font_disabled_color = Color(0.5, 0.58, 0.58, 1)
+OptionButton/colors/font_focus_color = Color(0.03, 0.13, 0.15, 1)
+OptionButton/colors/font_hover_color = Color(0.03, 0.13, 0.15, 1)
+OptionButton/colors/font_outline_color = Color(0.03, 0.13, 0.15, 1)
+OptionButton/colors/font_pressed_color = Color(0.03, 0.13, 0.15, 1)
+OptionButton/constants/outline_size = 8
+OptionButton/font_sizes/font_size = 26
+OptionButton/styles/disabled = SubResource("disabled")
 OptionButton/styles/focus = SubResource("hover")
 OptionButton/styles/hover = SubResource("hover")
 OptionButton/styles/normal = SubResource("normal")
 OptionButton/styles/pressed = SubResource("pressed")
+Panel/styles/panel = SubResource("panel_bg")
+PanelContainer/styles/panel = SubResource("panel_bg")
+PopupMenu/colors/font_color = Color(1, 0.99, 0.94, 1)
+PopupMenu/colors/font_hover_color = Color(0.03, 0.13, 0.15, 1)
+PopupMenu/font_sizes/font_size = 24
+PopupMenu/styles/hover = SubResource("item_hover")
+PopupMenu/styles/panel = SubResource("popup_bg")
+Small/base_type = &"Label"
+Small/colors/font_color = Color(0.6, 0.84, 0.82, 1)
+Small/colors/font_outline_color = Color(0.03, 0.13, 0.15, 1)
+Small/constants/outline_size = 6
+Small/font_sizes/font_size = 20
+SmallBtn/base_type = &"Button"
+SmallBtn/font_sizes/font_size = 20
+Title/base_type = &"Label"
+Title/colors/font_color = Color(1, 0.99, 0.94, 1)
+Title/colors/font_outline_color = Color(0.03, 0.13, 0.15, 1)
+Title/constants/outline_size = 22
+Title/font_sizes/font_size = 118
+VScrollBar/styles/grabber = SubResource("scroll_grab")
+VScrollBar/styles/grabber_highlight = SubResource("scroll_grab_hl")
+VScrollBar/styles/grabber_pressed = SubResource("scroll_grab_hl")
+VScrollBar/styles/scroll = SubResource("scroll_bg")

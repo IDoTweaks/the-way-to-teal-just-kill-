@@ -49,6 +49,7 @@ void vertex() {
 	VERTEX *= pulse;
 }
 void fragment() {
+	// cartoon: quantise the animated bands into flat steps
 	vec3 n = normalize(world_normal);
 	if(!FRONT_FACING){
 		n = -n;
@@ -64,6 +65,8 @@ void fragment() {
 	float combined_noise = mix(n1, n2, 0.5);
 	float bands = sin((local_pos.y * band_count) - rise + combined_noise * distort_strength * 8.0);
 	bands = bands * 0.5 + 0.5;
+	bands = floor(bands * 4.0) / 3.0;
+	bands = clamp(bands, 0.0, 1.0);
 	// --- upward chevrons wrapped around the whole sphere (spherical mapping) ---
 	vec3 dir = normalize(local_pos);
 	float lon = atan(dir.z, dir.x);                          // azimuth around Y, wraps seamlessly

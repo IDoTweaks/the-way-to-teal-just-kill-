@@ -9,6 +9,7 @@ var revealed = false
 var revealScale : float = 1.0
 @onready var scoreShow = $UI/MainContainer/ScoreShow
 @onready var timeShow = $UI/MainContainer/TimeShow
+@onready var recordShow = $UI/MainContainer/RecordShow
 @onready var nextBtn = $UI/MainContainer/MenuButtons/nextBtn
 @onready var gradeShow = $UI/MainContainer/gradeShow
 @onready var gradeFire = $UI/MainContainer/GradeFire
@@ -41,6 +42,24 @@ func _setTime(t : float, par : float, best : float):
 func _fmtTime(t : float) -> String:
 	var s = max(t, 0.0)
 	return "%d:%05.2f" % [int(s / 60.0), fmod(s, 60.0)]
+
+func _setRecords(bestTime : bool, bestScore : bool):
+	if not bestTime and not bestScore:
+		recordShow.visible = false
+		return
+	if bestTime and bestScore:
+		recordShow.text = "NEW RECORD!  TIME + SCORE"
+	elif bestTime:
+		recordShow.text = "NEW BEST TIME!"
+	else:
+		recordShow.text = "NEW BEST SCORE!"
+	recordShow.visible = true
+	recordShow.pivot_offset = recordShow.size / 2.0
+	recordShow.scale = Vector2(0.2, 0.2)
+	var tw = create_tween()
+	tw.set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(recordShow, "scale", Vector2.ONE, 0.7).set_delay(0.5)
+	tw.parallel().tween_callback(func(): Audio.play("win", 1.3, -4.0)).set_delay(0.5)
 
 func _setGrade(newGrade: String):
 	gradeShow.text = newGrade

@@ -1,5 +1,7 @@
 extends Node3D
 
+func _tutorial(): pass
+
 @onready var player = $Player
 @onready var objLabel = $TutorialHud/ObjectiveBox/Label
 
@@ -22,7 +24,7 @@ var _guide : Array[MeshInstance3D] = []
 var _guideT : float = 0.0
 const GUIDE_COUNT = 7
 const GUIDE_SPACING = 2.2
-const GATE_ORDER = ["GateMove", "GateJump", "GateSlide", "GateDash", "GateWJ", "GateSlam", "GateShoot", "GateShotgun", "GateSniper"]
+const GATE_ORDER = ["GateMove", "GateJump", "GateSlide", "GateDash", "GateWJ", "GateSlam", "GateShoot", "GateShotgun", "GateSniper", "GateOrb"]
 
 var _ghost : MeshInstance3D
 var _ghostTween : Tween
@@ -34,9 +36,10 @@ var _ghostPoints = {
 	"walljump":[Vector3(68.5, 1, 0), Vector3(70, 2.4, -1.2), Vector3(71.5, 3.6, 1.2), Vector3(73, 2, 0), Vector3(75, 1, 0)],
 	"slam":[Vector3(86, 1, 0), Vector3(86, 3.4, 0), Vector3(86, 0.5, 0)],
 	"shoot":[Vector3(99, 1, 0), Vector3(99, 1.2, 0)],
+	"orb":[Vector3(149, 1, 0), Vector3(152.2, 1.6, 0), Vector3(156, 5.4, 0), Vector3(160, 5.0, 0), Vector3(165, 1, 0)],
 }
-var _ghostSeg = {"move":1.2, "jump":0.38, "slide":0.9, "dash":0.28, "walljump":0.26, "slam":0.32, "shoot":0.1}
-var _ghostPause = {"move":0.15, "jump":0.5, "slide":0.5, "dash":0.7, "walljump":0.5, "slam":0.55, "shoot":0.05}
+var _ghostSeg = {"move":1.2, "jump":0.38, "slide":0.9, "dash":0.28, "walljump":0.26, "slam":0.32, "shoot":0.1, "orb":0.34}
+var _ghostPause = {"move":0.15, "jump":0.5, "slide":0.5, "dash":0.7, "walljump":0.5, "slam":0.55, "shoot":0.05, "orb":0.55}
 
 func _ready() -> void:
 	Global.currentLevel = 0
@@ -55,6 +58,7 @@ func _ready() -> void:
 		"Zone7": {"text":"SHOOT: LEFT MOUSE\nClear the enemies", "ab":[true,false,false,false,false,true], "guns":1, "gunLock":0, "gate":"GateShoot", "need":"kill", "enemies":["E7_1","E7_2"], "ghost":"shoot", "done":"The gate is open - move on"},
 		"Zone8": {"text":"SHOTGUN ONLY: it's the only weapon that'll work here\nGet close and blast them", "ab":[true,false,false,false,false,true], "guns":2, "gunLock":1, "gate":"GateShotgun", "need":"kill", "enemies":["E8_1","E8_2","E8_3"], "ghost":"shoot", "done":"BOOM.  Keep going"},
 		"Zone9": {"text":"SNIPER ONLY: hold RIGHT MOUSE to scope", "ab":[true,false,false,false,false,true], "guns":3, "gunLock":2, "gate":"GateSniper", "need":"kill", "enemies":["E9_1","E9_2"], "ghost":"shoot", "done":"BULLSEYE"},
+		"Zone11": {"text":"JUMP ORB: run into the glowing orb - it launches you\nUse it to clear the pit", "ab":[true,false,false,false,false,true], "guns":3, "gunLock":-1, "gate":"GateOrb", "need":"orb", "ghost":"orb", "done":"WHEEE!"},
 		"Zone10": {"text":"Everything is unlocked - grab the orb to finish!", "ab":[true,true,true,true,true,true], "guns":3, "gunLock":-1, "ghost":"", "done":""},
 	}
 	for z in phaseData.keys():
@@ -212,6 +216,7 @@ func _counterFor(kind):
 		"slide": return player.slideCount
 		"walljump": return player.wallJumpCount
 		"slam": return player.slamCount
+		"orb": return player.orbCount
 	return 0
 
 func _process(_delta):
@@ -273,6 +278,6 @@ func _openGate(gate):
 
 func _unhandled_input(event):
 	if Input.is_action_just_pressed("restart"):
-		Global._goToTutorial()
+		Global._restartCurrent()
 	if event is InputEventKey and event.pressed and event.keycode == KEY_BACKSPACE:
 		Global._finishTutorial()

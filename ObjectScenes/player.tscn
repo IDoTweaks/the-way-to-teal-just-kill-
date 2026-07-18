@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://bcugc3piu2xws"]
 
+[ext_resource type="Material" path="res://shaders/toonOutline.tres" id="90_out"]
+[ext_resource type="Shader" path="res://shaders/toon.gdshader" id="91_toon"]
 [ext_resource type="Script" uid="uid://ck51rj4rdst7j" path="res://Scripts/player.gd" id="1_m8bbn"]
 [ext_resource type="PackedScene" uid="uid://b62f64giqmj4h" path="res://Models/shotgun_low_poly.glb" id="2_e3k8h"]
 [ext_resource type="PackedScene" uid="uid://dnfrb64vva6ff" path="res://Models/scorpious9.glb" id="2_iixog"]
@@ -20,8 +22,15 @@
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_rt1b1"]
 gradient = SubResource("Gradient_gacgy")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m8bbn"]
-albedo_color = Color(0.21568628, 0.5686275, 1, 1)
+[sub_resource type="ShaderMaterial" id="StandardMaterial3D_m8bbn"]
+shader = ExtResource("91_toon")
+shader_parameter/base_color = Color(0.24, 0.6, 1, 1)
+shader_parameter/bands = 3
+shader_parameter/shade_strength = 0.55
+shader_parameter/shade_tint = Color(0.1, 0.25, 0.55, 1)
+shader_parameter/rim_amount = 0.5
+shader_parameter/rim_width = 3.0
+shader_parameter/rim_color = Color(0.7, 0.95, 1, 1)
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_8heul"]
 
@@ -29,8 +38,15 @@ albedo_color = Color(0.21568628, 0.5686275, 1, 1)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_m8bbn"]
 
-[sub_resource type="ORMMaterial3D" id="ORMMaterial3D_iixog"]
-albedo_color = Color(0.28669193, 0.50101376, 1, 1)
+[sub_resource type="ShaderMaterial" id="ORMMaterial3D_iixog"]
+shader = ExtResource("91_toon")
+shader_parameter/base_color = Color(0.3, 0.55, 1, 1)
+shader_parameter/bands = 3
+shader_parameter/shade_strength = 0.5
+shader_parameter/shade_tint = Color(0.12, 0.28, 0.6, 1)
+shader_parameter/rim_amount = 0.45
+shader_parameter/rim_width = 3.0
+shader_parameter/rim_color = Color(0.75, 0.95, 1, 1)
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_ramtr"]
 
@@ -803,7 +819,7 @@ theme_override_colors/font_color = Color(0, 0.9, 0.82, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
 theme_override_colors/font_outline_color = Color(0, 0.12, 0.11, 1)
 theme_override_constants/outline_size = 34
-theme_override_font_sizes/font_size = 80
+theme_type_variation = &"Display"
 text = "YOU FUCKING DIED
 GAME OVER"
 horizontal_alignment = 1
@@ -829,9 +845,7 @@ theme_override_constants/separation = 16
 z_index = 7
 custom_minimum_size = Vector2(300, 58)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
-theme_override_colors/font_hover_color = Color(0.01, 0.04, 0.04, 1)
-theme_override_font_sizes/font_size = 28
+theme_type_variation = &"H2"
 text = "RETRY"
 
 [node name="VSeparator" type="VSeparator" parent="GameOver/MainContainer/MenuButtons" unique_id=1002454785]
@@ -841,17 +855,14 @@ layout_mode = 2
 [node name="SettingsBtn" type="Button" parent="GameOver/MainContainer/MenuButtons" unique_id=1682905405]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
-theme_override_font_sizes/font_size = 28
+theme_type_variation = &"H2"
 text = "SETTINGS"
 
 [node name="QuitBtn" type="Button" parent="GameOver/MainContainer/MenuButtons" unique_id=206990400]
 z_index = 7
 custom_minimum_size = Vector2(300, 58)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
-theme_override_colors/font_hover_color = Color(0.01, 0.04, 0.04, 1)
-theme_override_font_sizes/font_size = 28
+theme_type_variation = &"H2"
 text = "QUIT"
 
 [node name="TextureRect" type="TextureRect" parent="GameOver" unique_id=859501969]
@@ -990,6 +1001,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="timer" type="Label" parent="HUD" unique_id=1972703702]
+theme = ExtResource("13_theme")
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -998,23 +1010,22 @@ offset_top = 8.0
 offset_right = 142.0
 offset_bottom = 76.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
 theme_override_colors/font_outline_color = Color(0, 0.12, 0.11, 1)
 theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 48
+theme_type_variation = &"H1"
 text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="enemyCounter" type="Label" parent="HUD" unique_id=771400001]
+theme = ExtResource("13_theme")
 offset_left = 32.0
 offset_top = 26.0
 offset_right = 460.0
 offset_bottom = 78.0
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
 theme_override_colors/font_outline_color = Color(0, 0.08, 0.07, 1)
 theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 32
+theme_type_variation = &"H2"
 text = "ENEMIES 0"
 vertical_alignment = 1
 
@@ -1031,6 +1042,7 @@ grow_vertical = 0
 mouse_filter = 2
 
 [node name="StyleMeterUI" type="Control" parent="HUD" unique_id=999111111]
+theme = ExtResource("13_theme")
 layout_mode = 3
 anchors_preset = 3
 anchor_left = 1.0
@@ -1045,6 +1057,7 @@ grow_horizontal = 0
 grow_vertical = 0
 
 [node name="WeaponIndicator" type="VBoxContainer" parent="HUD" unique_id=771500001]
+theme = ExtResource("13_theme")
 anchors_preset = 6
 anchor_left = 1.0
 anchor_top = 0.5
@@ -1072,7 +1085,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-theme_override_font_sizes/font_size = 28
+theme_type_variation = &"H2"
 text = "1 RIFLE"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -1089,7 +1102,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-theme_override_font_sizes/font_size = 28
+theme_type_variation = &"H2"
 text = "2 SHOTGUN"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -1106,7 +1119,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-theme_override_font_sizes/font_size = 28
+theme_type_variation = &"H2"
 text = "3 SNIPER"
 horizontal_alignment = 1
 vertical_alignment = 1

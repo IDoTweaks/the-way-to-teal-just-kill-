@@ -14,7 +14,7 @@ shader_parameter/fade_end = 30.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_asja6"]
 next_pass = SubResource("ShaderMaterial_brudt")
-albedo_color = Color(0, 1, 0, 1)
+albedo_color = Color(0.16, 0.86, 0.32, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_head"]
 size = Vector3(1, 1, 1)
@@ -25,10 +25,10 @@ size = Vector3(0.8, 0.8, 0.8)
 [sub_resource type="BoxMesh" id="BoxMesh_1ha6j"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_brudt"]
-albedo_color = Color(0, 0, 0, 1)
+albedo_color = Color(0.03, 0.13, 0.15, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wdflr"]
-albedo_color = Color(0, 1, 0.6039216, 1)
+albedo_color = Color(0.35, 1, 0.86, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_wdflr"]
 render_priority = 0

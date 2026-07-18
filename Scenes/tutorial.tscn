@@ -5,12 +5,25 @@
 [ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="3_fin"]
 [ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="4_pause"]
 [ext_resource type="PackedScene" uid="uid://dh8322144axab" path="res://ObjectScenes/walker.tscn" id="5_walk"]
-[ext_resource type="FontVariation" path="res://Fonts/Orbitron.tres" id="6_orb"]
+[ext_resource type="FontVariation" path="res://Fonts/LilitaOne.tres" id="6_orb"]
+[ext_resource type="PackedScene" uid="uid://du4s8p1pljnlb" path="res://ObjectScenes/jumpOrb.tscn" id="90_orb"]
+[ext_resource type="Theme" uid="uid://bfunkytheme01" path="res://UI/funkyTheme.tres" id="99_theme"]
 
 [sub_resource type="StandardMaterial3D" id="mat_level"]
+specular_mode = 1
 albedo_color = Color(0.16, 0.26, 0.18, 1)
 
+[sub_resource type="StandardMaterial3D" id="mat_hurdle"]
+specular_mode = 1
+albedo_color = Color(0.05, 0.5, 0.42, 1)
+emission_enabled = true
+emission = Color(0, 0.85, 0.78, 1)
+emission_energy_multiplier = 0.5
+
 [sub_resource type="Environment" id="env"]
+ambient_light_source = 3
+ambient_light_color = Color(0.55, 0.85, 0.8, 1)
+ambient_light_energy = 0.35
 tonemap_mode = 2
 glow_enabled = true
 glow_intensity = 0.5
@@ -19,17 +32,12 @@ fog_enabled = true
 fog_light_energy = 1.4
 fog_density = 0.003
 
-[sub_resource type="StandardMaterial3D" id="mat_hurdle"]
-albedo_color = Color(0.05, 0.5, 0.42, 1)
-emission_enabled = true
-emission = Color(0, 0.85, 0.78, 1)
-emission_energy_multiplier = 0.5
-
 [sub_resource type="BoxShape3D" id="gateShape"]
 size = Vector3(1, 11, 19)
 
 [sub_resource type="StandardMaterial3D" id="mat_gate"]
 transparency = 1
+specular_mode = 1
 albedo_color = Color(0, 0.85, 0.78, 0.35)
 emission_enabled = true
 emission = Color(0, 0.85, 0.78, 1)
@@ -63,23 +71,23 @@ use_collision = true
 collision_layer = 17
 
 [node name="Ceiling" type="CSGBox3D" parent="Level" unique_id=1779593218]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 85, 11.5, 0)
-size = Vector3(174, 1, 20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 94.817, 12.186729, -0.33215332)
+size = Vector3(195.21594, 1, 20)
 
 [node name="WallNegZ" type="CSGBox3D" parent="Level" unique_id=2017858454]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 85, 5.5, -10)
-size = Vector3(174, 12, 1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 92.87134, 5.5, -10)
+size = Vector3(189.74268, 12, 1)
 
 [node name="WallPosZ" type="CSGBox3D" parent="Level" unique_id=669657350]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 85, 5.5, 10)
-size = Vector3(174, 12, 1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 93.14496, 5.5, 10)
+size = Vector3(190.28992, 12, 1)
 
 [node name="WallBack" type="CSGBox3D" parent="Level" unique_id=765714562]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 5.5, 0)
 size = Vector3(1, 12, 20)
 
 [node name="WallFront" type="CSGBox3D" parent="Level" unique_id=752026309]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 172, 5.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 187.75224, 5.5, 0)
 size = Vector3(1, 12, 20)
 
 [node name="FloorA" type="CSGBox3D" parent="Level" unique_id=532395951]
@@ -95,8 +103,20 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54.25, -0.1, 0)
 size = Vector3(1.5, 1.6, 20)
 
 [node name="FloorB" type="CSGBox3D" parent="Level" unique_id=532395954]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 113.5, -0.5, 0)
-size = Vector3(117, 1, 20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 104, -0.5, 0)
+size = Vector3(98, 1, 20)
+
+[node name="OrbPit" type="CSGBox3D" parent="Level" unique_id=532395960]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 157.5, -1.4, 0)
+size = Vector3(11, 1, 20)
+
+[node name="OrbClimb" type="CSGBox3D" parent="Level" unique_id=532395961]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 162.2, -1.25, 0)
+size = Vector3(1.6, 1.6, 20)
+
+[node name="FloorC" type="CSGBox3D" parent="Level" unique_id=532395962]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 175.5, -0.5, 0)
+size = Vector3(25, 1, 20)
 
 [node name="Hurdle" type="CSGBox3D" parent="Level" unique_id=1450678896]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.4, 0)
@@ -285,8 +305,30 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 130, 4, 0)
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Zone9" unique_id=894158882]
 shape = SubResource("zoneShape")
 
-[node name="Zone10" type="Area3D" parent="." unique_id=894158891]
+[node name="GateOrb" type="StaticBody3D" parent="." unique_id=777303891]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 168, 5.5, 0)
+
+[node name="mesh" type="MeshInstance3D" parent="GateOrb" unique_id=777303892]
+material_override = SubResource("mat_gate")
+mesh = SubResource("gateMesh")
+
+[node name="col" type="CollisionShape3D" parent="GateOrb" unique_id=777303893]
+shape = SubResource("gateShape")
+
+[node name="TutorialOrb" parent="." unique_id=1342762599 instance=ExtResource("90_orb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 152.2, 1.6, 0)
+
+[node name="RescueOrb" parent="." unique_id=1342762600 instance=ExtResource("90_orb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 156.5, -0.1, 0)
+
+[node name="Zone11" type="Area3D" parent="." unique_id=894158901]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 149, 4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone11" unique_id=894158902]
+shape = SubResource("zoneShape")
+
+[node name="Zone10" type="Area3D" parent="." unique_id=894158891]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 171, 4, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Zone10" unique_id=894158892]
 shape = SubResource("zoneShape")
@@ -297,124 +339,124 @@ shape = SubResource("zoneShape")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3.4, 0)
 pixel_size = 0.011
 billboard = 1
-modulate = Color(0, 1, 0.85, 1)
-outline_modulate = Color(0, 0.1, 0.09, 1)
+modulate = Color(0.35, 1, 0.86, 1)
+outline_modulate = Color(0.03, 0.13, 0.15, 1)
 text = "MOVE  W A S D
 walk to the gate"
 font = ExtResource("6_orb")
 font_size = 72
-outline_size = 24
+outline_size = 26
 
 [node name="Sign_jump" type="Label3D" parent="Signs" unique_id=1500918102]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 3.4, 0)
 pixel_size = 0.011
 billboard = 1
-modulate = Color(0, 1, 0.85, 1)
-outline_modulate = Color(0, 0.1, 0.09, 1)
+modulate = Color(0.35, 1, 0.86, 1)
+outline_modulate = Color(0.03, 0.13, 0.15, 1)
 text = "JUMP  SPACE
 hop the barrier"
 font = ExtResource("6_orb")
 font_size = 72
-outline_size = 24
+outline_size = 26
 
 [node name="Sign_slide" type="Label3D" parent="Signs" unique_id=1500918103]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33, 3.4, 0)
 pixel_size = 0.011
 billboard = 1
-modulate = Color(0, 1, 0.85, 1)
-outline_modulate = Color(0, 0.1, 0.09, 1)
+modulate = Color(0.35, 1, 0.86, 1)
+outline_modulate = Color(0.03, 0.13, 0.15, 1)
 text = "SLIDE  hold CTRL
 keep your speed"
 font = ExtResource("6_orb")
 font_size = 68
-outline_size = 24
+outline_size = 26
 
 [node name="Sign_dash" type="Label3D" parent="Signs" unique_id=1500918104]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47, 3.4, 0)
 pixel_size = 0.011
 billboard = 1
-modulate = Color(0, 1, 0.85, 1)
-outline_modulate = Color(0, 0.1, 0.09, 1)
+modulate = Color(0.35, 1, 0.86, 1)
+outline_modulate = Color(0.03, 0.13, 0.15, 1)
 text = "DASH  SHIFT
 jump then dash the gap"
 font = ExtResource("6_orb")
 font_size = 64
-outline_size = 24
+outline_size = 26
 
 [node name="Sign_wj" type="Label3D" parent="Signs" unique_id=1500918105]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 67, 3.9, 0)
 pixel_size = 0.011
 billboard = 1
-modulate = Color(0, 1, 0.85, 1)
-outline_modulate = Color(0, 0.1, 0.09, 1)
+modulate = Color(0.35, 1, 0.86, 1)
+outline_modulate = Color(0.03, 0.13, 0.15, 1)
 text = "WALL-JUMP
 jump into a wall, jump again"
 font = ExtResource("6_orb")
 font_size = 58
-outline_size = 24
+outline_size = 26
 
 [node name="Sign_slam" type="Label3D" parent="Signs" unique_id=1500918106]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 83, 3.4, 0)
 pixel_size = 0.011
 billboard = 1
-modulate = Color(0, 1, 0.85, 1)
-outline_modulate = Color(0, 0.1, 0.09, 1)
+modulate = Color(0.35, 1, 0.86, 1)
+outline_modulate = Color(0.03, 0.13, 0.15, 1)
 text = "SLAM
 jump, then CTRL in the air"
 font = ExtResource("6_orb")
 font_size = 64
-outline_size = 24
+outline_size = 26
 
 [node name="Sign_shoot" type="Label3D" parent="Signs" unique_id=1500918107]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98, 3.4, 0)
 pixel_size = 0.011
 billboard = 1
-modulate = Color(0, 1, 0.85, 1)
-outline_modulate = Color(0, 0.1, 0.09, 1)
+modulate = Color(0.35, 1, 0.86, 1)
+outline_modulate = Color(0.03, 0.13, 0.15, 1)
 text = "SHOOT  LEFT MOUSE
 clear the enemies"
 font = ExtResource("6_orb")
 font_size = 68
-outline_size = 24
+outline_size = 26
 
 [node name="Sign_shotgun" type="Label3D" parent="Signs" unique_id=1500918108]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 115, 3.4, 0)
 pixel_size = 0.011
 billboard = 1
-modulate = Color(0, 1, 0.85, 1)
-outline_modulate = Color(0, 0.1, 0.09, 1)
+modulate = Color(0.35, 1, 0.86, 1)
+outline_modulate = Color(0.03, 0.13, 0.15, 1)
 text = "SHOTGUN  press 2 or scroll
 get close, then blast"
 font = ExtResource("6_orb")
 font_size = 60
-outline_size = 24
+outline_size = 26
 
 [node name="Sign_sniper" type="Label3D" parent="Signs" unique_id=1500918109]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 132, 3.4, 0)
 pixel_size = 0.011
 billboard = 1
-modulate = Color(0, 1, 0.85, 1)
-outline_modulate = Color(0, 0.1, 0.09, 1)
+modulate = Color(0.35, 1, 0.86, 1)
+outline_modulate = Color(0.03, 0.13, 0.15, 1)
 text = "SNIPER  press 3
 RIGHT MOUSE to scope"
 font = ExtResource("6_orb")
 font_size = 62
-outline_size = 24
+outline_size = 26
 
 [node name="SignExit" type="Label3D" parent="Signs" unique_id=1500918110]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 156, 3.6, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 178, 3.6, 0)
 pixel_size = 0.016
 billboard = 1
-modulate = Color(0, 1, 0.85, 1)
-outline_modulate = Color(0, 0.1, 0.09, 1)
+modulate = Color(0.35, 1, 0.86, 1)
+outline_modulate = Color(0.03, 0.13, 0.15, 1)
 text = "THE WAY TO TEAL
 touch the orb!"
 font = ExtResource("6_orb")
 font_size = 80
-outline_size = 26
+outline_size = 28
 
 [node name="FinishOrb" parent="." unique_id=1342762593 node_paths=PackedStringArray("player") instance=ExtResource("3_fin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 158, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 181, 2, 0)
 toLevel = 1
 tutorialExit = true
 player = NodePath("../Player")
@@ -436,6 +478,7 @@ offset_bottom = -108.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
+theme = ExtResource("99_theme")
 theme_override_styles/panel = SubResource("objBox")
 
 [node name="Label" type="Label" parent="TutorialHud/ObjectiveBox" unique_id=2014145455]
@@ -449,11 +492,9 @@ offset_right = -16.0
 offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
+theme_type_variation = &"H2"
 theme_override_colors/font_outline_color = Color(0, 0.1, 0.09, 1)
 theme_override_constants/outline_size = 6
-theme_override_fonts/font = ExtResource("6_orb")
-theme_override_font_sizes/font_size = 26
 text = "MOVE: W A S D"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -468,7 +509,6 @@ offset_top = -52.0
 offset_right = 540.0
 offset_bottom = -22.0
 grow_vertical = 0
-theme_override_colors/font_color = Color(0.5, 0.7, 0.68, 0.85)
-theme_override_fonts/font = ExtResource("6_orb")
-theme_override_font_sizes/font_size = 20
+theme = ExtResource("99_theme")
+theme_type_variation = &"Small"
 text = "BACKSPACE: skip tutorial      R: restart"

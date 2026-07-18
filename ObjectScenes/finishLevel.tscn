@@ -13,63 +13,6 @@ shader_parameter/ember = Color(0, 0.45, 0.42, 1)
 shader_parameter/flame = Color(0, 0.85, 0.7, 1)
 shader_parameter/hot = Color(0.55, 1, 0.92, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c24de"]
-resource_name = "blue_button_hover"
-content_margin_left = 22.0
-content_margin_top = 10.0
-content_margin_right = 22.0
-content_margin_bottom = 10.0
-bg_color = Color(0.07, 0.15, 0.28, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.25, 0.62, 1, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_juqyi"]
-resource_name = "blue_button_normal"
-content_margin_left = 22.0
-content_margin_top = 10.0
-content_margin_right = 22.0
-content_margin_bottom = 10.0
-bg_color = Color(0.04, 0.08, 0.16, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.12, 0.42, 0.82, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vlw2s"]
-resource_name = "blue_button_pressed"
-content_margin_left = 22.0
-content_margin_top = 10.0
-content_margin_right = 22.0
-content_margin_bottom = 10.0
-bg_color = Color(0.05, 0.1, 0.2, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.08, 0.88, 0.42, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="Theme" id="Theme_1"]
-Button/styles/focus = SubResource("StyleBoxFlat_c24de")
-Button/styles/hover = SubResource("StyleBoxFlat_c24de")
-Button/styles/normal = SubResource("StyleBoxFlat_juqyi")
-Button/styles/pressed = SubResource("StyleBoxFlat_vlw2s")
-
 [node name="levelEnd" type="Control" unique_id=421539132]
 layout_mode = 3
 anchors_preset = 15
@@ -77,6 +20,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("5_theme")
 script = ExtResource("1_c24de")
 
 [node name="Background" type="ColorRect" parent="." unique_id=170738047]
@@ -91,6 +35,7 @@ color = Color(0.02, 0.03, 0.04, 0.92)
 [node name="UI" type="CanvasLayer" parent="." unique_id=84086019]
 
 [node name="MainContainer" type="Control" parent="UI" unique_id=1117547620]
+theme = ExtResource("5_theme")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -99,16 +44,15 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Title" type="Label" parent="UI/MainContainer" unique_id=263088528]
+theme_type_variation = &"Display"
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_top = 70.0
 offset_bottom = 170.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0.18, 0.65, 1, 1)
 theme_override_colors/font_outline_color = Color(0.02, 0.06, 0.14, 0.9)
 theme_override_constants/outline_size = 0
-theme_override_font_sizes/font_size = 72
 text = "LEVEL CLEARED"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -122,14 +66,15 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -190.0
-offset_top = -140.0
+offset_top = -265.0
 offset_right = 190.0
-offset_bottom = 310.0
+offset_bottom = 30.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
 [node name="gradeCaption" type="Label" parent="UI/MainContainer" unique_id=771122335]
+theme_type_variation = &"H1"
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -137,20 +82,19 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -200.0
-offset_top = -260.0
+offset_top = -330.0
 offset_right = 200.0
-offset_bottom = -210.0
+offset_bottom = -268.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.05, 0.88, 0.42, 1)
 theme_override_colors/font_outline_color = Color(0.02, 0.06, 0.04, 0.9)
 theme_override_constants/outline_size = 0
-theme_override_font_sizes/font_size = 34
 text = "GRADE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="gradeShow" type="Label" parent="UI/MainContainer" unique_id=1169089017]
+theme_type_variation = &"Hero"
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -158,20 +102,19 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -200.0
-offset_top = -210.0
+offset_top = -255.0
 offset_right = 200.0
-offset_bottom = 110.0
+offset_bottom = 15.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.05, 0.88, 0.42, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 0
-theme_override_font_sizes/font_size = 200
 text = "S"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="ScoreShow" type="Label" parent="UI/MainContainer" unique_id=912895409]
+theme_type_variation = &"Display"
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -179,21 +122,20 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -300.0
-offset_top = 170.0
+offset_top = 40.0
 offset_right = 300.0
-offset_bottom = 320.0
+offset_bottom = 200.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.18, 0.65, 1, 1)
 theme_override_colors/font_outline_color = Color(0.02, 0.06, 0.14, 0.9)
 theme_override_constants/outline_size = 0
-theme_override_font_sizes/font_size = 56
 text = "SCORE
 0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="TimeShow" type="Label" parent="UI/MainContainer" unique_id=912895410]
+theme_type_variation = &"H2"
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -201,16 +143,33 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -300.0
-offset_top = 322.0
+offset_top = 215.0
 offset_right = 300.0
-offset_bottom = 366.0
+offset_bottom = 265.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
 theme_override_colors/font_outline_color = Color(0.02, 0.06, 0.14, 0.9)
 theme_override_constants/outline_size = 0
-theme_override_font_sizes/font_size = 28
 text = "TIME  0:00"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RecordShow" type="Label" parent="UI/MainContainer" unique_id=912895411]
+visible = false
+theme_type_variation = &"H1"
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = 278.0
+offset_right = 400.0
+offset_bottom = 343.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "NEW RECORD!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -227,32 +186,25 @@ offset_right = 380.0
 offset_bottom = -80.0
 grow_horizontal = 2
 grow_vertical = 0
-theme = ExtResource("5_theme")
 theme_override_constants/separation = 28
 alignment = 1
 
 [node name="nextBtn" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=771500001]
 custom_minimum_size = Vector2(210, 64)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.2, 1, 0.55, 1)
-theme_override_colors/font_hover_color = Color(0.5, 1, 0.8, 1)
-theme_override_font_sizes/font_size = 28
+theme_type_variation = &"BigBtn"
 text = "NEXT LEVEL"
 
 [node name="retry" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=1785955525]
 custom_minimum_size = Vector2(210, 64)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.85, 0.95, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 28
+theme_type_variation = &"BigBtn"
 text = "RETRY"
 
 [node name="QuitBtn" type="Button" parent="UI/MainContainer/MenuButtons" unique_id=523900938]
 custom_minimum_size = Vector2(210, 64)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.85, 0.95, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 28
+theme_type_variation = &"BigBtn"
 text = "QUIT"
 
 [connection signal="button_down" from="UI/MainContainer/MenuButtons/nextBtn" to="." method="_on_next_button_down"]

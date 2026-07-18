@@ -11,6 +11,7 @@ func _ready() -> void:
 	root.visible = false
 	settings.visible = false
 	$Root/Center/Buttons/ResumeBtn.pressed.connect(_resume)
+	$Root/Center/Buttons/RestartBtn.pressed.connect(_on_restart)
 	$Root/Center/Buttons/SettingsBtn.pressed.connect(_on_settings)
 	$Root/Center/Buttons/MenuBtn.pressed.connect(_on_menu)
 	$Root/Center/Buttons/QuitBtn.pressed.connect(_on_quit)
@@ -19,7 +20,9 @@ func _ready() -> void:
 func _input(event : InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		if isPaused and settings.visible:
-			_on_settings_closed()
+			if settings._listening != "":
+				return
+			settings._on_back_pressed()
 		elif isPaused:
 			_resume()
 		else:
@@ -34,6 +37,11 @@ func _pause() -> void:
 	buttons.visible = true
 	Audio.play("ui_click", 0.7, -4.0)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func _on_restart() -> void:
+	isPaused = false
+	get_tree().paused = false
+	Global._restartCurrent()
 
 func _resume() -> void:
 	isPaused = false

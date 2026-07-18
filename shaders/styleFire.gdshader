@@ -47,6 +47,8 @@ void fragment(){
 	float reach = fill * 1.15;          // how high the flames climb
 	float edge = reach - base + (n - 0.5) * 0.55;
 	float intensity = smoothstep(0.0, 0.22, edge);
+	intensity = floor(intensity * 3.0) / 2.0;
+	intensity = clamp(intensity, 0.0, 1.0);
 
 	// taper the sides so it reads as a tongue of fire, not a block
 	float sides = smoothstep(0.0, 0.18, uv.x) * smoothstep(1.0, 0.82, uv.x);
@@ -54,7 +56,7 @@ void fragment(){
 
 	// colour shifts from ember (bottom) to white-hot teal (top)
 	vec3 col = mix(ember.rgb, flame.rgb, smoothstep(0.0, 0.55, base));
-	col = mix(col, hot.rgb, smoothstep(0.5, 1.0, base + n * 0.2));
+	col = mix(col, hot.rgb, floor(smoothstep(0.5, 1.0, base + n * 0.2) * 3.0) / 2.0);
 	col *= 1.3 + intensity * 1.2;
 
 	COLOR = vec4(col, intensity * (0.55 + 0.45 * fill));

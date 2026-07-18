@@ -6,6 +6,7 @@ uniform float outline_thickness = 0.03;
 uniform float speed = 2.0;
 uniform float noise_scale = 4.0;
 uniform float alpha = 1.0;
+uniform int cel_bands : hint_range(2, 6) = 3;
 uniform sampler2D fire_noise : source_color, repeat_enable;
 uniform sampler2D color_ramp : source_color, repeat_enable, filter_linear_mipmap;
 
@@ -39,6 +40,9 @@ void fragment() {
     
     // Усиление контраста
     float ramp_pos = smoothstep(0.2, 0.8, combined_noise);
+    // flat stepped tongues instead of a smooth gradient
+    ramp_pos = floor(ramp_pos * float(cel_bands)) / float(cel_bands - 1);
+    ramp_pos = clamp(ramp_pos, 0.0, 1.0);
     vec3 fire_color = texture(color_ramp, vec2(ramp_pos, 0.0)).rgb;
     
     // Эффект "языков пламени"
@@ -46,7 +50,7 @@ void fragment() {
     fire_color *= 1.0 + flame_mask * 2.0;
     
     // Динамическая прозрачность с учетом нового параметра alpha
-    ALPHA = smoothstep(0.2, 0.8, combined_noise) * alpha; // <-- Умножаем на alpha
+    ALPHA = step(0.25, combined_noise) * alpha; // <-- Умножаем на alpha
     
     // Добавляем свечение с вариациями
     EMISSION = fire_color * (1.0 + sin(TIME * 10.0) * 0.3);

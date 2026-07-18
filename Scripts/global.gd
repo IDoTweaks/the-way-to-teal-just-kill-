@@ -27,6 +27,7 @@ var bossNames : Dictionary = {}
 var currentLevel = 1
 var maxUnlocked = 1
 var tutorialComplete := false
+var menuTourPending := false
 
 const GHOST_FILE = "user://ghosts.dat"
 const GHOST_VERSION = 1
@@ -58,6 +59,11 @@ var renderScale := 1.0
 var glowOn := true
 var decalDensity := 1.0
 var fpsCap := 0
+var invertY := false
+var toggleScope := false
+var toggleSlide := false
+var showGhost := true
+var toonOutlines := false
 
 const SETTINGS_RES : Array[Vector2i] = [
 	Vector2i(2560, 1440),
@@ -87,6 +93,12 @@ func _loadSettings():
 		glowOn = config.get_value("graphics", "glow", glowOn)
 		decalDensity = config.get_value("graphics", "decalDensity", decalDensity)
 		fpsCap = config.get_value("graphics", "fpsCap", fpsCap)
+		invertY = config.get_value("controls", "invertY", invertY)
+		toggleScope = config.get_value("controls", "toggleScope", toggleScope)
+		toggleSlide = config.get_value("controls", "toggleSlide", toggleSlide)
+		showGhost = config.get_value("gameplay", "showGhost", showGhost)
+		toonOutlines = config.get_value("graphics", "toonOutlines", toonOutlines)
+		keybinds = config.get_value("controls", "keybinds", keybinds)
 	_applySettings()
 
 func _saveSettings():
@@ -105,9 +117,15 @@ func _saveSettings():
 	config.set_value("graphics", "glow", glowOn)
 	config.set_value("graphics", "decalDensity", decalDensity)
 	config.set_value("graphics", "fpsCap", fpsCap)
+	config.set_value("controls", "invertY", invertY)
+	config.set_value("controls", "toggleScope", toggleScope)
+	config.set_value("controls", "toggleSlide", toggleSlide)
+	config.set_value("gameplay", "showGhost", showGhost)
+	config.set_value("graphics", "toonOutlines", toonOutlines)
+	config.set_value("controls", "keybinds", keybinds)
 	config.save("user://settings.cfg")
 
-func _resetDefaults():
+func _resetDefaultsNoSave():
 	masterVol = 1.0
 	musicVol = 1.0
 	sfxVol = 1.0
@@ -122,8 +140,16 @@ func _resetDefaults():
 	glowOn = true
 	decalDensity = 1.0
 	fpsCap = 0
+	invertY = false
+	toggleScope = false
+	toggleSlide = false
+	showGhost = true
+	toonOutlines = false
 	resIndex = 1
 	_applySettings()
+
+func _resetDefaults():
+	_resetDefaultsNoSave()
 	_saveSettings()
 
 func _applySettings():
@@ -132,6 +158,7 @@ func _applySettings():
 	_applyVol(2, sfxVol)
 	_applyDisplay()
 	_applyGraphics()
+	_applyKeybinds()
 
 func _applyGraphics():
 	Engine.max_fps = fpsCap
@@ -157,6 +184,113 @@ func _findEnvs(node : Node, out : Array = []) -> Array:
 	for c in node.get_children():
 		_findEnvs(c, out)
 	return out
+
+const REBINDABLE = {
+	"forward": "MOVE FORWARD", "backward": "MOVE BACK", "left": "MOVE LEFT", "right": "MOVE RIGHT",
+	"jump": "JUMP", "dash": "DASH", "slide": "SLIDE / SLAM", "shoot": "SHOOT", "scope": "SCOPE",
+	"gun1": "RIFLE", "gun2": "SHOTGUN", "gun3": "SNIPER", "restart": "RESTART LEVEL",
+}
+var keybinds : Dictionary = {}
+var _defaultBinds : Dictionary = {}
+
+func _captureDefaultBinds():
+	if not _defaultBinds.is_empty():
+		return
+	for action in REBINDABLE:
+		if InputMap.has_action(action):
+			_defaultBinds[action] = InputMap.action_get_events(action).duplicate()
+
+func _applyKeybinds():
+	_captureDefaultBinds()
+	for action in REBINDABLE:
+		if not InputMap.has_action(action):
+			continue
+		if not keybinds.has(action):
+			continue
+		InputMap.action_erase_events(action)
+		var ev = _eventFromDict(keybinds[action])
+		if ev != null:
+			InputMap.action_add_event(action, ev)
+
+func _rebind(action : String, event : InputEvent) -> bool:
+	if not InputMap.has_action(action):
+		return false
+	var d = _eventToDict(event)
+	if d.is_empty():
+		return false
+	# if another action already owns this input, SWAP rather than leaving it unbound
+	var oldEvents = InputMap.action_get_events(action)
+	var oldEvent = oldEvents[0] if oldEvents.size() > 0 else null
+	for other in REBINDABLE:
+		if other == action or not InputMap.has_action(other):
+			continue
+		var taken = false
+		for e in InputMap.action_get_events(other):
+			if _eventToDict(e) == d:
+				taken = true
+				break
+		if not taken:
+			continue
+		InputMap.action_erase_events(other)
+		if oldEvent != null:
+			InputMap.action_add_event(other, oldEvent)
+			keybinds[other] = _eventToDict(oldEvent)
+		else:
+			keybinds.erase(other)
+	keybinds[action] = d
+	InputMap.action_erase_events(action)
+	InputMap.action_add_event(action, event)
+	return true
+
+func _resetKeybinds(save : bool = true):
+	_captureDefaultBinds()
+	keybinds.clear()
+	for action in _defaultBinds:
+		InputMap.action_erase_events(action)
+		for ev in _defaultBinds[action]:
+			InputMap.action_add_event(action, ev)
+	if save:
+		_saveSettings()
+
+func _eventToDict(event : InputEvent) -> Dictionary:
+	if event is InputEventKey:
+		return {"t": "k", "c": event.physical_keycode if event.physical_keycode != 0 else event.keycode}
+	if event is InputEventMouseButton:
+		return {"t": "m", "c": event.button_index}
+	return {}
+
+func _eventFromDict(d) -> InputEvent:
+	if typeof(d) != TYPE_DICTIONARY:
+		return null
+	if d.get("t", "") == "k":
+		var k = InputEventKey.new()
+		k.physical_keycode = int(d.get("c", 0))
+		return k
+	if d.get("t", "") == "m":
+		var m = InputEventMouseButton.new()
+		m.button_index = int(d.get("c", 1))
+		return m
+	return null
+
+func _bindLabel(action : String) -> String:
+	if not InputMap.has_action(action):
+		return "-"
+	var evs = InputMap.action_get_events(action)
+	if evs.is_empty():
+		return "UNBOUND"
+	var e = evs[0]
+	if e is InputEventKey:
+		var code = e.physical_keycode if e.physical_keycode != 0 else e.keycode
+		return OS.get_keycode_string(code)
+	if e is InputEventMouseButton:
+		match e.button_index:
+			MOUSE_BUTTON_LEFT: return "MOUSE 1"
+			MOUSE_BUTTON_RIGHT: return "MOUSE 2"
+			MOUSE_BUTTON_MIDDLE: return "MOUSE 3"
+			MOUSE_BUTTON_WHEEL_UP: return "WHEEL UP"
+			MOUSE_BUTTON_WHEEL_DOWN: return "WHEEL DOWN"
+		return "MOUSE %d" % e.button_index
+	return "?"
 
 func _applyVol(bus : int, value : float):
 	AudioServer.set_bus_volume_db(bus, linear_to_db(max(value, 0.0001)))
@@ -289,12 +423,12 @@ func _buildLoading():
 	layer.add_child(_loading)
 
 	var bg = ColorRect.new()
-	bg.color = Color(0.012, 0.018, 0.022, 1)
+	bg.color = Color(0.06, 0.19, 0.22, 1)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_loading.add_child(bg)
 
-	var font = load("res://Fonts/Orbitron.tres")
+	_loading.theme = load("res://UI/funkyTheme.tres")
 
 	_loadTitle = Label.new()
 	_loadTitle.set_anchors_preset(Control.PRESET_CENTER)
@@ -303,10 +437,7 @@ func _buildLoading():
 	_loadTitle.offset_top = -110
 	_loadTitle.offset_bottom = -30
 	_loadTitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_loadTitle.add_theme_font_size_override("font_size", 64)
-	_loadTitle.add_theme_color_override("font_color", Color(0.92, 1, 0.99))
-	if font:
-		_loadTitle.add_theme_font_override("font", font)
+	_loadTitle.theme_type_variation = "Display"
 	_loading.add_child(_loadTitle)
 
 	_loadSub = Label.new()
@@ -316,14 +447,11 @@ func _buildLoading():
 	_loadSub.offset_top = 40
 	_loadSub.offset_bottom = 84
 	_loadSub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_loadSub.add_theme_font_size_override("font_size", 26)
-	_loadSub.add_theme_color_override("font_color", Color(0, 0.85, 0.78))
-	if font:
-		_loadSub.add_theme_font_override("font", font)
+	_loadSub.theme_type_variation = "H2"
 	_loading.add_child(_loadSub)
 
 	var track = ColorRect.new()
-	track.color = Color(0, 0.85, 0.78, 0.16)
+	track.color = Color(0.03, 0.13, 0.15, 1)
 	track.set_anchors_preset(Control.PRESET_CENTER)
 	track.offset_left = -260
 	track.offset_right = 260
@@ -452,6 +580,13 @@ func _goToLevel(idx):
 	_fading = false
 	await _fadeTo(0.0, .3)
 
+func _restartCurrent():
+	var scn = get_tree().current_scene
+	if scn != null and scn.has_method("_tutorial"):
+		_goToTutorial()
+	else:
+		_goToLevel(currentLevel)
+
 func _goToTutorial():
 	if _fading:
 		return
@@ -469,5 +604,6 @@ func _goToTutorial():
 func _finishTutorial():
 	tutorialComplete = true
 	_localSave()
-	_goToLevel(1)
+	menuTourPending = true
+	_goToLevel(0)
 

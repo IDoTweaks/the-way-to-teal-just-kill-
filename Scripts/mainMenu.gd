@@ -22,6 +22,7 @@ var musicStatus : Label
 var funkyTheme = preload("res://UI/funkyTheme.tres")
 
 func _ready() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	Audio.music_for_level(0)
 	settingsCont.closed.connect(_on_settings_closed)
 	stageSelect.closed.connect(_on_stage_closed)
@@ -31,7 +32,10 @@ func _ready() -> void:
 	_baseBtnRot = menuButtons.rotation
 	_buildMusicOverlay()
 	get_window().files_dropped.connect(_onFilesDropped)
-	if not Global.tutorialComplete:
+	if Global.menuTourPending:
+		Global.menuTourPending = false
+		_startMenuTour.call_deferred()
+	elif not Global.tutorialComplete:
 		Global._goToTutorial.call_deferred()
 
 func _process(delta: float) -> void:
@@ -146,22 +150,20 @@ func _buildMusicOverlay() -> void:
 	box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_theme_constant_override("separation", 18)
+	box.theme = funkyTheme
 	musicOverlay.add_child(box)
 
 	var header := Label.new()
 	header.text = "CUSTOM MUSIC"
 	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	header.add_theme_font_size_override("font_size", 64)
-	header.add_theme_color_override("font_color", Color(0, 0.85, 0.78, 1))
-	header.add_theme_color_override("font_outline_color", Color(0, 0.12, 0.11, 0.9))
+	header.theme_type_variation = "Display"
 	header.add_theme_constant_override("outline_size", 16)
 	box.add_child(header)
 
 	var sub := Label.new()
 	sub.text = "pick a level, then drag a song (.ogg / .mp3 / .wav) into the window"
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sub.add_theme_font_size_override("font_size", 24)
-	sub.add_theme_color_override("font_color", Color(0.1, 1, 0.5, 0.85))
+	sub.theme_type_variation = "Small"
 	box.add_child(sub)
 
 	var rows := VBoxContainer.new()
@@ -175,26 +177,22 @@ func _buildMusicOverlay() -> void:
 		row.add_theme_constant_override("separation", 14)
 
 		var nameBtn := Button.new()
-		nameBtn.theme = funkyTheme
 		nameBtn.text = _levelName(idx)
 		nameBtn.custom_minimum_size = Vector2(280, 50)
-		nameBtn.add_theme_font_size_override("font_size", 26)
 		nameBtn.pressed.connect(_onSelectMusicLevel.bind(idx))
 		row.add_child(nameBtn)
 
 		var song := Label.new()
 		song.custom_minimum_size = Vector2(440, 0)
 		song.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		song.add_theme_font_size_override("font_size", 22)
+		song.theme_type_variation = "Accent"
 		song.clip_text = true
 		row.add_child(song)
 
 		var clearBtn := Button.new()
-		clearBtn.theme = funkyTheme
 		clearBtn.text = "RESET"
 		clearBtn.custom_minimum_size = Vector2(120, 50)
-		clearBtn.add_theme_font_size_override("font_size", 20)
-		clearBtn.add_theme_color_override("font_color", Color(1, 0.55, 0.55, 1))
+		clearBtn.theme_type_variation = "SmallBtn"
 		clearBtn.pressed.connect(_onClearMusicLevel.bind(idx))
 		row.add_child(clearBtn)
 
@@ -203,20 +201,65 @@ func _buildMusicOverlay() -> void:
 
 	musicStatus = Label.new()
 	musicStatus.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	musicStatus.add_theme_font_size_override("font_size", 22)
-	musicStatus.add_theme_color_override("font_color", Color(0.6, 0.78, 0.76, 0.95))
+	musicStatus.theme_type_variation = "Small"
 	box.add_child(musicStatus)
 
 	var back := Button.new()
 	back.text = "BACK"
-	back.theme = funkyTheme
 	back.custom_minimum_size = Vector2(300, 60)
 	back.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	back.add_theme_font_size_override("font_size", 32)
-	back.add_theme_color_override("font_color", Color(0.92, 1, 0.99, 1))
-	back.add_theme_color_override("font_hover_color", Color(0.01, 0.04, 0.04, 1))
+	back.theme_type_variation = "BigBtn"
 	back.pressed.connect(_onMusicBack)
 	box.add_child(back)
 
 	musicStatus.text = "selected: %s - drag a song into the window" % _levelName(musicSelectedLevel)
 	_refreshMusicRows()
+
+
+# --- guided tour of the menu, run once straight after the tutorial ---------
+
+func _btn(name : String) -> Callable:
+	return func(): return menuButtons.get_node_or_null(name)
+
+func _tab(i : int) -> Callable:
+	return func(): return settingsCont._tabBtns[i] if i < settingsCont._tabBtns.size() else null
+
+func _startMenuTour() -> void:
+	var tour = CanvasLayer.new()
+	tour.set_script(load("res://Scripts/menu_tour.gd"))
+	add_child(tour)
+	tour.finished.connect(_onMenuTourDone)
+	tour.start([
+		{"text": "Nice work! This is the main menu. Let's have a quick look around.", "target": func(): return null},
+		{"text": "PLAY takes you to the level select, where you pick a stage and see your best score and time.", "target": _btn("JoinGameBtn")},
+		{"text": "TUTORIAL replays the course you just finished, any time you want.", "target": _btn("TutorialBtn")},
+		{"text": "MUSIC lets you drop your own songs in - pick a level, then drag an audio file onto the window.", "target": _btn("MusicBtn")},
+		{"text": "SETTINGS is where everything is tuned. Let's open it.", "target": _btn("SettingsBtn")},
+		{"text": "AUDIO: master, music and SFX volume.", "target": _tab(0),
+			"before": func(): _openSettingsForTour(0)},
+		{"text": "DISPLAY: window mode, resolution, field of view, and screen shake if the motion bothers you.", "target": _tab(1),
+			"before": func(): settingsCont._showTab(1)},
+		{"text": "GRAPHICS: if the game runs badly, drop RENDER SCALE first - it's the biggest speed-up.", "target": _tab(2),
+			"before": func(): settingsCont._showTab(2)},
+		{"text": "CONTROLS: mouse sensitivity, invert Y, and hold-vs-toggle for scope and slide.", "target": _tab(3),
+			"before": func(): settingsCont._showTab(3)},
+		{"text": "KEYBINDS: click any bind and press a new key. Nothing can end up unbound - it swaps instead.", "target": _tab(4),
+			"before": func(): settingsCont._showTab(4)},
+		{"text": "Changes apply straight away, but they are only kept when you press SAVE. Leaving discards them.", "target": func(): return settingsCont.saveBtn,
+			"before": func(): settingsCont._showTab(0)},
+		{"text": "That's the tour. Ready to play?", "target": _btn("JoinGameBtn"),
+			"before": func(): _closeSettingsForTour()},
+	])
+
+func _openSettingsForTour(tab : int) -> void:
+	settingsCont.open()
+	settingsOpen = true
+	settingsCont._showTab(tab)
+
+func _closeSettingsForTour() -> void:
+	settingsCont.hide()
+	settingsOpen = false
+
+func _onMenuTourDone() -> void:
+	_closeSettingsForTour()
+	stageSelect.open()

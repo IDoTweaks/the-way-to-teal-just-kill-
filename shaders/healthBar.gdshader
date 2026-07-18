@@ -6,6 +6,9 @@ uniform vec4 full_col : source_color = vec4(0.15, 0.5, 1.0, 1.0);   // blue man
 uniform vec4 hurt_col : source_color = vec4(0.0, 1.0, 0.45, 1.0);   // becoming the green world
 uniform vec4 back_col : source_color = vec4(0.02, 0.05, 0.12, 0.85);
 uniform float skew = 0.14;
+uniform float segments : hint_range(4.0, 24.0) = 10.0;
+uniform vec4 ink : source_color = vec4(0.03, 0.13, 0.15, 1.0);
+uniform float gap = 0.16;
 
 void fragment(){
 	vec2 uv = UV;
@@ -33,6 +36,10 @@ void fragment(){
 
 		vec3 col = energy * scan * pulse;
 		col += vec3(0.8, 1.0, 1.0) * edge;
+		// chunky ink-separated segments instead of one smooth bar
+		float seg = fract(sx * segments);
+		float notch = step(seg, gap);
+		col = mix(col, ink.rgb, notch * 0.85);
 
 		vec3 outc = mix(back_col.rgb, col, filled);
 		float a = mix(back_col.a, 1.0, filled);

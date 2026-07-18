@@ -27,6 +27,10 @@ func _ready() -> void:
 	camRotations = Global.ghostCamRot.get(lvl, PackedVector3Array())
 	weapons = Global.ghostWeapon.get(lvl, PackedInt32Array())
 	max = mini(postions.size(), weapons.size())
+	if not Global.showGhost:
+		visible = false
+		set_physics_process(false)
+		return
 	if max == 0:
 		visible = false
 		set_physics_process(false)

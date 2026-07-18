@@ -1,11 +1,11 @@
 extends CanvasLayer
 signal done
 
-const PURPLE = Color(0.62, 0.25, 1.0)
-const TEAL = Color(0.0, 0.85, 0.72)
-const TEXT = Color(0.86, 0.86, 0.88)
-const DIM = Color(0.55, 0.55, 0.58)
-const DANGER = Color(0.9, 0.25, 0.3)
+const PURPLE = Color(0.35, 1.0, 0.86)
+const TEAL = Color(0.35, 1.0, 0.86)
+const TEXT = Color(1.0, 0.99, 0.94)
+const DIM = Color(0.6, 0.84, 0.82)
+const DANGER = Color(1.0, 0.42, 0.38)
 const COST = 20.0
 
 const OPENERS = [
@@ -139,9 +139,11 @@ func _seatEveryone() -> void:
 func _buildPanel() -> void:
 	panel = PanelContainer.new()
 	var style = StyleBoxFlat.new()
-	style.bg_color = Color(.04, .04, .05, .97)
+	style.bg_color = Color(0.06, 0.19, 0.22, 0.98)
 	style.border_color = PURPLE
-	style.set_border_width_all(2)
+	style.set_border_width_all(6)
+	style.set_corner_radius_all(28)
+	style.corner_detail = 12
 	style.set_content_margin_all(20)
 	panel.add_theme_stylebox_override("panel", style)
 	panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
@@ -157,20 +159,20 @@ func _buildPanel() -> void:
 
 	var speaker = Label.new()
 	speaker.text = "THE SNAKE, ESQ."
-	speaker.add_theme_font_size_override("font_size", 15)
+	speaker.add_theme_font_size_override("font_size", 20)
 	speaker.add_theme_color_override("font_color", PURPLE)
 	box.add_child(speaker)
 
 	lineLabel = Label.new()
 	lineLabel.text = OPENERS[clamp(visitNum - 1, 0, OPENERS.size() - 1)]
 	lineLabel.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	lineLabel.add_theme_font_size_override("font_size", 19)
+	lineLabel.add_theme_font_size_override("font_size", 26)
 	lineLabel.add_theme_color_override("font_color", TEXT)
 	box.add_child(lineLabel)
 
 	var status = Label.new()
 	status.text = "the deal: one paralysis level off, for %d health.        you: paralysis %d, health %d" % [int(COST), player.paraLevel, int(player.health)]
-	status.add_theme_font_size_override("font_size", 14)
+	status.add_theme_font_size_override("font_size", 20)
 	status.add_theme_color_override("font_color", DIM)
 	box.add_child(status)
 
@@ -181,7 +183,7 @@ func _buildPanel() -> void:
 	var acceptBtn = Button.new()
 	acceptBtn.text = "TAKE THE DEAL"
 	acceptBtn.custom_minimum_size = Vector2(260, 44)
-	acceptBtn.add_theme_font_size_override("font_size", 17)
+	acceptBtn.add_theme_font_size_override("font_size", 24)
 	if player.health <= COST:
 		acceptBtn.text = "TAKE THE DEAL  [THIS WILL KILL YOU]"
 		acceptBtn.add_theme_color_override("font_color", DANGER)
@@ -192,7 +194,7 @@ func _buildPanel() -> void:
 	var declineBtn = Button.new()
 	declineBtn.text = "NO DEAL"
 	declineBtn.custom_minimum_size = Vector2(180, 44)
-	declineBtn.add_theme_font_size_override("font_size", 17)
+	declineBtn.add_theme_font_size_override("font_size", 24)
 	declineBtn.pressed.connect(_decline)
 	row.add_child(declineBtn)
 
