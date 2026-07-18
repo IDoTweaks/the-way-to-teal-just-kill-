@@ -28,6 +28,13 @@ var dead = false
 var animTime : float = 0.0
 var baseBodyY : float = 0.0
 
+var baseAttackWait : float = 0.0
+
+func _buff(on):
+	if baseAttackWait == 0.0:
+		baseAttackWait = attackTimer.wait_time
+	attackTimer.wait_time = baseAttackWait / (1.4 if on else 1.0)
+
 func _makeTarg(targ):
 	gotShot = true
 	target = targ

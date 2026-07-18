@@ -1,53 +1,55 @@
 extends CharacterBody3D
-func _drone(): pass
+func _sprinkler(): pass
 func _enemy(): pass
 
-const SPEED = 6.0
-@onready var attackTimer = $attackCd
-@export var scoreWorth = 4000
-@export var health = 30
+@export var scoreWorth = 3000
+@export var health = 60
 @onready var body = $body
-@onready var hoverRing = $body/HoverRing
+@onready var head = $body/head
 @onready var dmgTxt = preload("res://ObjectScenes/damageText.tscn")
 @onready var textSpawn = $body/textSpawn
-@export var sightDist : float = 35.0
+@onready var bulletSpawn = $body/head/bulletSpawn
 @export var player : CharacterBody3D
 @export_flags_3d_physics var wallLayer : int
-@onready var bullet = preload("res://ObjectScenes/droneBullet.tscn")
+@export var damage = 8
+@export var bulletSpeed : float = 9.0
+@export var fireGap : float = .35
+@export var sweepArc : float = 70.0
+@export var sweepSpeed : float = 1.4
+@export var sightDist : float = 26.0
+@onready var bullet = preload("res://ObjectScenes/greenBullet.tscn")
 @onready var explosionParticles = preload("res://Particles/enemyExplode.tscn")
 @onready var muzzleParticles = preload("res://Particles/enemyMuzzle.tscn")
-@onready var bulletSpawn = $body/bulletSpawn
 var particleInstance
-@export var hoverHeight : float = 4.0
-@export var preferredDist : float = 12.0
-@export var accel : float = 6.0
-@export var strafeSpeed : float = 2.5
-@export var damage = 25
+var maxHealth : float = 60.0
 var target
+var mode : String = "idle"
 var gotShot = false
-var canAttack : bool = true
 var textActive = false
 var txt
-var animTime : float = 0.0
-var baseBodyY : float = 0.0
-var fireKick : float = 0.0
 var dead = false
-
-var baseAttackWait : float = 0.0
+var animTime : float = 0.0
+var fireCd : float = 0.0
+var headKick : float = 0.0
+var headBaseZ : float = 0.0
+const LOS_INTERVAL = 0.1
+var losAccum : float = 0.0
+var seesPlayer : bool = false
+var buffMult : float = 1.0
 
 func _buff(on):
-	if baseAttackWait == 0.0:
-		baseAttackWait = attackTimer.wait_time
-	attackTimer.wait_time = baseAttackWait / (1.4 if on else 1.0)
+	buffMult = 1.4 if on else 1.0
 
 func _makeTarg(targ):
 	gotShot = true
 	target = targ
+	mode = "attack"
 
 func _ready() -> void:
 	add_to_group("enemies")
+	maxHealth = health
 	body._updateMat(1)
-	baseBodyY = body.position.y
+	headBaseZ = head.position.z
 	await get_tree().physics_frame
 
 func _activeTarget():
@@ -66,7 +68,8 @@ func _damage(dmg):
 	else:
 		_updateDmgTxt(dmg)
 	if health >= 0:
-		body._updateMat(health / 30.0)
+		body._hitPunch()
+		body._updateMat(health / maxHealth)
 	else:
 		_die()
 
@@ -86,8 +89,18 @@ func _die():
 
 func _deathAnim():
 	set_physics_process(false)
-	velocity = Vector3.ZERO
 	body._killTweens()
+	var popHead = head
+	popHead.reparent(get_parent())
+	var htw = create_tween()
+	htw.set_parallel(true)
+	htw.set_trans(Tween.TRANS_QUAD)
+	htw.set_ease(Tween.EASE_OUT)
+	htw.tween_property(popHead, "position:y", popHead.position.y + 3.2, .5)
+	htw.tween_property(popHead, "rotation:x", popHead.rotation.x + PI * 2.2, .5)
+	htw.tween_property(popHead, "scale", Vector3.ZERO, .5)
+	htw.finished.connect(popHead.queue_free)
+	Audio.play("walljump", 1.5, -8.0)
 	var tw = create_tween()
 	tw.set_parallel(true)
 	tw.set_trans(Tween.TRANS_BACK)
@@ -107,67 +120,60 @@ func _canSeePlayer():
 
 func _hasLineOfSight(tgt):
 	var spaceState := get_world_3d().direct_space_state
-	var query := PhysicsRayQueryParameters3D.create(global_position, tgt.global_position)
+	var query := PhysicsRayQueryParameters3D.create(global_position + Vector3(0, 1, 0), tgt.global_position)
 	query.exclude = [self]
 	query.collision_mask = wallLayer
 	var result := spaceState.intersect_ray(query)
 	return result.is_empty()
 
-func _shootAt(targetPos : Vector3):
-	if bulletSpawn == null:
-		return
-	if canAttack:
-		var myBullet = bullet.instantiate()
-		myBullet.dest = targetPos
-		get_parent().add_child(myBullet)
-		myBullet.global_position = bulletSpawn.global_position
-		var muzzle = muzzleParticles.instantiate()
-		get_parent().add_child(muzzle)
-		muzzle.global_position = bulletSpawn.global_position
-		muzzle.emitting = true
-		fireKick = 1.0
-		canAttack = false
-		attackTimer.start()
+func _fire():
+	var dir = -head.global_transform.basis.z
+	var myBullet = bullet.instantiate()
+	myBullet.dest = bulletSpawn.global_position + dir * 40.0
+	myBullet.damage = damage
+	myBullet.speed = bulletSpeed
+	myBullet.lifeTime = 3.0
+	get_parent().add_child(myBullet)
+	myBullet.global_position = bulletSpawn.global_position
+	myBullet.add_collision_exception_with(self)
+	add_collision_exception_with(myBullet)
+	var muzzle = muzzleParticles.instantiate()
+	get_parent().add_child(muzzle)
+	muzzle.global_position = bulletSpawn.global_position
+	muzzle.emitting = true
+	headKick = 1.0
+	Audio.play("rifle", 1.3, -14.0)
 
 func _physics_process(delta: float) -> void:
-	var tgt = _activeTarget()
-	if tgt != null and is_instance_valid(tgt):
-		var desired = tgt.global_position + Vector3(0, hoverHeight, 0)
-		var toDesired = desired - global_position
-		var flat = Vector3(toDesired.x, 0, toDesired.z)
-		var dist = flat.length()
-		var move = Vector3.ZERO
-		if dist > 0.1:
-			var fdir = flat / dist
-			if dist > preferredDist + 1.0:
-				move += fdir * SPEED
-			elif dist < preferredDist - 1.0:
-				move -= fdir * SPEED
-			var strafe = fdir.cross(Vector3.UP)
-			move += strafe * sin(animTime * 1.5) * strafeSpeed
-		move.y = clamp(toDesired.y, -1.0, 1.0) * SPEED
-		velocity = velocity.lerp(move, accel * delta)
-		if _canSeePlayer() and canAttack:
-			_shootAt(tgt.global_position)
-	else:
-		velocity = velocity.lerp(Vector3.ZERO, accel * delta)
+	if not is_on_floor():
+		velocity += get_gravity() * delta
+	losAccum += delta
+	if losAccum >= LOS_INTERVAL:
+		losAccum = 0.0
+		seesPlayer = _canSeePlayer()
+		mode = "attack" if seesPlayer else "idle"
+	if mode == "attack":
+		fireCd -= delta * buffMult
+		if fireCd <= 0:
+			fireCd = fireGap
+			_fire()
 	move_and_slide()
 
 func _process(delta: float) -> void:
 	if dead:
 		return
 	animTime += delta
-	body.position.y = baseBodyY + sin(animTime * 2.0) * 0.12
-	hoverRing.rotation.y += delta * 4.0
-	fireKick = move_toward(fireKick, 0.0, delta * 4.0)
-	body.rotation.x = lerp_angle(body.rotation.x, fireKick * 0.5, delta * 14.0)
-	body.scale = Vector3.ONE * (1.0 + fireKick * 0.15)
+	headKick = move_toward(headKick, 0.0, delta * 6.0)
+	head.position.z = headBaseZ + headKick * .12
 	var tgt = _activeTarget()
-	if tgt != null and is_instance_valid(tgt):
+	if mode == "attack" and tgt != null and is_instance_valid(tgt):
 		var look = tgt.global_position - global_position
 		look.y = 0
 		if look.length() > 0.1:
-			rotation.y = lerp_angle(rotation.y, atan2(-look.x, -look.z), delta * 8.0)
+			var bearing = atan2(-look.x, -look.z) - rotation.y
+			head.rotation.y = bearing + sin(animTime * sweepSpeed) * deg_to_rad(sweepArc)
+	else:
+		head.rotation.y += delta * .8
 	if txt == null:
 		textActive = false
 
@@ -191,6 +197,3 @@ func _on_chase_body_entered(bod: Node3D) -> void:
 
 func _on_chase_body_exited(bod: Node3D) -> void:
 	pass
-
-func _on_attack_cd_timeout() -> void:
-	canAttack = true

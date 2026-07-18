@@ -1,0 +1,86 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/sprinkler.gd" id="1_sprk"]
+[ext_resource type="Shader" path="res://Scripts/enemy.gdshader" id="2_sh"]
+[ext_resource type="Script" path="res://Scripts/meshInstanceBody.gd" id="3_body"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/enemyMarker.tscn" id="4_mark"]
+
+[sub_resource type="ShaderMaterial" id="green_mat"]
+shader = ExtResource("2_sh")
+shader_parameter/base_color = Color(0, 0.36, 0.13, 1)
+shader_parameter/fill_color = Color(0, 1, 0.27, 1)
+shader_parameter/fill_percent = 1.0
+shader_parameter/min_y = -0.55
+shader_parameter/max_y = 0.55
+
+[sub_resource type="StandardMaterial3D" id="dark_mat"]
+albedo_color = Color(0.17641911, 0.17641908, 0.17641908, 1)
+
+[sub_resource type="CylinderMesh" id="base_mesh"]
+top_radius = 0.38
+bottom_radius = 0.72
+height = 1.1
+
+[sub_resource type="CylinderMesh" id="head_mesh"]
+top_radius = 0.34
+bottom_radius = 0.34
+height = 0.42
+
+[sub_resource type="BoxMesh" id="nozzle_mesh"]
+size = Vector3(0.14, 0.14, 0.55)
+
+[sub_resource type="BoxMesh" id="marker_box"]
+size = Vector3(0.2, 0.2, 0.2)
+
+[sub_resource type="CylinderShape3D" id="body_shape"]
+radius = 0.72
+height = 1.6
+
+[sub_resource type="SphereShape3D" id="chase_shape"]
+radius = 26.0
+
+[node name="Enemy" type="CharacterBody3D"]
+script = ExtResource("1_sprk")
+wallLayer = 1
+
+[node name="EnemyMarker" parent="." instance=ExtResource("4_mark")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
+
+[node name="body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+material_override = SubResource("green_mat")
+mesh = SubResource("base_mesh")
+script = ExtResource("3_body")
+
+[node name="head" type="MeshInstance3D" parent="body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.78, 0)
+material_override = SubResource("dark_mat")
+mesh = SubResource("head_mesh")
+
+[node name="nozzle" type="MeshInstance3D" parent="body/head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.5)
+material_override = SubResource("dark_mat")
+mesh = SubResource("nozzle_mesh")
+
+[node name="bulletSpawn" type="MeshInstance3D" parent="body/head"]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0.04, -0.95)
+visible = false
+mesh = SubResource("marker_box")
+
+[node name="textSpawn" type="MeshInstance3D" parent="body"]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 1.35, 0)
+visible = false
+mesh = SubResource("marker_box")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("body_shape")
+
+[node name="chase" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="chase"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("chase_shape")
+
+[connection signal="body_entered" from="chase" to="." method="_on_chase_body_entered"]
+[connection signal="body_exited" from="chase" to="." method="_on_chase_body_exited"]

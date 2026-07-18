@@ -1,0 +1,171 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="1_pl"]
+[ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="2_pm"]
+[ext_resource type="Shader" uid="uid://gs1w87wuiau3" path="res://shaders/bossFloor.gdshader" id="3_fl"]
+[ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="4_orb"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/gnat.tscn" id="5_gnat"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/splitter.tscn" id="6_split"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/sprinkler.tscn" id="7_sprk"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/warden.tscn" id="8_ward"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/lobber.tscn" id="9_lob"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/diver.tscn" id="10_div"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/intern.tscn" id="11_int"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/printer.tscn" id="12_prt"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/stapler.tscn" id="13_stap"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/shredder.tscn" id="14_shred"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_out"]
+render_priority = 0
+shader = ExtResource("3_fl")
+shader_parameter/outline_color = Color(0, 0, 0, 1)
+shader_parameter/outline_width = 1.0
+shader_parameter/fade_start = 10.0
+shader_parameter/fade_end = 40.0
+
+[sub_resource type="StandardMaterial3D" id="floor_mat"]
+next_pass = SubResource("ShaderMaterial_out")
+albedo_color = Color(0, 0.8666667, 0, 1)
+
+[sub_resource type="BoxMesh" id="box_mesh"]
+
+[sub_resource type="BoxShape3D" id="box_shape"]
+
+[sub_resource type="StandardMaterial3D" id="wall_mat"]
+next_pass = SubResource("ShaderMaterial_out")
+albedo_color = Color(0, 0.45, 0.12, 1)
+
+[sub_resource type="Environment" id="env"]
+background_mode = 1
+background_color = Color(0.84313726, 1, 1, 1)
+
+[node name="EnemyTest" type="Node3D"]
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(50, 0, 0, 0, 1, 0, 0, 0, 50, 0, -0.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Floor"]
+material_override = SubResource("floor_mat")
+mesh = SubResource("box_mesh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("box_shape")
+
+[node name="WallN" type="StaticBody3D" parent="."]
+transform = Transform3D(50, 0, 0, 0, 10, 0, 0, 0, 1, 0, 5, -25)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallN"]
+material_override = SubResource("wall_mat")
+mesh = SubResource("box_mesh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallN"]
+shape = SubResource("box_shape")
+
+[node name="WallS" type="StaticBody3D" parent="."]
+transform = Transform3D(50, 0, 0, 0, 10, 0, 0, 0, 1, 0, 5, 25)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallS"]
+material_override = SubResource("wall_mat")
+mesh = SubResource("box_mesh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallS"]
+shape = SubResource("box_shape")
+
+[node name="WallE" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 10, 0, 0, 0, 50, 25, 5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallE"]
+material_override = SubResource("wall_mat")
+mesh = SubResource("box_mesh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallE"]
+shape = SubResource("box_shape")
+
+[node name="WallW" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 10, 0, 0, 0, 50, -25, 5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallW"]
+material_override = SubResource("wall_mat")
+mesh = SubResource("box_mesh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallW"]
+shape = SubResource("box_shape")
+
+[node name="Pillar1" type="StaticBody3D" parent="."]
+transform = Transform3D(2.5, 0, 0, 0, 3.5, 0, 0, 0, 2.5, -10, 1.75, -2)
+
+[node name="Mesh" type="MeshInstance3D" parent="Pillar1"]
+material_override = SubResource("wall_mat")
+mesh = SubResource("box_mesh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pillar1"]
+shape = SubResource("box_shape")
+
+[node name="Pillar2" type="StaticBody3D" parent="."]
+transform = Transform3D(2.5, 0, 0, 0, 3.5, 0, 0, 0, 2.5, 10, 1.75, -2)
+
+[node name="Mesh" type="MeshInstance3D" parent="Pillar2"]
+material_override = SubResource("wall_mat")
+mesh = SubResource("box_mesh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pillar2"]
+shape = SubResource("box_shape")
+
+[node name="Player" parent="." instance=ExtResource("1_pl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 20)
+
+[node name="Gnat1" parent="." instance=ExtResource("5_gnat")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.5, 6)
+
+[node name="Gnat2" parent="." instance=ExtResource("5_gnat")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 0.5, 4.5)
+
+[node name="Gnat3" parent="." instance=ExtResource("5_gnat")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.5, 4)
+
+[node name="Splitter" parent="." instance=ExtResource("6_split")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.5, 2)
+
+[node name="Sprinkler" parent="." node_paths=PackedStringArray("player") instance=ExtResource("7_sprk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8)
+player = NodePath("../Player")
+
+[node name="Warden" parent="." node_paths=PackedStringArray("player") instance=ExtResource("8_ward")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0.5, -6)
+player = NodePath("../Player")
+
+[node name="Lobber" parent="." node_paths=PackedStringArray("player") instance=ExtResource("9_lob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0.5, -16)
+player = NodePath("../Player")
+
+[node name="Diver" parent="." node_paths=PackedStringArray("player") instance=ExtResource("10_div")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 7, -10)
+player = NodePath("../Player")
+
+[node name="Intern" parent="." node_paths=PackedStringArray("player") instance=ExtResource("11_int")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0.5, -16)
+player = NodePath("../Player")
+
+[node name="Printer" parent="." node_paths=PackedStringArray("player") instance=ExtResource("12_prt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0.5, -16)
+player = NodePath("../Player")
+
+[node name="Stapler" parent="." node_paths=PackedStringArray("player") instance=ExtResource("13_stap")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0.5, 8)
+player = NodePath("../Player")
+
+[node name="Shredder" parent="." node_paths=PackedStringArray("player") instance=ExtResource("14_shred")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -18)
+player = NodePath("../Player")
+
+[node name="FinishOrb" parent="." node_paths=PackedStringArray("player") instance=ExtResource("4_orb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 1, 21)
+player = NodePath("../Player")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 207, 971, 378)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="PauseMenu" parent="." instance=ExtResource("2_pm")]

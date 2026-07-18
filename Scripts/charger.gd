@@ -36,6 +36,13 @@ var chargeState : String = ""
 var chargeTimer : float = 0.0
 var dashDir : Vector3 = Vector3.ZERO
 
+var baseAttackWait : float = 0.0
+
+func _buff(on):
+	if baseAttackWait == 0.0:
+		baseAttackWait = attackTimer.wait_time
+	attackTimer.wait_time = baseAttackWait / (1.4 if on else 1.0)
+
 func _makeTarg(targ):
 	gotShot = true
 	target = targ
