@@ -24,6 +24,7 @@ var _hitArrow : Label
 @export var health = 100
 @export var killHeal : float = 5.0
 var time = 0.0;
+@export var parTime : float = 60.0
 var count = true
 @onready var maxScore = 0
 
@@ -99,6 +100,28 @@ const JUMP_BUFFER_TIME = 0.12
 var upDashed = false;
 var knockbackTimer: float = 0.0
 const KNOCKBACK_LOCK_TIME = 0.15
+
+# tutorial ability locks + action counters (all abilities on by default outside the tutorial)
+var abJump := true
+var abDash := true
+var abSlide := true
+var abWallJump := true
+var abSlam := true
+var abShoot := true
+var jumpCount := 0
+var dashCount := 0
+var slideCount := 0
+var wallJumpCount := 0
+var slamCount := 0
+var shotCount := 0
+
+func _setAbilities(j, d, s, w, sl, sh):
+	abJump = j
+	abDash = d
+	abSlide = s
+	abWallJump = w
+	abSlam = sl
+	abShoot = sh
 @export var slamVeloc = 25.0
 var airTime :float = 0.0
 
@@ -222,7 +245,7 @@ func _updateStaminaHud():
 		seg.size.x = full * frac
 		seg.color = STAMINA_ORANGE if frac > 0.0 else STAMINA_DIM
 	if stamina >= 100.0 and !wasFull:
-		Audio.play("pickup", 1.7, -20.0)
+		Audio.play("ui_hover", 1.7, -22.0)
 
 func _staminaFail():
 	if _staminaMsg == null:
@@ -232,7 +255,14 @@ func _staminaFail():
 	var tw = create_tween()
 	tw.tween_property(_staminaMsg, "modulate:a", 0.0, 0.9)
 
+static var _tex_footprint : ImageTexture
+static var _tex_bullet : ImageTexture
+static var _tex_vignette : ImageTexture
+static var _tex_para : ImageTexture
+
 func _make_teal_texture() -> ImageTexture:
+	if _tex_footprint != null:
+		return _tex_footprint
 	var img = Image.create(64, 64, false, Image.FORMAT_RGBA8)
 	img.fill(Color(0, 0, 0, 0))
 
@@ -274,26 +304,36 @@ func _make_teal_texture() -> ImageTexture:
 
 			img.set_pixel(x, y, col)
 
-	return ImageTexture.create_from_image(img)
+	_tex_footprint = ImageTexture.create_from_image(img)
+	return _tex_footprint
 
 func _spawn_footprint(pos: Vector3) -> void:
+	var cap = _decalCap(max_footprints)
+	if cap <= 0:
+		return
 	var decal = Decal.new()
-	decal.size = Vector3(decal_size, 0.5, decal_size)
+	decal.size = Vector3(decal_size, 0.25, decal_size)
 	decal.texture_albedo = _footprint_tex
 	decal.position = pos + Vector3(0, 0.05, 0)
 	decal.modulate = Color(0.11, 0.62, 0.46, 0.85)
+	decal.distance_fade_enabled = true
+	decal.distance_fade_begin = 22.0
+	decal.distance_fade_length = 8.0
 	get_parent().add_child(decal)
 	_footprint_pool.append(decal)
 
-	if _footprint_pool.size() > max_footprints:
+	while _footprint_pool.size() > cap:
 		var oldest = _footprint_pool.pop_front()
 		oldest.queue_free()
+
+func _decalCap(base : int) -> int:
+	return int(base * Global.decalDensity)
 
 #gun
 @export var damage : float = 10
 @export var bullet_hole_size: float = 0.15
 @export var max_bullet_holes: int = 100
-@export var shotGunDmg : float = 6
+@export var shotGunDmg : float = 10
 @export var sniperDmg : float = 150
 @export var sniperCooldown : float = 2.2
 @onready var shotGunCdTimer = $shotGunCd
@@ -310,10 +350,18 @@ const GUN_REST_ROT = Vector3(-0.15707964, -3.2637658, 0.15707964)
 
 var _bullet_pool: Array[Node] = []
 var _bullet_tex: ImageTexture
-var _laser_line_mat : StandardMaterial3D
 var _laser_beam_mat : StandardMaterial3D
+var _tracer_core_mat : StandardMaterial3D
+var _tracer_glow_mat : StandardMaterial3D
+var _tracerPool : Array[Node3D] = []
+var _tracerLife : Array[float] = []
+var _tracerLen : Array[float] = []
+var _tracerIdx : int = 0
+const TRACER_POOL_SIZE = 24
+const TRACER_LIFE = 0.085
 var currentGun : int = 0
 var unlockedGuns : int = 3
+var forcedGun : int = -1
 var shotGunCd = false
 #0 - rifle
 #1 - shotgun
@@ -341,6 +389,8 @@ func _updateRayGating():
 			ray.enabled = currentGun == 1
 
 func _switchGuns():
+	if forcedGun >= 0:
+		return
 	if Input.is_action_just_pressed("gun1") and unlockedGuns > 0:
 		_selectGun(0)
 	elif Input.is_action_just_pressed("gun2") and unlockedGuns > 1:
@@ -349,7 +399,17 @@ func _switchGuns():
 		_selectGun(2)
 
 func _cycleGun(dir: int):
+	if forcedGun >= 0:
+		return
 	_selectGun((currentGun + dir + unlockedGuns) % unlockedGuns)
+
+func _setGunLock(idx: int):
+	forcedGun = idx
+	if idx >= 0:
+		if idx >= unlockedGuns:
+			unlockedGuns = idx + 1
+		currentGun = idx
+		_showGunModels()
 
 func _selectGun(idx):
 	if idx == currentGun:
@@ -450,12 +510,14 @@ func _finishLevel():
 	_spawnParticleAt(finishParticles, global_position)
 	var earnedScore = maxScore - _calcMaxScore()
 	var finalScore = clamp(earnedScore, 0, maxScore)
-	var scorePercent = float(finalScore) / maxScore if maxScore > 0 else 0.0
+	var scorePercent = float(finalScore) / maxScore if maxScore > 0 else 1.0
 	var healthPercent = clamp(float(health) / 100.0, 0.0, 1.0)
-	var gradeRating = scorePercent * 0.65 + healthPercent * 0.35
+	var timePercent = _timeScore()
+	var gradeRating = scorePercent * 0.55 + healthPercent * 0.25 + timePercent * 0.20
 	var grade = _calcGrade(gradeRating * 100.0, 100.0)
 	var displayScore = finalScore
 	var lvl = Global.currentLevel
+	var prevBest = Global._bestTime(lvl)
 	Global._completeLevel(lvl)
 	Global._recordTime(lvl, time)
 	Global._localSave()
@@ -463,8 +525,16 @@ func _finishLevel():
 		Global._saveGhost(lvl, positionSaves.duplicate(), rotationSaves.duplicate(), camPositionSaves.duplicate(), camRotationSaves.duplicate(), weaponSaves.duplicate(), displayScore)
 	levelEnd._setScore(displayScore)
 	levelEnd._setGrade(grade)
+	levelEnd._setTime(time, parTime, prevBest)
 	levelEnd._setLevel(lvl)
 	levelEnd.visible = true
+
+func _timeScore() -> float:
+	if parTime <= 0.0:
+		return 1.0
+	if time <= parTime:
+		return 1.0
+	return clamp(1.0 - (time - parTime) / parTime, 0.0, 1.0)
 
 func _calcGrade(num, maxVal):
 	if maxVal <= 0:
@@ -507,6 +577,8 @@ func _calcGrade(num, maxVal):
 
 
 func _make_bullet_texture() -> ImageTexture:
+	if _tex_bullet != null:
+		return _tex_bullet
 	var img = Image.create(64, 64, false, Image.FORMAT_RGBA8)
 	var center = Vector2(32, 32)
 	for x in range(64):
@@ -522,14 +594,21 @@ func _make_bullet_texture() -> ImageTexture:
 				img.set_pixel(x, y, Color(0.08, 0.45, 0.35, (1 - t) * 0.6))
 			else:
 				img.set_pixel(x, y, Color(0, 0, 0, 0))
-	return ImageTexture.create_from_image(img)
+	_tex_bullet = ImageTexture.create_from_image(img)
+	return _tex_bullet
 
 func _spawn_bullet_hole(pos: Vector3, normal: Vector3) -> void:
+	var cap = _decalCap(max_bullet_holes)
+	if cap <= 0:
+		return
 	var decal = Decal.new()
-	decal.size = Vector3(bullet_hole_size, 1.0, bullet_hole_size)
+	decal.size = Vector3(bullet_hole_size, 0.25, bullet_hole_size)
 	decal.texture_albedo = _bullet_tex
 	decal.albedo_mix = 1.0
 	decal.modulate = Color(1, 1, 1, 1)
+	decal.distance_fade_enabled = true
+	decal.distance_fade_begin = 30.0
+	decal.distance_fade_length = 10.0
 	decal.position = pos + normal * 0.05
 	var up = normal
 	var right: Vector3
@@ -544,7 +623,7 @@ func _spawn_bullet_hole(pos: Vector3, normal: Vector3) -> void:
 	get_parent().add_child(decal)
 	_bullet_pool.append(decal)
 
-	if _bullet_pool.size() > max_bullet_holes:
+	while _bullet_pool.size() > cap:
 		var oldest = _bullet_pool.pop_front()
 		oldest.queue_free()
 
@@ -570,6 +649,8 @@ func _startInSlide():
 	animaPlayer.play("inSlide")
 
 func _shootAnim():
+	if not abShoot:
+		return
 	if Input.is_action_pressed("shoot"):
 		if currentGun == 0:
 			shotGun.visible = false
@@ -592,6 +673,7 @@ func _shootAnim():
 		if animaPlayer.current_animation == "shootingAnim":
 			animaPlayer.stop()
 func _shoot():
+	shotCount += 1
 	if currentGun == 0:
 		_addShake(.01)
 		Audio.play("rifle", 1.0, -5.0)
@@ -682,21 +764,91 @@ func _applyForce(point :Vector3,force , maxRange:float = 10, lockInput : bool = 
 		knockbackTimer = KNOCKBACK_LOCK_TIME
 
 
+func _buildTracerPool():
+	var coreMesh = CylinderMesh.new()
+	coreMesh.top_radius = 0.016
+	coreMesh.bottom_radius = 0.016
+	coreMesh.height = 1.0
+	coreMesh.radial_segments = 6
+	coreMesh.rings = 0
+	var glowMesh = CylinderMesh.new()
+	glowMesh.top_radius = 0.02
+	glowMesh.bottom_radius = 0.085
+	glowMesh.height = 1.0
+	glowMesh.radial_segments = 6
+	glowMesh.rings = 0
+
+	_tracer_core_mat = StandardMaterial3D.new()
+	_tracer_core_mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+	_tracer_core_mat.transparency = StandardMaterial3D.TRANSPARENCY_ALPHA
+	_tracer_core_mat.blend_mode = StandardMaterial3D.BLEND_MODE_ADD
+	_tracer_core_mat.depth_draw_mode = StandardMaterial3D.DEPTH_DRAW_DISABLED
+	_tracer_core_mat.albedo_color = Color(0.85, 1.0, 0.98, 1)
+	_tracer_core_mat.emission_enabled = true
+	_tracer_core_mat.emission = Color(0.8, 1.0, 0.97)
+	_tracer_core_mat.emission_energy_multiplier = 9.0
+
+	_tracer_glow_mat = StandardMaterial3D.new()
+	_tracer_glow_mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+	_tracer_glow_mat.transparency = StandardMaterial3D.TRANSPARENCY_ALPHA
+	_tracer_glow_mat.blend_mode = StandardMaterial3D.BLEND_MODE_ADD
+	_tracer_glow_mat.depth_draw_mode = StandardMaterial3D.DEPTH_DRAW_DISABLED
+	_tracer_glow_mat.albedo_color = Color(0, 0.85, 0.78, 0.5)
+	_tracer_glow_mat.emission_enabled = true
+	_tracer_glow_mat.emission = Color(0, 0.9, 0.82)
+	_tracer_glow_mat.emission_energy_multiplier = 4.0
+
+	for i in TRACER_POOL_SIZE:
+		var root = Node3D.new()
+		var core = MeshInstance3D.new()
+		core.mesh = coreMesh
+		core.material_override = _tracer_core_mat
+		core.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var glow = MeshInstance3D.new()
+		glow.mesh = glowMesh
+		glow.material_override = _tracer_glow_mat
+		glow.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		root.add_child(core)
+		root.add_child(glow)
+		root.visible = false
+		get_parent().add_child(root)
+		_tracerPool.append(root)
+		_tracerLife.append(0.0)
+		_tracerLen.append(0.0)
+
 func _draw_laser_line(from_pos: Vector3, to_pos: Vector3, duration: float = 0.1):
-	var line_instance = MeshInstance3D.new()
-	var imm_mesh = ImmediateMesh.new()
+	if _tracerPool.is_empty():
+		return
+	var dist = from_pos.distance_to(to_pos)
+	if dist < 0.05:
+		return
+	var idx = _tracerIdx
+	_tracerIdx = (_tracerIdx + 1) % _tracerPool.size()
+	var t = _tracerPool[idx]
+	var ydir = (to_pos - from_pos).normalized()
+	var xdir = ydir.cross(Vector3.UP)
+	if xdir.length() < 0.01:
+		xdir = ydir.cross(Vector3.RIGHT)
+	xdir = xdir.normalized()
+	var zdir = xdir.cross(ydir).normalized()
+	t.global_transform = Transform3D(Basis(xdir, ydir, zdir), (from_pos + to_pos) * 0.5)
+	t.scale = Vector3(1.0, dist, 1.0)
+	t.visible = true
+	_tracerLife[idx] = TRACER_LIFE
+	_tracerLen[idx] = dist
 
-	line_instance.mesh = imm_mesh
-	line_instance.material_override = _laser_line_mat
-
-	imm_mesh.surface_begin(Mesh.PRIMITIVE_LINES)
-	imm_mesh.surface_add_vertex(from_pos)
-	imm_mesh.surface_add_vertex(to_pos)
-	imm_mesh.surface_end()
-	
-	get_parent().add_child(line_instance)
-	await get_tree().create_timer(duration).timeout
-	line_instance.queue_free()
+func _updateTracers(delta : float):
+	for i in _tracerPool.size():
+		if _tracerLife[i] <= 0.0:
+			continue
+		_tracerLife[i] -= delta
+		var t = _tracerPool[i]
+		if _tracerLife[i] <= 0.0:
+			t.visible = false
+			continue
+		var f = _tracerLife[i] / TRACER_LIFE
+		var w = 0.25 + f * f * 1.35
+		t.scale = Vector3(w, _tracerLen[i], w)
 
 func _draw_laser_beam(from_pos: Vector3, to_pos: Vector3, duration: float = 0.35):
 	var beam = MeshInstance3D.new()
@@ -737,16 +889,14 @@ func _ready() -> void:
 	_last_footprint_pos = global_position
 	_bullet_tex = _make_bullet_texture()
 	playerCam.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
-	_laser_line_mat = StandardMaterial3D.new()
-	_laser_line_mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
-	_laser_line_mat.albedo_color = Color(0, 0.5, 1)
 	_laser_beam_mat = StandardMaterial3D.new()
 	_laser_beam_mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
 	_laser_beam_mat.transparency = StandardMaterial3D.TRANSPARENCY_ALPHA
-	_laser_beam_mat.albedo_color = Color(0.2, 0.6, 1.0, 0.9)
+	_laser_beam_mat.albedo_color = Color(0.55, 1.0, 0.95, 0.9)
 	_laser_beam_mat.emission_enabled = true
-	_laser_beam_mat.emission = Color(0.25, 0.65, 1.0)
-	_laser_beam_mat.emission_energy_multiplier = 6.0
+	_laser_beam_mat.emission = Color(0, 0.95, 0.85)
+	_laser_beam_mat.emission_energy_multiplier = 8.0
+	_buildTracerPool.call_deferred()
 	muzzleParticles = shootingParticles.instantiate()
 	muzzleParticles.finished.disconnect(Callable(muzzleParticles, "_on_finished"))
 	gunParticleSpawn.add_child(muzzleParticles)
@@ -793,6 +943,7 @@ func _process(delta: float) -> void:
 	playerCam.rotation.x = camPitch + camKickPitch
 	playerCam.rotation.z = camRoll
 	_updateJuice(delta)
+	_updateTracers(delta)
 	_reloadVisual()
 	#NOTE-use only when unhandles input isnt good enough
 	
@@ -882,15 +1033,15 @@ func _physics_process(delta: float) -> void:
 		slide = Input.is_action_pressed("slide") and _canSlide() and stamina > 0
 		if slide and not wasSliding:
 			if is_on_floor():
-				animaPlayer.play("slide")
+				animaPlayer.play("slide"); slideCount += 1
 				var currentDir = Vector3(velocity.x,0,velocity.z).normalized()
 				if currentDir.length() > 0.1:
 					velocity.x += currentDir.x * 6
 					velocity.z += currentDir.z * 6
-			elif slamming == false and _useStamina(slamCost):
+			elif slamming == false and abSlam and _useStamina(slamCost):
 				slamming = true
 				slamStartHeight = global_position.y
-				animaPlayer.play("slam")
+				animaPlayer.play("slam"); slamCount += 1
 		if Input.is_action_just_pressed("slide") and !is_on_floor() and !slamming and _canSlide() and stamina < slamCost - 0.05:
 			_staminaFail()
 		if slide and is_on_floor():
@@ -904,7 +1055,7 @@ func _physics_process(delta: float) -> void:
 			_staminaFail()
 		if Input.is_action_just_pressed("dash") and dashCdTimer <= 0 and _canDash() and _useStamina(DASH_COST):
 			Audio.play("dash", 1.0, -3.0)
-			animaPlayer.play("dash")
+			animaPlayer.play("dash"); dashCount += 1
 			_spawnParticleAt(dashParticles, global_position)
 			var input_dir := Input.get_vector("left", "right", "forward", "backward")
 			var camForw = -playerCam.global_transform.basis.z
@@ -927,7 +1078,7 @@ func _physics_process(delta: float) -> void:
 			velocity += get_gravity()* delta;
 	if knockbackTimer <= 0:
 		if jumpBuffer > 0 and canWallJump and !is_on_floor() and wallJumpCd <= 0 and _canWallJump() and _useStamina(wallJumpCost):
-			Audio.play("walljump", 1.0, -3.0)
+			Audio.play("walljump", 1.0, -3.0); wallJumpCount += 1
 			_spawnParticleAt(wallJumpParticles, global_position)
 			var bounced = velocity.bounce(wallNormal)
 			velocity.x = bounced.x * .4 + wallNormal.x *WALL_JUMP_BOOST
@@ -941,7 +1092,7 @@ func _physics_process(delta: float) -> void:
 			coyoteTimer = 0.0
 			jumpBuffer = 0.0
 			velocity.y = JUMP_VELOCITY * _jumpMult()
-			Audio.play("jump", 1.0, -7.0)
+			Audio.play("jump", 1.0, -7.0); jumpCount += 1
 			_spawnParticleAt(jumpParticles, feet.global_position)
 		
 	if not is_on_floor() and Input.is_action_just_released("jump") and velocity.y > 0:
@@ -955,7 +1106,7 @@ func _physics_process(delta: float) -> void:
 			if Input.is_action_just_pressed("jump") and coyoteTimer > 0 and _canJump():
 				coyoteTimer = 0.0
 				velocity.y = JUMP_VELOCITY * _jumpMult()
-				Audio.play("jump", 1.0, -7.0)
+				Audio.play("jump", 1.0, -7.0); jumpCount += 1
 				_spawnParticleAt(jumpParticles, feet.global_position)
 
 			var input_dir := Input.get_vector("left", "right", "forward", "backward")
@@ -1062,20 +1213,20 @@ func _curePara(amount : int = 1, healthCost : float = 0.0):
 	if healthCost > 0:
 		health -= healthCost
 		_updateHud()
-	Audio.play("pickup", 1.2, -2.0)
+	Audio.play("win", 1.2, -8.0)
 	return true
 
 func _canDash():
-	return paraLevel < 2
+	return paraLevel < 2 and abDash
 
 func _canSlide():
-	return paraLevel < 3
+	return paraLevel < 3 and abSlide
 
 func _canWallJump():
-	return paraLevel < 4
+	return paraLevel < 4 and abWallJump
 
 func _canJump():
-	return paraLevel < 8
+	return paraLevel < 8 and abJump
 
 func _dashPower():
 	if paraLevel >= 1:
@@ -1221,6 +1372,8 @@ func _updateJuice(delta : float):
 		paraVignette.modulate.a = clamp(f * 0.6 + paraFlash, 0.0, 0.85) * flashMul
 
 func _make_vignette_texture() -> ImageTexture:
+	if _tex_vignette != null:
+		return _tex_vignette
 	var s = 128
 	var img = Image.create(s, s, false, Image.FORMAT_RGBA8)
 	var c = Vector2(s * 0.5, s * 0.5)
@@ -1230,9 +1383,12 @@ func _make_vignette_texture() -> ImageTexture:
 			var d = Vector2(x, y).distance_to(c) / maxd
 			var a = clamp((d - 0.55) / 0.45, 0.0, 1.0)
 			img.set_pixel(x, y, Color(0.95, 0.05, 0.05, a * a))
-	return ImageTexture.create_from_image(img)
+	_tex_vignette = ImageTexture.create_from_image(img)
+	return _tex_vignette
 
 func _makeParaTexture() -> ImageTexture:
+	if _tex_para != null:
+		return _tex_para
 	var s = 128
 	var img = Image.create(s, s, false, Image.FORMAT_RGBA8)
 	var c = Vector2(s * 0.5, s * 0.5)
@@ -1242,7 +1398,8 @@ func _makeParaTexture() -> ImageTexture:
 			var d = Vector2(x, y).distance_to(c) / maxd
 			var a = clamp((d - 0.45) / 0.55, 0.0, 1.0)
 			img.set_pixel(x, y, Color(0.5, 0.12, 0.85, a * a))
-	return ImageTexture.create_from_image(img)
+	_tex_para = ImageTexture.create_from_image(img)
+	return _tex_para
 
 func _spawnSlam():
 	_addShake(.08)

@@ -201,7 +201,7 @@ func _accept() -> void:
 		return
 	choosing = false
 	player.paraLevel = max(player.paraLevel - 1, 0)
-	Audio.play("pickup", 1.1, -2.0)
+	Audio.play("ui_click", 1.1, -4.0)
 	player._takeDamage(COST)
 	if player.health > 0:
 		lineLabel.text = "pleasure doing business."

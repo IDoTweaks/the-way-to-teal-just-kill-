@@ -11,7 +11,6 @@
 albedo_color = Color(0.16, 0.26, 0.18, 1)
 
 [sub_resource type="Environment" id="env"]
-ssao_enabled = false
 tonemap_mode = 2
 glow_enabled = true
 glow_intensity = 0.5
@@ -19,6 +18,12 @@ glow_hdr_threshold = 1.1
 fog_enabled = true
 fog_light_energy = 1.4
 fog_density = 0.003
+
+[sub_resource type="StandardMaterial3D" id="mat_hurdle"]
+albedo_color = Color(0.05, 0.5, 0.42, 1)
+emission_enabled = true
+emission = Color(0, 0.85, 0.78, 1)
+emission_energy_multiplier = 0.5
 
 [sub_resource type="BoxShape3D" id="gateShape"]
 size = Vector3(1, 11, 19)
@@ -57,53 +62,54 @@ material_override = SubResource("mat_level")
 use_collision = true
 collision_layer = 17
 
-[node name="Floor" type="CSGBox3D" parent="Level" unique_id=532395951]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, -0.5, 0)
-size = Vector3(132, 1, 20)
-
 [node name="Ceiling" type="CSGBox3D" parent="Level" unique_id=1779593218]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, 11.5, 0)
-size = Vector3(132, 1, 20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 85, 11.5, 0)
+size = Vector3(174, 1, 20)
 
 [node name="WallNegZ" type="CSGBox3D" parent="Level" unique_id=2017858454]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, 5.5, -10)
-size = Vector3(132, 12, 1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 85, 5.5, -10)
+size = Vector3(174, 12, 1)
 
 [node name="WallPosZ" type="CSGBox3D" parent="Level" unique_id=669657350]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, 5.5, 10)
-size = Vector3(132, 12, 1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 85, 5.5, 10)
+size = Vector3(174, 12, 1)
 
 [node name="WallBack" type="CSGBox3D" parent="Level" unique_id=765714562]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 5.5, 0)
 size = Vector3(1, 12, 20)
 
 [node name="WallFront" type="CSGBox3D" parent="Level" unique_id=752026309]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 130, 5.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 172, 5.5, 0)
 size = Vector3(1, 12, 20)
 
-[node name="Step1" type="CSGBox3D" parent="Level" unique_id=1450678896]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.75, 0)
-size = Vector3(4, 1.5, 8)
+[node name="FloorA" type="CSGBox3D" parent="Level" unique_id=532395951]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.5, -0.5, 0)
+size = Vector3(51, 1, 20)
 
-[node name="Step2" type="CSGBox3D" parent="Level" unique_id=1289734726]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 1.5, 0)
-size = Vector3(4, 3, 8)
+[node name="RecoveryPit" type="CSGBox3D" parent="Level" unique_id=532395952]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, -1.4, 0)
+size = Vector3(6, 1, 20)
 
-[node name="Plat2a" type="CSGBox3D" parent="Level" unique_id=2134110812]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.5, 1, 0)
-size = Vector3(9, 2, 8)
+[node name="RecoveryBlock" type="CSGBox3D" parent="Level" unique_id=532395953]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54.25, -0.1, 0)
+size = Vector3(1.5, 1.6, 20)
 
-[node name="Plat2b" type="CSGBox3D" parent="Level" unique_id=177967956]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 1, 0)
-size = Vector3(6, 2, 8)
+[node name="FloorB" type="CSGBox3D" parent="Level" unique_id=532395954]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 113.5, -0.5, 0)
+size = Vector3(117, 1, 20)
 
-[node name="WallJ" type="CSGBox3D" parent="Level" unique_id=1210694859]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 4, 5)
-size = Vector3(1, 8, 8)
+[node name="Hurdle" type="CSGBox3D" parent="Level" unique_id=1450678896]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.4, 0)
+material_override = SubResource("mat_hurdle")
+size = Vector3(1.2, 0.8, 20)
 
-[node name="HighLedge" type="CSGBox3D" parent="Level" unique_id=1174099782]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 4, -2)
-size = Vector3(6, 1, 6)
+[node name="ChimNeg" type="CSGBox3D" parent="Level" unique_id=1289734727]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70, 2.5, -1.7)
+size = Vector3(6, 5, 1)
+
+[node name="ChimPos" type="CSGBox3D" parent="Level" unique_id=1289734728]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70, 2.5, 1.7)
+size = Vector3(6, 5, 1)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=271040567]
 environment = SubResource("env")
@@ -114,209 +120,289 @@ transform = Transform3D(1, 0, 0, 0, -0.37609485, 0.9265812, 0, -0.9265812, -0.37
 [node name="Player" parent="." unique_id=1083916896 instance=ExtResource("2_pl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2, 0)
 
-[node name="Gate4" type="StaticBody3D" parent="." unique_id=777303873]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70, 5.5, 0)
+[node name="GateMove" type="StaticBody3D" parent="." unique_id=777303801]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 5.5, 0)
 collision_layer = 17
 
-[node name="col" type="CollisionShape3D" parent="Gate4" unique_id=1169763650]
+[node name="col" type="CollisionShape3D" parent="GateMove" unique_id=777303802]
 shape = SubResource("gateShape")
 
-[node name="mesh" type="MeshInstance3D" parent="Gate4" unique_id=1068449340]
+[node name="mesh" type="MeshInstance3D" parent="GateMove" unique_id=777303803]
 mesh = SubResource("gateMesh")
 
-[node name="Gate5" type="StaticBody3D" parent="." unique_id=958423154]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 86, 5.5, 0)
+[node name="GateJump" type="StaticBody3D" parent="." unique_id=777303811]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27, 5.5, 0)
 collision_layer = 17
 
-[node name="col" type="CollisionShape3D" parent="Gate5" unique_id=312918689]
+[node name="col" type="CollisionShape3D" parent="GateJump" unique_id=777303812]
 shape = SubResource("gateShape")
 
-[node name="mesh" type="MeshInstance3D" parent="Gate5" unique_id=448976578]
+[node name="mesh" type="MeshInstance3D" parent="GateJump" unique_id=777303813]
 mesh = SubResource("gateMesh")
 
-[node name="Gate6" type="StaticBody3D" parent="." unique_id=1453308339]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 102, 5.5, 0)
+[node name="GateSlide" type="StaticBody3D" parent="." unique_id=777303821]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 5.5, 0)
 collision_layer = 17
 
-[node name="col" type="CollisionShape3D" parent="Gate6" unique_id=450993572]
+[node name="col" type="CollisionShape3D" parent="GateSlide" unique_id=777303822]
 shape = SubResource("gateShape")
 
-[node name="mesh" type="MeshInstance3D" parent="Gate6" unique_id=340020965]
+[node name="mesh" type="MeshInstance3D" parent="GateSlide" unique_id=777303823]
 mesh = SubResource("gateMesh")
 
-[node name="Gate7" type="StaticBody3D" parent="." unique_id=1362621993]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 118, 5.5, 0)
+[node name="GateDash" type="StaticBody3D" parent="." unique_id=777303831]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 61, 5.5, 0)
 collision_layer = 17
 
-[node name="col" type="CollisionShape3D" parent="Gate7" unique_id=462385111]
+[node name="col" type="CollisionShape3D" parent="GateDash" unique_id=777303832]
 shape = SubResource("gateShape")
 
-[node name="mesh" type="MeshInstance3D" parent="Gate7" unique_id=796242862]
+[node name="mesh" type="MeshInstance3D" parent="GateDash" unique_id=777303833]
 mesh = SubResource("gateMesh")
 
-[node name="P4_1" parent="." unique_id=280742981 instance=ExtResource("5_walk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, 2, 3)
+[node name="GateWJ" type="StaticBody3D" parent="." unique_id=777303841]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 77, 5.5, 0)
+collision_layer = 17
 
-[node name="P4_2" parent="." unique_id=551974362 instance=ExtResource("5_walk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66, 2, -3)
+[node name="col" type="CollisionShape3D" parent="GateWJ" unique_id=777303842]
+shape = SubResource("gateShape")
 
-[node name="P5_1" parent="." unique_id=1372018732 instance=ExtResource("5_walk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 2, 2)
+[node name="mesh" type="MeshInstance3D" parent="GateWJ" unique_id=777303843]
+mesh = SubResource("gateMesh")
 
-[node name="P5_2" parent="." unique_id=1657782478 instance=ExtResource("5_walk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82, 2, -2)
+[node name="GateSlam" type="StaticBody3D" parent="." unique_id=777303851]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 93, 5.5, 0)
+collision_layer = 17
 
-[node name="P5_3" parent="." unique_id=116990743 instance=ExtResource("5_walk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84, 2, 0)
+[node name="col" type="CollisionShape3D" parent="GateSlam" unique_id=777303852]
+shape = SubResource("gateShape")
 
-[node name="P6_1" parent="." unique_id=770785533 instance=ExtResource("5_walk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98, 2, 4)
+[node name="mesh" type="MeshInstance3D" parent="GateSlam" unique_id=777303853]
+mesh = SubResource("gateMesh")
 
-[node name="P6_2" parent="." unique_id=106471873 instance=ExtResource("5_walk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 2, -4)
+[node name="GateShoot" type="StaticBody3D" parent="." unique_id=777303861]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 110, 5.5, 0)
+collision_layer = 17
 
-[node name="P7_1" parent="." unique_id=1183018193 instance=ExtResource("5_walk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 110, 2, 3)
+[node name="col" type="CollisionShape3D" parent="GateShoot" unique_id=777303862]
+shape = SubResource("gateShape")
 
-[node name="P7_2" parent="." unique_id=1886549413 instance=ExtResource("5_walk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 112, 2, -3)
+[node name="mesh" type="MeshInstance3D" parent="GateShoot" unique_id=777303863]
+mesh = SubResource("gateMesh")
 
-[node name="P7_3" parent="." unique_id=1393792141 instance=ExtResource("5_walk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114, 2, 3)
+[node name="GateShotgun" type="StaticBody3D" parent="." unique_id=777303871]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 127, 5.5, 0)
+collision_layer = 17
 
-[node name="P7_4" parent="." unique_id=1418886761 instance=ExtResource("5_walk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 116, 2, -3)
+[node name="col" type="CollisionShape3D" parent="GateShotgun" unique_id=777303872]
+shape = SubResource("gateShape")
 
-[node name="Zone1" type="Area3D" parent="." unique_id=894158864]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 4, 0)
+[node name="mesh" type="MeshInstance3D" parent="GateShotgun" unique_id=777303873]
+mesh = SubResource("gateMesh")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone1" unique_id=994671725]
+[node name="GateSniper" type="StaticBody3D" parent="." unique_id=777303881]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 146, 5.5, 0)
+collision_layer = 17
+
+[node name="col" type="CollisionShape3D" parent="GateSniper" unique_id=777303882]
+shape = SubResource("gateShape")
+
+[node name="mesh" type="MeshInstance3D" parent="GateSniper" unique_id=777303883]
+mesh = SubResource("gateMesh")
+
+[node name="E7_1" parent="." unique_id=280742901 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 102, 2, 2)
+
+[node name="E7_2" parent="." unique_id=280742902 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 104, 2, -2)
+
+[node name="E8_1" parent="." unique_id=280742911 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 118, 2, 2)
+
+[node name="E8_2" parent="." unique_id=280742912 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 120, 2, -2)
+
+[node name="E8_3" parent="." unique_id=280742913 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 122, 2, 0)
+
+[node name="E9_1" parent="." unique_id=280742921 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 136, 2, 3)
+
+[node name="E9_2" parent="." unique_id=280742922 instance=ExtResource("5_walk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 140, 2, -3)
+
+[node name="Zone1" type="Area3D" parent="." unique_id=894158801]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone1" unique_id=894158802]
 shape = SubResource("zoneShape")
 
-[node name="Zone2" type="Area3D" parent="." unique_id=618308423]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 4, 0)
+[node name="Zone2" type="Area3D" parent="." unique_id=894158811]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 4, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone2" unique_id=1803730565]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone2" unique_id=894158812]
 shape = SubResource("zoneShape")
 
-[node name="Zone3" type="Area3D" parent="." unique_id=2036694006]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 4, 0)
+[node name="Zone3" type="Area3D" parent="." unique_id=894158821]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 4, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone3" unique_id=207550000]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone3" unique_id=894158822]
 shape = SubResource("zoneShape")
 
-[node name="Zone4" type="Area3D" parent="." unique_id=1209235869]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58, 4, 0)
+[node name="Zone4" type="Area3D" parent="." unique_id=894158831]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 4, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone4" unique_id=1304199304]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone4" unique_id=894158832]
 shape = SubResource("zoneShape")
 
-[node name="Zone5" type="Area3D" parent="." unique_id=891642194]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 76, 4, 0)
+[node name="Zone5" type="Area3D" parent="." unique_id=894158841]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, 4, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone5" unique_id=617255597]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone5" unique_id=894158842]
 shape = SubResource("zoneShape")
 
-[node name="Zone6" type="Area3D" parent="." unique_id=799151558]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 92, 4, 0)
+[node name="Zone6" type="Area3D" parent="." unique_id=894158851]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 4, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone6" unique_id=454162323]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone6" unique_id=894158852]
 shape = SubResource("zoneShape")
 
-[node name="Zone7" type="Area3D" parent="." unique_id=1021515214]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 106, 4, 0)
+[node name="Zone7" type="Area3D" parent="." unique_id=894158861]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 96, 4, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone7" unique_id=211517374]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone7" unique_id=894158862]
+shape = SubResource("zoneShape")
+
+[node name="Zone8" type="Area3D" parent="." unique_id=894158871]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 113, 4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone8" unique_id=894158872]
+shape = SubResource("zoneShape")
+
+[node name="Zone9" type="Area3D" parent="." unique_id=894158881]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 130, 4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone9" unique_id=894158882]
+shape = SubResource("zoneShape")
+
+[node name="Zone10" type="Area3D" parent="." unique_id=894158891]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 149, 4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone10" unique_id=894158892]
 shape = SubResource("zoneShape")
 
 [node name="Signs" type="Node3D" parent="." unique_id=522699541]
 
-[node name="Sign1" type="Label3D" parent="Signs" unique_id=1500918140]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 3.4, 0)
+[node name="Sign_move" type="Label3D" parent="Signs" unique_id=1500918101]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3.4, 0)
 pixel_size = 0.011
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
 outline_modulate = Color(0, 0.1, 0.09, 1)
-text = "MOVE   W A S D
-JUMP   SPACE"
+text = "MOVE  W A S D
+walk to the gate"
 font = ExtResource("6_orb")
-font_size = 80
+font_size = 72
 outline_size = 24
 
-[node name="Sign2" type="Label3D" parent="Signs" unique_id=1084059350]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 3.4, 0)
+[node name="Sign_jump" type="Label3D" parent="Signs" unique_id=1500918102]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 3.4, 0)
 pixel_size = 0.011
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
 outline_modulate = Color(0, 0.1, 0.09, 1)
-text = "SLIDE   CTRL
-DASH   SHIFT"
+text = "JUMP  SPACE
+hop the barrier"
 font = ExtResource("6_orb")
-font_size = 80
+font_size = 72
 outline_size = 24
 
-[node name="Sign3" type="Label3D" parent="Signs" unique_id=1492235912]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 3.4, 0)
+[node name="Sign_slide" type="Label3D" parent="Signs" unique_id=1500918103]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33, 3.4, 0)
 pixel_size = 0.011
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
 outline_modulate = Color(0, 0.1, 0.09, 1)
-text = "WALL-JUMP into walls
-SLAM = SLIDE in the air"
+text = "SLIDE  hold CTRL
+keep your speed"
 font = ExtResource("6_orb")
-font_size = 70
+font_size = 68
 outline_size = 24
 
-[node name="Sign4" type="Label3D" parent="Signs" unique_id=991128867]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, 3.4, 0)
+[node name="Sign_dash" type="Label3D" parent="Signs" unique_id=1500918104]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47, 3.4, 0)
 pixel_size = 0.011
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
 outline_modulate = Color(0, 0.1, 0.09, 1)
-text = "LEFT MOUSE = SHOOT
+text = "DASH  SHIFT
+jump then dash the gap"
+font = ExtResource("6_orb")
+font_size = 64
+outline_size = 24
+
+[node name="Sign_wj" type="Label3D" parent="Signs" unique_id=1500918105]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 67, 3.9, 0)
+pixel_size = 0.011
+billboard = 1
+modulate = Color(0, 1, 0.85, 1)
+outline_modulate = Color(0, 0.1, 0.09, 1)
+text = "WALL-JUMP
+jump into a wall, jump again"
+font = ExtResource("6_orb")
+font_size = 58
+outline_size = 24
+
+[node name="Sign_slam" type="Label3D" parent="Signs" unique_id=1500918106]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 83, 3.4, 0)
+pixel_size = 0.011
+billboard = 1
+modulate = Color(0, 1, 0.85, 1)
+outline_modulate = Color(0, 0.1, 0.09, 1)
+text = "SLAM
+jump, then CTRL in the air"
+font = ExtResource("6_orb")
+font_size = 64
+outline_size = 24
+
+[node name="Sign_shoot" type="Label3D" parent="Signs" unique_id=1500918107]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 98, 3.4, 0)
+pixel_size = 0.011
+billboard = 1
+modulate = Color(0, 1, 0.85, 1)
+outline_modulate = Color(0, 0.1, 0.09, 1)
+text = "SHOOT  LEFT MOUSE
 clear the enemies"
 font = ExtResource("6_orb")
-font_size = 76
+font_size = 68
 outline_size = 24
 
-[node name="Sign5" type="Label3D" parent="Signs" unique_id=1317899682]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74, 3.4, 0)
+[node name="Sign_shotgun" type="Label3D" parent="Signs" unique_id=1500918108]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 115, 3.4, 0)
 pixel_size = 0.011
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
 outline_modulate = Color(0, 0.1, 0.09, 1)
-text = "SCROLL = SWITCH GUNS
-SHOTGUN up close"
+text = "SHOTGUN  press 2 or scroll
+get close, then blast"
 font = ExtResource("6_orb")
-font_size = 70
+font_size = 60
 outline_size = 24
 
-[node name="Sign6" type="Label3D" parent="Signs" unique_id=137473331]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, 3.4, 0)
+[node name="Sign_sniper" type="Label3D" parent="Signs" unique_id=1500918109]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 132, 3.4, 0)
 pixel_size = 0.011
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
 outline_modulate = Color(0, 0.1, 0.09, 1)
-text = "SNIPER + RIGHT MOUSE
-scope to aim"
+text = "SNIPER  press 3
+RIGHT MOUSE to scope"
 font = ExtResource("6_orb")
-font_size = 70
+font_size = 62
 outline_size = 24
 
-[node name="Sign7" type="Label3D" parent="Signs" unique_id=1954424709]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 104, 3.4, 0)
-pixel_size = 0.011
-billboard = 1
-modulate = Color(0, 1, 0.85, 1)
-outline_modulate = Color(0, 0.1, 0.09, 1)
-text = "STYLE = fast, airborne,
-varied kills"
-font = ExtResource("6_orb")
-font_size = 66
-outline_size = 24
-
-[node name="SignExit" type="Label3D" parent="Signs" unique_id=686990147]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 122, 3.6, 0)
+[node name="SignExit" type="Label3D" parent="Signs" unique_id=1500918110]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 156, 3.6, 0)
 pixel_size = 0.016
 billboard = 1
 modulate = Color(0, 1, 0.85, 1)
@@ -328,7 +414,7 @@ font_size = 80
 outline_size = 26
 
 [node name="FinishOrb" parent="." unique_id=1342762593 node_paths=PackedStringArray("player") instance=ExtResource("3_fin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 124, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 158, 2, 0)
 toLevel = 1
 tutorialExit = true
 player = NodePath("../Player")
@@ -368,7 +454,7 @@ theme_override_colors/font_outline_color = Color(0, 0.1, 0.09, 1)
 theme_override_constants/outline_size = 6
 theme_override_fonts/font = ExtResource("6_orb")
 theme_override_font_sizes/font_size = 26
-text = "MOVE: W A S D      JUMP: SPACE"
+text = "MOVE: W A S D"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2

@@ -103,8 +103,19 @@ var bossBar
 var bossIntro
 var introPlaying = false
 
+func _briefingUp():
+	for n in get_tree().root.find_children("*", "CanvasLayer", true, false):
+		if n.has_method("_paraBriefing"):
+			return true
+	return false
+
 func _startIntro():
 	await get_tree().create_timer(.6, true, false, true).timeout
+	while _briefingUp():
+		await get_tree().process_frame
+		if dead or !is_instance_valid(self):
+			introPlaying = false
+			return
 	if dead or !is_instance_valid(self) or bossIntro == null:
 		introPlaying = false
 		return
@@ -588,7 +599,7 @@ func _sleep():
 	atkCd = attackGap
 	_setExposed(true)
 	Audio.play("enemy_death", 0.35, -3.0)
-	Audio.play("pickup", 0.5, -8.0)
+	Audio.play("ui_click", 0.5, -8.0)
 	if bossBar:
 		bossBar._setOpen(true)
 	var tween = create_tween()

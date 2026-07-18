@@ -8,6 +8,7 @@ var tickAccum : float = 0.0
 var revealed = false
 var revealScale : float = 1.0
 @onready var scoreShow = $UI/MainContainer/ScoreShow
+@onready var timeShow = $UI/MainContainer/TimeShow
 @onready var nextBtn = $UI/MainContainer/MenuButtons/nextBtn
 @onready var gradeShow = $UI/MainContainer/gradeShow
 @onready var gradeFire = $UI/MainContainer/GradeFire
@@ -30,6 +31,17 @@ func _setScore(newScore:int):
 	score = 0
 	revealed = false
 	revealScale = 1.0
+func _setTime(t : float, par : float, best : float):
+	var line = "TIME  %s     PAR  %s" % [_fmtTime(t), _fmtTime(par)]
+	if best >= 0.0:
+		line += "     BEST  %s" % _fmtTime(best)
+	timeShow.text = line
+	timeShow.modulate = Color(0.3, 1.0, 0.6) if t <= par else Color(0, 0.85, 0.78)
+
+func _fmtTime(t : float) -> String:
+	var s = max(t, 0.0)
+	return "%d:%05.2f" % [int(s / 60.0), fmod(s, 60.0)]
+
 func _setGrade(newGrade: String):
 	gradeShow.text = newGrade
 	gradeShow.modulate = _gradeColor(newGrade)
@@ -67,7 +79,7 @@ func _revealGrade():
 	if gradeFill >= 1.0:
 		Audio.play("win", 1.0, -3.0)
 	else:
-		Audio.play("pickup", 0.9, -5.0)
+		Audio.play("ui_click", 0.9, -6.0)
 
 func _gradeFill(grade : String) -> float:
 	if grade.begins_with("S"):

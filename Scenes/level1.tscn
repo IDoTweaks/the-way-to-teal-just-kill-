@@ -224,7 +224,8 @@ transform = Transform3D(1, 0, 0, 0, -0.37609485, 0.9265812, 0, -0.9265812, -0.37
 
 [node name="Player" parent="." unique_id=659499291 instance=ExtResource("1_vly50")]
 transform = Transform3D(0.12933208, 0, -0.99160135, 0, 1, 0, 0.99160135, 0, 0.12933208, 0, 2.2655072, 0)
-shotGunDmg = 7.5
+shotGunDmg = 10.0
+parTime = 50.0
 
 [node name="Enemy" parent="." unique_id=1301325712 instance=ExtResource("3_c5erv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1, 0.5)

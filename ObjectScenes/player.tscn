@@ -972,7 +972,7 @@ mesh = SubResource("BoxMesh_m8bbn")
 libraries/ = SubResource("AnimationLibrary_tut37")
 
 [node name="shotGunCd" type="Timer" parent="." unique_id=1161446591]
-wait_time = 1.5
+wait_time = 1.1
 
 [node name="levelEnd" parent="." unique_id=421539132 instance=ExtResource("7_lvdpo")]
 visible = false

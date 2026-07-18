@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+func _paraBriefing(): pass
+
 const PURPLE = Color(0.62, 0.25, 1.0)
 const TEXT = Color(0.86, 0.86, 0.88)
 const DIM = Color(0.55, 0.55, 0.58)

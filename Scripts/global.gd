@@ -1,6 +1,14 @@
 extends Node
 var _fade : ColorRect
 var _fading := false
+var _loading : Control
+var _loadTitle : Label
+var _loadSub : Label
+var _loadBar : ColorRect
+var _loadTween : Tween
+var _loadStart : int = 0
+const LOADING_MIN_MS = 450
+const LOADING_SETTLE_FRAMES = 6
 @onready var mainMenu = preload("res://Scenes/mainMenu.tscn")
 @onready var level1 = preload("res://Scenes/level1.tscn")
 @onready var level2 = preload("res://Scenes/level2.tscn")
@@ -46,6 +54,10 @@ var scopedSens := 0.0022
 var fov := 75.0
 var screenShake := 1.0
 var reducedFlash := false
+var renderScale := 1.0
+var glowOn := true
+var decalDensity := 1.0
+var fpsCap := 0
 
 const SETTINGS_RES : Array[Vector2i] = [
 	Vector2i(2560, 1440),
@@ -71,6 +83,10 @@ func _loadSettings():
 		fov = config.get_value("display", "fov", fov)
 		screenShake = config.get_value("display", "screenShake", screenShake)
 		reducedFlash = config.get_value("display", "reducedFlash", reducedFlash)
+		renderScale = config.get_value("graphics", "renderScale", renderScale)
+		glowOn = config.get_value("graphics", "glow", glowOn)
+		decalDensity = config.get_value("graphics", "decalDensity", decalDensity)
+		fpsCap = config.get_value("graphics", "fpsCap", fpsCap)
 	_applySettings()
 
 func _saveSettings():
@@ -85,6 +101,10 @@ func _saveSettings():
 	config.set_value("display", "fov", fov)
 	config.set_value("display", "screenShake", screenShake)
 	config.set_value("display", "reducedFlash", reducedFlash)
+	config.set_value("graphics", "renderScale", renderScale)
+	config.set_value("graphics", "glow", glowOn)
+	config.set_value("graphics", "decalDensity", decalDensity)
+	config.set_value("graphics", "fpsCap", fpsCap)
 	config.save("user://settings.cfg")
 
 func _resetDefaults():
@@ -98,6 +118,10 @@ func _resetDefaults():
 	fov = 75.0
 	screenShake = 1.0
 	reducedFlash = false
+	renderScale = 1.0
+	glowOn = true
+	decalDensity = 1.0
+	fpsCap = 0
 	resIndex = 1
 	_applySettings()
 	_saveSettings()
@@ -107,6 +131,32 @@ func _applySettings():
 	_applyVol(1, musicVol)
 	_applyVol(2, sfxVol)
 	_applyDisplay()
+	_applyGraphics()
+
+func _applyGraphics():
+	Engine.max_fps = fpsCap
+	var tree = get_tree()
+	if tree == null:
+		return
+	var vp = tree.root
+	vp.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR2 if renderScale < 0.999 else Viewport.SCALING_3D_MODE_BILINEAR
+	vp.scaling_3d_scale = renderScale
+	_applyGlow()
+
+func _applyGlow():
+	var tree = get_tree()
+	if tree == null or tree.current_scene == null:
+		return
+	for env in _findEnvs(tree.current_scene):
+		if env.environment:
+			env.environment.glow_enabled = glowOn
+
+func _findEnvs(node : Node, out : Array = []) -> Array:
+	if node is WorldEnvironment:
+		out.append(node)
+	for c in node.get_children():
+		_findEnvs(c, out)
+	return out
 
 func _applyVol(bus : int, value : float):
 	AudioServer.set_bus_volume_db(bus, linear_to_db(max(value, 0.0001)))
@@ -223,6 +273,114 @@ func _buildFade():
 	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_fade.process_mode = Node.PROCESS_MODE_ALWAYS
 	layer.add_child(_fade)
+	_buildLoading()
+
+func _buildLoading():
+	var layer = CanvasLayer.new()
+	layer.layer = 129
+	layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(layer)
+
+	_loading = Control.new()
+	_loading.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_loading.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_loading.process_mode = Node.PROCESS_MODE_ALWAYS
+	_loading.visible = false
+	layer.add_child(_loading)
+
+	var bg = ColorRect.new()
+	bg.color = Color(0.012, 0.018, 0.022, 1)
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_loading.add_child(bg)
+
+	var font = load("res://Fonts/Orbitron.tres")
+
+	_loadTitle = Label.new()
+	_loadTitle.set_anchors_preset(Control.PRESET_CENTER)
+	_loadTitle.offset_left = -460
+	_loadTitle.offset_right = 460
+	_loadTitle.offset_top = -110
+	_loadTitle.offset_bottom = -30
+	_loadTitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_loadTitle.add_theme_font_size_override("font_size", 64)
+	_loadTitle.add_theme_color_override("font_color", Color(0.92, 1, 0.99))
+	if font:
+		_loadTitle.add_theme_font_override("font", font)
+	_loading.add_child(_loadTitle)
+
+	_loadSub = Label.new()
+	_loadSub.set_anchors_preset(Control.PRESET_CENTER)
+	_loadSub.offset_left = -460
+	_loadSub.offset_right = 460
+	_loadSub.offset_top = 40
+	_loadSub.offset_bottom = 84
+	_loadSub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_loadSub.add_theme_font_size_override("font_size", 26)
+	_loadSub.add_theme_color_override("font_color", Color(0, 0.85, 0.78))
+	if font:
+		_loadSub.add_theme_font_override("font", font)
+	_loading.add_child(_loadSub)
+
+	var track = ColorRect.new()
+	track.color = Color(0, 0.85, 0.78, 0.16)
+	track.set_anchors_preset(Control.PRESET_CENTER)
+	track.offset_left = -260
+	track.offset_right = 260
+	track.offset_top = 108
+	track.offset_bottom = 114
+	track.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_loading.add_child(track)
+
+	_loadBar = ColorRect.new()
+	_loadBar.color = Color(0, 0.85, 0.78, 1)
+	_loadBar.set_anchors_preset(Control.PRESET_CENTER)
+	_loadBar.offset_top = 108
+	_loadBar.offset_bottom = 114
+	_loadBar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_loading.add_child(_loadBar)
+
+func _levelLabel(idx) -> String:
+	if idx == 0:
+		return "MAIN MENU"
+	if _isBoss(idx):
+		return _bossName(idx)
+	return "LEVEL %d" % idx
+
+func _showLoading(title : String):
+	if _loading == null:
+		return
+	_loadTitle.text = "LOADING"
+	_loadSub.text = title
+	_loading.visible = true
+	_loadStart = Time.get_ticks_msec()
+	if _loadTween:
+		_loadTween.kill()
+	_loadBar.offset_left = -260
+	_loadBar.offset_right = -180
+	_loadTween = create_tween().set_loops()
+	_loadTween.tween_method(_setLoadBar, -260.0, 180.0, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_loadTween.tween_method(_setLoadBar, 180.0, -260.0, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+func _setLoadBar(x : float):
+	if _loadBar:
+		_loadBar.offset_left = x
+		_loadBar.offset_right = x + 80.0
+
+func _hideLoading():
+	if _loading == null:
+		return
+	var held = Time.get_ticks_msec() - _loadStart
+	if held < LOADING_MIN_MS:
+		await get_tree().create_timer((LOADING_MIN_MS - held) / 1000.0).timeout
+	if _loadTween:
+		_loadTween.kill()
+		_loadTween = null
+	_loading.visible = false
+
+func _settleFrames():
+	for i in LOADING_SETTLE_FRAMES:
+		await get_tree().process_frame
 
 func _fadeTo(a : float, t : float):
 	if _fade == null:
@@ -285,9 +443,12 @@ func _goToLevel(idx):
 	_fading = true
 	currentLevel = idx
 	await _fadeTo(1.0, .2)
+	_showLoading(_levelLabel(idx))
 	Audio.music_for_level(idx)
 	get_tree().change_scene_to_packed(levels[idx])
-	await get_tree().process_frame
+	await _settleFrames()
+	_applyGlow()
+	await _hideLoading()
 	_fading = false
 	await _fadeTo(0.0, .3)
 
@@ -296,9 +457,12 @@ func _goToTutorial():
 		return
 	_fading = true
 	await _fadeTo(1.0, .2)
+	_showLoading("TUTORIAL")
 	Audio.music_for_level(0)
 	get_tree().change_scene_to_packed(tutorial)
-	await get_tree().process_frame
+	await _settleFrames()
+	_applyGlow()
+	await _hideLoading()
 	_fading = false
 	await _fadeTo(0.0, .3)
 

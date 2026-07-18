@@ -101,7 +101,8 @@ transform = Transform3D(24, 0, 0, 0, 0.8, 0, 0, 0, 26, 12, -0.4, 0)
 [node name="Player" parent="." instance=ExtResource("2_pl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2, -9)
 dashBoost = 22.0
-shotGunDmg = 7.5
+shotGunDmg = 10.0
+parTime = 50.0
 
 [node name="Player2" parent="." instance=ExtResource("3_gh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2, -9)

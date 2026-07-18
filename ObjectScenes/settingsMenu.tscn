@@ -40,86 +40,120 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(600, 760)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 theme_override_styles/panel = SubResource("Panel_sb")
 
 [node name="Margin" type="MarginContainer" parent="Center/Panel"]
 layout_mode = 2
 theme_override_constants/margin_left = 38
-theme_override_constants/margin_top = 30
+theme_override_constants/margin_top = 26
 theme_override_constants/margin_right = 38
-theme_override_constants/margin_bottom = 30
+theme_override_constants/margin_bottom = 26
 
 [node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin"]
-custom_minimum_size = Vector2(480, 0)
 layout_mode = 2
 theme = ExtResource("4_theme")
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="TitleLabel" type="Label" parent="Center/Panel/Margin/VBox"]
-custom_minimum_size = Vector2(0, 78)
+custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 1, 0.99, 1)
 theme_override_colors/font_outline_color = Color(0, 0.5, 0.46, 1)
 theme_override_constants/outline_size = 0
-theme_override_font_sizes/font_size = 62
+theme_override_font_sizes/font_size = 48
 text = "SETTINGS"
+vertical_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="Center/Panel/Margin/VBox"]
 layout_mode = 2
 
-[node name="VolLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="Scroll" type="ScrollContainer" parent="Center/Panel/Margin/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="List" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Scroll"]
+custom_minimum_size = Vector2(480, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="AudioHeader" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 20
+text = "— AUDIO —"
+
+[node name="VolLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
 theme_override_font_sizes/font_size = 26
 text = "MASTER VOLUME"
 
-[node name="VolumeSlider" type="HSlider" parent="Center/Panel/Margin/VBox"]
+[node name="VolumeSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
 modulate = Color(0.3, 0.95, 0.95, 1)
 custom_minimum_size = Vector2(0, 26)
 layout_mode = 2
+scrollable = false
 min_value = 0.0
 max_value = 1.0
 step = 0.01
 value = 1.0
 
-[node name="MusicLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="MusicLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
 theme_override_font_sizes/font_size = 26
 text = "MUSIC"
 
-[node name="MusicSlider" type="HSlider" parent="Center/Panel/Margin/VBox"]
+[node name="MusicSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
 modulate = Color(0.3, 0.95, 0.95, 1)
 custom_minimum_size = Vector2(0, 26)
 layout_mode = 2
+scrollable = false
 min_value = 0.0
 max_value = 1.0
 step = 0.01
 value = 1.0
 
-[node name="SfxLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="SfxLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
 theme_override_font_sizes/font_size = 26
 text = "SFX"
 
-[node name="SfxSlider" type="HSlider" parent="Center/Panel/Margin/VBox"]
+[node name="SfxSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
 modulate = Color(0.3, 0.95, 0.95, 1)
 custom_minimum_size = Vector2(0, 26)
 layout_mode = 2
+scrollable = false
 min_value = 0.0
 max_value = 1.0
 step = 0.01
 value = 1.0
 
-[node name="DispLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="HSeparatorA" type="HSeparator" parent="Center/Panel/Margin/VBox/Scroll/List"]
+layout_mode = 2
+
+[node name="DisplayHeader" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 20
+text = "— DISPLAY —"
+
+[node name="DispLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
 theme_override_font_sizes/font_size = 26
 text = "DISPLAY MODE"
 
-[node name="DisplayOption" type="OptionButton" parent="Center/Panel/Margin/VBox"]
+[node name="DisplayOption" type="OptionButton" parent="Center/Panel/Margin/VBox/Scroll/List"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 selected = 1
@@ -131,95 +165,166 @@ popup/item_1/id = 1
 popup/item_2/text = "FULLSCREEN"
 popup/item_2/id = 2
 
-[node name="ResLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="ResLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
 theme_override_font_sizes/font_size = 26
 text = "RESOLUTION"
 
-[node name="ResOption" type="OptionButton" parent="Center/Panel/Margin/VBox"]
+[node name="ResOption" type="OptionButton" parent="Center/Panel/Margin/VBox/Scroll/List"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 disabled = true
 
-[node name="SensLabel" type="Label" parent="Center/Panel/Margin/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
-theme_override_font_sizes/font_size = 26
-text = "SENSITIVITY"
-
-[node name="SensSlider" type="HSlider" parent="Center/Panel/Margin/VBox"]
-modulate = Color(0.3, 0.95, 0.95, 1)
-custom_minimum_size = Vector2(0, 26)
-layout_mode = 2
-min_value = 0.0005
-max_value = 0.02
-step = 0.0005
-value = 0.005
-
-[node name="ScopeSensLabel" type="Label" parent="Center/Panel/Margin/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
-theme_override_font_sizes/font_size = 26
-text = "SCOPED SENSITIVITY"
-
-[node name="ScopeSensSlider" type="HSlider" parent="Center/Panel/Margin/VBox"]
-modulate = Color(0.3, 0.95, 0.95, 1)
-custom_minimum_size = Vector2(0, 26)
-layout_mode = 2
-min_value = 0.0005
-max_value = 0.02
-step = 0.0005
-value = 0.0022
-
-[node name="FovLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="FovLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
 theme_override_font_sizes/font_size = 26
 text = "FIELD OF VIEW"
 
-[node name="FovSlider" type="HSlider" parent="Center/Panel/Margin/VBox"]
+[node name="FovSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
 modulate = Color(0.3, 0.95, 0.95, 1)
 custom_minimum_size = Vector2(0, 26)
 layout_mode = 2
+scrollable = false
 min_value = 60.0
 max_value = 110.0
 step = 1.0
 value = 75.0
 
-[node name="ShakeLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="ShakeLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
 theme_override_font_sizes/font_size = 26
 text = "SCREEN SHAKE"
 
-[node name="ShakeSlider" type="HSlider" parent="Center/Panel/Margin/VBox"]
+[node name="ShakeSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
 modulate = Color(0.3, 0.95, 0.95, 1)
 custom_minimum_size = Vector2(0, 26)
 layout_mode = 2
+scrollable = false
 min_value = 0.0
 max_value = 1.0
 step = 0.05
 value = 1.0
 
-[node name="FlashCheck" type="CheckButton" parent="Center/Panel/Margin/VBox"]
+[node name="FlashCheck" type="CheckButton" parent="Center/Panel/Margin/VBox/Scroll/List"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "REDUCED FLASH"
+
+[node name="HSeparator3" type="HSeparator" parent="Center/Panel/Margin/VBox/Scroll/List"]
+layout_mode = 2
+
+[node name="GraphicsHeader" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 20
+text = "— GRAPHICS —"
+
+[node name="QualityLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
+theme_override_font_sizes/font_size = 26
+text = "RENDER SCALE  (lower = faster)"
+
+[node name="ScaleSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
+modulate = Color(0.3, 0.95, 0.95, 1)
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+scrollable = false
+min_value = 0.5
+max_value = 1.0
+step = 0.05
+value = 1.0
+
+[node name="DecalLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
+theme_override_font_sizes/font_size = 26
+text = "DECAL DENSITY"
+
+[node name="DecalSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
+modulate = Color(0.3, 0.95, 0.95, 1)
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+scrollable = false
+min_value = 0.0
+max_value = 1.0
+step = 0.1
+value = 1.0
+
+[node name="FpsLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
+theme_override_font_sizes/font_size = 26
+text = "FPS CAP"
+
+[node name="FpsOption" type="OptionButton" parent="Center/Panel/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+
+[node name="GlowCheck" type="CheckButton" parent="Center/Panel/Margin/VBox/Scroll/List"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+button_pressed = true
+text = "GLOW"
+
+[node name="HSeparatorB" type="HSeparator" parent="Center/Panel/Margin/VBox/Scroll/List"]
+layout_mode = 2
+
+[node name="ControlsHeader" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 20
+text = "— CONTROLS —"
+
+[node name="SensLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
+theme_override_font_sizes/font_size = 26
+text = "SENSITIVITY"
+
+[node name="SensSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
+modulate = Color(0.3, 0.95, 0.95, 1)
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+scrollable = false
+min_value = 0.0005
+max_value = 0.02
+step = 0.0005
+value = 0.005
+
+[node name="ScopeSensLabel" type="Label" parent="Center/Panel/Margin/VBox/Scroll/List"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.85, 0.78, 1)
+theme_override_font_sizes/font_size = 26
+text = "SCOPED SENSITIVITY"
+
+[node name="ScopeSensSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Scroll/List"]
+modulate = Color(0.3, 0.95, 0.95, 1)
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+scrollable = false
+min_value = 0.0005
+max_value = 0.02
+step = 0.0005
+value = 0.0022
 
 [node name="HSeparator2" type="HSeparator" parent="Center/Panel/Margin/VBox"]
 layout_mode = 2
 
 [node name="ResetBtn" type="Button" parent="Center/Panel/Margin/VBox"]
-custom_minimum_size = Vector2(0, 56)
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 28
 text = "RESET TO DEFAULT"
 alignment = 0
 
 [node name="BackBtn" type="Button" parent="Center/Panel/Margin/VBox"]
-custom_minimum_size = Vector2(0, 56)
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 28
 text = "◀ BACK"
 alignment = 0

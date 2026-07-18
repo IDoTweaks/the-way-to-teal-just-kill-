@@ -20,7 +20,7 @@ func _on_jump_area_body_entered(body: Node3D) -> void:
 
 func _launch(body: Node3D) -> void:
 	onCd = true
-	Audio.play("pickup", 1.0, -3.0)
+	Audio.play("jump", 1.25, -4.0)
 	var burst = pickupParticles.instantiate()
 	get_parent().add_child(burst)
 	burst.global_position = global_position
@@ -36,7 +36,7 @@ func _launch(body: Node3D) -> void:
 		return
 	onCd = false
 	_scaleOrb(1.0, .25)
-	Audio.play("pickup", 1.9, -18.0)
+	Audio.play("ui_hover", 1.6, -20.0)
 
 func _scaleOrb(mult : float, time : float):
 	if !is_inside_tree():
