@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="4_uvyhu"]
 [ext_resource type="PackedScene" uid="uid://cxd7ktd7qi6m2" path="res://ObjectScenes/snake.tscn" id="5_3fud5"]
 [ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="6_pause"]
+[ext_resource type="Shader" path="res://shaders/bossSky.gdshader" id="99_sky"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_i00bq"]
 render_priority = 0
@@ -34,9 +35,26 @@ albedo_color = Color(0, 1, 0.76862746, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_mipte"]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bosssky"]
+shader = ExtResource("99_sky")
+
+[sub_resource type="Sky" id="Sky_boss"]
+sky_material = SubResource("ShaderMaterial_bosssky")
+
 [sub_resource type="Environment" id="Environment_kag7s"]
-background_mode = 1
-background_color = Color(0.84313726, 1, 1, 1)
+background_mode = 2
+sky = SubResource("Sky_boss")
+ambient_light_source = 3
+ambient_light_energy = 0.55
+tonemap_mode = 2
+glow_enabled = true
+glow_intensity = 0.55
+glow_hdr_threshold = 1.1
+fog_enabled = true
+fog_light_color = Color(0.1, 0.42, 0.44, 1)
+fog_light_energy = 1.1
+fog_density = 0.0035
+fog_sky_affect = 0.0
 
 [node name="BossFloor" type="Node3D" unique_id=2125884418 node_paths=PackedStringArray("player", "snake")]
 script = ExtResource("1_i4i7f")

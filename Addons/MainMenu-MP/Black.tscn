@@ -20,7 +20,7 @@ script = ExtResource("1_k7s4i")
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.02, 0.03, 0.04, 0.92)
+color = Color(0.02, 0.03, 0.04, 0.28)
 
 [node name="BackgroundPattern" type="TextureRect" parent="." unique_id=788495792]
 modulate = Color(0.15, 0.15, 0.18, 0.3)
@@ -83,22 +83,43 @@ text = "(just kill:)"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Tagline" type="Label" parent="UI/MainContainer" unique_id=1967707046]
+[node name="TowerSign" type="Label" parent="UI/MainContainer" unique_id=1967707048]
 theme_type_variation = &"H2"
-modulate = Color(0, 0.521919, 0.5219188, 1)
+modulate = Color(0.349, 1, 0.859, 0.92)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 60.0
-offset_top = 150.0
-offset_right = 720.0
-offset_bottom = 188.0
+offset_left = -63.0
+offset_top = -128.0
+offset_right = 697.0
+offset_bottom = -72.0
 grow_horizontal = 2
 grow_vertical = 2
-pivot_offset = Vector2(330, 19)
+theme_override_constants/outline_size = 8
+theme_override_colors/font_outline_color = Color(0.031, 0.133, 0.149, 1)
+text = "SNEK & CO."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Tagline" type="Label" parent="UI/MainContainer" unique_id=1967707046]
+theme_type_variation = &"Micro"
+modulate = Color(0.35, 0.78, 0.75, 1)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -820.0
+offset_top = -234.0
+offset_right = -300.0
+offset_bottom = -88.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(260, 73)
 text = "MADE FOR STARDANCE BY:
 LOVE/LOVETHEGODOTDEVELOPER
 SWIFTFISHI/SWIFTFISHI3
