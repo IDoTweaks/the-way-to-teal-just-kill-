@@ -7,6 +7,7 @@ const SPEED = 6.0
 @export var scoreWorth = 5500
 @export var health = 120
 @onready var body = $body
+@onready var face = $body/face
 @onready var dmgTxt = preload("res://ObjectScenes/damageText.tscn")
 @onready var textSpawn = $body/textSpawn
 @export var navAgent : NavigationAgent3D
@@ -172,6 +173,8 @@ func _physics_process(delta: float) -> void:
 				velocity.z = 0
 
 	move_and_slide()
+	if global_position.y < -80:
+		_die()
 
 	if chargeState == "dash" and _targetValid():
 		if global_position.distance_to(target.global_position) < 2.0:
@@ -198,6 +201,7 @@ func _process(delta: float) -> void:
 	body.rotation.x = lerp_angle(body.rotation.x, targetPitch, delta * 13.0)
 	body.scale = body.scale.lerp(targetScale, delta * 16.0)
 	body.position.y = baseBodyY + bob
+	face._set_face("dash" if chargeState != "" else "mad")
 	var faceDir = dashDir if chargeState == "dash" else (_flatDirTo(target) if _targetValid() else Vector3.ZERO)
 	if faceDir.length() > 0.1:
 		rotation.y = lerp_angle(rotation.y, atan2(-faceDir.x, -faceDir.z), delta * 9.0)

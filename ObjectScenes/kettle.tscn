@@ -5,11 +5,13 @@
 [ext_resource type="Script" uid="uid://4gxcy6cx0q1m" path="res://Scripts/meshInstanceBody.gd" id="3_kett"]
 [ext_resource type="Script" path="res://Scripts/kettle_vent.gd" id="4_kett"]
 [ext_resource type="PackedScene" path="res://ObjectScenes/enemyMarker.tscn" id="5_kett"]
+[ext_resource type="Material" path="res://shaders/toonOutline.tres" id="98_out"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_kettbody"]
 render_priority = 0
 shader = ExtResource("2_kett")
-shader_parameter/base_color = Color(0.08, 0.3, 0.16, 1)
+shader_parameter/base_color = Color(0.35, 1, 0.86, 1)
+next_pass = ExtResource("98_out")
 shader_parameter/fill_color = Color(0, 1, 0.35, 1)
 shader_parameter/fill_percent = 1.0
 shader_parameter/min_y = -1.3

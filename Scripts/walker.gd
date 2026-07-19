@@ -27,8 +27,17 @@ var txt
 var dead = false
 var animTime : float = 0.0
 var baseBodyY : float = 0.0
+var lungeState : String = ""
+var lungeTimer : float = 0.0
+var lungeDir : Vector3 = Vector3.ZERO
+var navAccum : float = 0.0
+@export var lungeSpeed : float = 15.0
+@export var lungeRange : float = 1.9
+@export var windupTime : float = 0.35
 
 var baseAttackWait : float = 0.0
+
+func _selfDriven():pass
 
 func _buff(on):
 	if baseAttackWait == 0.0:
@@ -92,16 +101,40 @@ func _deathAnim():
 	queue_free()
 
 
+func _flatDirTo(t) -> Vector3:
+	var d = t.global_position - global_position
+	d.y = 0
+	return d.normalized() if d.length() > 0.01 else Vector3.ZERO
+
+func _targetValid():
+	return target != null and is_instance_valid(target)
+
 func _physics_process(delta: float) -> void:
-	if mode == "attack" and canAttack and target != null:
-		animPlayer.play("attack")
-		canAttack = false
-		attackTimer.start()
-		target._takeDamage(damage, global_position)
 	if not is_on_floor():
 		velocity += get_gravity() * delta
-		
-	if mode != "attack":
+
+	if lungeState != "":
+		_updateLunge(delta)
+	elif mode == "attack" and canAttack and _targetValid():
+		lungeState = "windup"
+		lungeTimer = windupTime
+		canAttack = false
+	elif mode == "chase" and _targetValid():
+		navAccum += delta
+		if navAccum >= 0.2:
+			navAccum = 0.0
+			navAgent.target_position = target.global_position
+		var nxt = navAgent.get_next_path_position()
+		var dir = nxt - global_position
+		dir.y = 0
+		if dir.length() < 0.05:
+			dir = _flatDirTo(target)
+		else:
+			dir = dir.normalized()
+		velocity.x = lerp(velocity.x, dir.x * SPEED, accelaration * delta)
+		velocity.z = lerp(velocity.z, dir.z * SPEED, accelaration * delta)
+
+	if lungeState != "lunge":
 		var space = get_world_3d().direct_space_state
 		var horizontal = Vector3(velocity.x,0,velocity.z).normalized()
 		if horizontal.length() > 0.1:
@@ -111,8 +144,40 @@ func _physics_process(delta: float) -> void:
 			if !hit:
 				velocity.x = 0
 				velocity.z = 0
-	#if shouldMove:
 	move_and_slide()
+	if global_position.y < -80:
+		_die()
+
+func _updateLunge(delta: float):
+	lungeTimer -= delta
+	match lungeState:
+		"windup":
+			velocity.x = move_toward(velocity.x, 0, 30 * delta)
+			velocity.z = move_toward(velocity.z, 0, 30 * delta)
+			if lungeTimer <= 0:
+				lungeState = "lunge"
+				lungeTimer = 0.28
+				lungeDir = _flatDirTo(target) if _targetValid() else Vector3.ZERO
+				velocity.x = lungeDir.x * lungeSpeed
+				velocity.z = lungeDir.z * lungeSpeed
+				velocity.y = 2.5
+				animPlayer.play("attack")
+				Audio.play("dash", 0.7, -10.0)
+		"lunge":
+			if _targetValid() and global_position.distance_to(target.global_position) < lungeRange:
+				target._takeDamage(damage, global_position)
+				lungeState = "recover"
+				lungeTimer = 0.35
+				attackTimer.start()
+			elif lungeTimer <= 0:
+				lungeState = "recover"
+				lungeTimer = 0.35
+				attackTimer.start()
+		"recover":
+			velocity.x = move_toward(velocity.x, 0, 25 * delta)
+			velocity.z = move_toward(velocity.z, 0, 25 * delta)
+			if lungeTimer <= 0:
+				lungeState = ""
 
 func _process(delta: float) -> void:
 	if dead:
@@ -121,6 +186,12 @@ func _process(delta: float) -> void:
 	animTime += delta * (1.0 + spd * 0.45)
 	body.position.y = baseBodyY + abs(sin(animTime * 3.0)) * 0.10
 	body.rotation.z = sin(animTime * 3.0) * 0.06
+	var lean = 0.0
+	if lungeState == "windup":
+		lean = -0.45
+	elif lungeState == "lunge":
+		lean = 0.35
+	body.rotation.x = lerp_angle(body.rotation.x, lean, delta * 12.0)
 	if target != null and is_instance_valid(target):
 		var look = target.global_position - global_position
 		look.y = 0
@@ -130,17 +201,15 @@ func _process(delta: float) -> void:
 		textActive = false
 
 func _on_attack_body_entered(body: Node3D) -> void:
-	if not gotShot:
-		if body.has_method("player"):
-			mode = "attack"
+	if body.has_method("player"):
+		mode = "attack"
 		if target == null:
 			target = body
 
 
 func _on_attack_body_exited(body: Node3D) -> void:
-	if not gotShot:
-		if body.has_method("player"):
-			mode = "chase"
+	if body.has_method("player"):
+		mode = "chase"
 
 func _updateDmgTxt(moreDamage:int):
 	if txt != null:

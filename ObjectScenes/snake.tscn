@@ -1,20 +1,26 @@
 [gd_scene format=3 uid="uid://cxd7ktd7qi6m2"]
 
-[ext_resource type="Shader" uid="uid://gs1w87wuiau3" path="res://shaders/bossFloor.gdshader" id="1_1ha6j"]
+[ext_resource type="Shader" path="res://shaders/toonSnake.gdshader" id="1_toon"]
+[ext_resource type="Material" path="res://shaders/toonOutlineThick.tres" id="1_out"]
 [ext_resource type="Script" uid="uid://hahci5tp3ev0" path="res://Scripts/snake.gd" id="1_brudt"]
 [ext_resource type="Script" path="res://Scripts/snake_part.gd" id="2_part"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_brudt"]
+[sub_resource type="ShaderMaterial" id="StandardMaterial3D_asja6"]
 render_priority = 0
-shader = ExtResource("1_1ha6j")
-shader_parameter/outline_color = Color(0, 0, 0, 1)
-shader_parameter/outline_width = 1.0
-shader_parameter/fade_start = 10.0
-shader_parameter/fade_end = 30.0
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_asja6"]
-next_pass = SubResource("ShaderMaterial_brudt")
-albedo_color = Color(0.16, 0.86, 0.32, 1)
+shader = ExtResource("1_toon")
+shader_parameter/body_color = Color(0.17, 0.78, 0.32, 1)
+shader_parameter/belly_color = Color(0.62, 0.95, 0.5, 1)
+shader_parameter/belly_amount = 0.45
+shader_parameter/glow = 0.0
+shader_parameter/glow_color = Color(0, 1, 0.85, 1)
+shader_parameter/glow_pulse_speed = 6.0
+shader_parameter/bands = 3
+shader_parameter/shade_strength = 0.55
+shader_parameter/shade_tint = Color(0.06, 0.3, 0.38, 1)
+shader_parameter/rim_amount = 0.5
+shader_parameter/rim_width = 3.0
+shader_parameter/rim_color = Color(0.7, 1, 0.95, 1)
+next_pass = ExtResource("1_out")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_head"]
 size = Vector3(1, 1, 1)
@@ -25,22 +31,38 @@ size = Vector3(0.8, 0.8, 0.8)
 [sub_resource type="BoxMesh" id="BoxMesh_1ha6j"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_brudt"]
+shading_mode = 0
 albedo_color = Color(0.03, 0.13, 0.15, 1)
 
+[sub_resource type="StandardMaterial3D" id="mat_eyewhite"]
+shading_mode = 0
+albedo_color = Color(1, 0.988, 0.941, 1)
+
+[sub_resource type="StandardMaterial3D" id="mat_teeth"]
+shading_mode = 0
+albedo_color = Color(1, 0.988, 0.941, 1)
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wdflr"]
+shading_mode = 0
 albedo_color = Color(0.35, 1, 0.86, 1)
+next_pass = ExtResource("1_out")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_wdflr"]
+[sub_resource type="ShaderMaterial" id="StandardMaterial3D_70tkm"]
 render_priority = 0
-shader = ExtResource("1_1ha6j")
-shader_parameter/outline_color = Color(0, 0, 0, 1)
-shader_parameter/outline_width = 1.0
-shader_parameter/fade_start = 10.0
-shader_parameter/fade_end = 30.0
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_70tkm"]
-next_pass = SubResource("ShaderMaterial_wdflr")
-albedo_color = Color(0, 0.6627451, 0, 1)
+shader = ExtResource("1_toon")
+shader_parameter/body_color = Color(0.13, 0.66, 0.26, 1)
+shader_parameter/belly_color = Color(0.55, 0.92, 0.45, 1)
+shader_parameter/belly_amount = 0.5
+shader_parameter/glow = 0.0
+shader_parameter/glow_color = Color(0, 1, 0.85, 1)
+shader_parameter/glow_pulse_speed = 6.0
+shader_parameter/bands = 3
+shader_parameter/shade_strength = 0.55
+shader_parameter/shade_tint = Color(0.06, 0.3, 0.38, 1)
+shader_parameter/rim_amount = 0.5
+shader_parameter/rim_width = 3.0
+shader_parameter/rim_color = Color(0.7, 1, 0.95, 1)
+next_pass = ExtResource("1_out")
 
 [sub_resource type="BoxMesh" id="BoxMesh_0dflv"]
 
@@ -71,6 +93,41 @@ mesh = SubResource("BoxMesh_1ha6j")
 [node name="MeshInstance3D4" type="MeshInstance3D" parent="head" unique_id=1809448407]
 transform = Transform3D(0.06, 0, 0, 0, 0.19999999, 0, 0, 0, 0.67666996, -0.5177578, -0.28023136, -0.023283735)
 material_override = SubResource("StandardMaterial3D_brudt")
+mesh = SubResource("BoxMesh_1ha6j")
+
+[node name="eyeWhite1" type="MeshInstance3D" parent="head"]
+transform = Transform3D(0.05, 0, 0, 0, 0.34, 0, 0, 0, 0.34, -0.5077578, 0.23899576, 0.27596146)
+material_override = SubResource("mat_eyewhite")
+mesh = SubResource("BoxMesh_1ha6j")
+
+[node name="eyeWhite2" type="MeshInstance3D" parent="head"]
+transform = Transform3D(0.05, 0, 0, 0, 0.34, 0, 0, 0, 0.34, -0.5077578, 0.10378045, -0.24005628)
+material_override = SubResource("mat_eyewhite")
+mesh = SubResource("BoxMesh_1ha6j")
+
+[node name="brow1" type="MeshInstance3D" parent="head"]
+transform = Transform3D(0.05, 0, 0, 0.10327885, 0.34426284, 0, 0, 0, 0.09, -0.5277578, 0.44, 0.276)
+material_override = SubResource("StandardMaterial3D_brudt")
+mesh = SubResource("BoxMesh_1ha6j")
+
+[node name="brow2" type="MeshInstance3D" parent="head"]
+transform = Transform3D(0.05, 0, 0, -0.10327885, 0.34426284, 0, 0, 0, 0.09, -0.5277578, 0.305, -0.24)
+material_override = SubResource("StandardMaterial3D_brudt")
+mesh = SubResource("BoxMesh_1ha6j")
+
+[node name="teeth1" type="MeshInstance3D" parent="head"]
+transform = Transform3D(0.052, 0, 0, 0, 0.07, 0, 0, 0, 0.09, -0.5277578, -0.21, 0.15)
+material_override = SubResource("mat_teeth")
+mesh = SubResource("BoxMesh_1ha6j")
+
+[node name="teeth2" type="MeshInstance3D" parent="head"]
+transform = Transform3D(0.052, 0, 0, 0, 0.07, 0, 0, 0, 0.09, -0.5277578, -0.21, -0.02)
+material_override = SubResource("mat_teeth")
+mesh = SubResource("BoxMesh_1ha6j")
+
+[node name="teeth3" type="MeshInstance3D" parent="head"]
+transform = Transform3D(0.052, 0, 0, 0, 0.07, 0, 0, 0, 0.09, -0.5277578, -0.21, -0.19)
+material_override = SubResource("mat_teeth")
 mesh = SubResource("BoxMesh_1ha6j")
 
 [node name="horn" type="StaticBody3D" parent="head" unique_id=1856774841]

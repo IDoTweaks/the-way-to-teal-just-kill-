@@ -31,6 +31,7 @@ var txt
 var animTime : float = 0.0
 var baseBodyY : float = 0.0
 var fireKick : float = 0.0
+var hitKick : float = 0.0
 var dead = false
 
 var baseAttackWait : float = 0.0
@@ -66,6 +67,7 @@ func _damage(dmg):
 	else:
 		_updateDmgTxt(dmg)
 	if health >= 0:
+		hitKick = 1.0
 		body._updateMat(health / 30.0)
 	else:
 		_die()
@@ -152,6 +154,8 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity = velocity.lerp(Vector3.ZERO, accel * delta)
 	move_and_slide()
+	if global_position.y < -80:
+		_die()
 
 func _process(delta: float) -> void:
 	if dead:
@@ -160,8 +164,10 @@ func _process(delta: float) -> void:
 	body.position.y = baseBodyY + sin(animTime * 2.0) * 0.12
 	hoverRing.rotation.y += delta * 4.0
 	fireKick = move_toward(fireKick, 0.0, delta * 4.0)
+	hitKick = move_toward(hitKick, 0.0, delta * 6.0)
 	body.rotation.x = lerp_angle(body.rotation.x, fireKick * 0.5, delta * 14.0)
-	body.scale = Vector3.ONE * (1.0 + fireKick * 0.15)
+	body.rotation.z = sin(animTime * 40.0) * hitKick * 0.18
+	body.scale = Vector3.ONE * (1.0 + fireKick * 0.15 + hitKick * 0.18)
 	var tgt = _activeTarget()
 	if tgt != null and is_instance_valid(tgt):
 		var look = tgt.global_position - global_position

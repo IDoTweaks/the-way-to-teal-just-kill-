@@ -3,7 +3,6 @@ extends Area3D
 var currDelt = 0.005
 var targ = null
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	deathRay.visible = false
 
@@ -13,7 +12,6 @@ func _activate(type : int):
 		_shoot()
 	else:
 		_removeSelf()
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	currDelt = delta
 

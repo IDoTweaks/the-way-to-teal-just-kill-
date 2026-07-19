@@ -36,7 +36,14 @@ var txt
 var dead = false
 var animTime : float = 0.0
 var baseBodyY : float = 0.0
+var baseBodyRotY : float = 0.0
 var baseAttackWait : float = 0.0
+var burstLeft : int = 0
+var burstTimer : float = 0.0
+var hopCd : float = 0.0
+@export var burstCount : int = 3
+@export var burstGap : float = 0.14
+@export var scareDist : float = 4.5
 
 func _buff(on):
 	if baseAttackWait == 0.0:
@@ -51,6 +58,7 @@ func _ready() -> void:
 	add_to_group("enemies")
 	body._updateMat(1)
 	baseBodyY = body.position.y
+	baseBodyRotY = body.rotation.y
 	await get_tree().physics_frame
 func _takeDamage(dmg):
 	_damage(dmg)
@@ -117,21 +125,24 @@ func _shootAt(targetPos : Vector3):
 	if bulletSpawn == null:
 		return
 	if canAttack:
-		if animPlayer.has_animation("attack"):
-			animPlayer.play("attack")
-		var myBullet = bullet.instantiate()
-		myBullet.dest = targetPos
-		if lifeTime != 0.0:
-			myBullet.lifeTime = lifeTime
-		get_parent().add_child(myBullet)
-		myBullet.global_position = bulletSpawn.global_position
-		var muzzle = muzzleParticles.instantiate()
-		get_parent().add_child(muzzle)
-		muzzle.global_position = bulletSpawn.global_position
-		muzzle.emitting = true
-		Audio.play("rifle", 0.75, -9.0)
 		canAttack = false
-		attackTimer.start()
+		burstLeft = burstCount
+		burstTimer = 0.0
+
+func _fireOne(targetPos : Vector3):
+	if animPlayer.has_animation("attack"):
+		animPlayer.play("attack")
+	var myBullet = bullet.instantiate()
+	myBullet.dest = targetPos
+	if lifeTime != 0.0:
+		myBullet.lifeTime = lifeTime
+	get_parent().add_child(myBullet)
+	myBullet.global_position = bulletSpawn.global_position
+	var muzzle = muzzleParticles.instantiate()
+	get_parent().add_child(muzzle)
+	muzzle.global_position = bulletSpawn.global_position
+	muzzle.emitting = true
+	Audio.play("rifle", 0.75 + randf_range(0.0, 0.12), -9.0)
  
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
@@ -154,11 +165,38 @@ func _physics_process(delta: float) -> void:
 	if seesPlayer:
 		if canAttack:
 			_shootAt(player.global_position)
-	
-	
 
-	#if shouldMove:
+	if burstLeft > 0:
+		burstTimer -= delta
+		if burstTimer <= 0:
+			var aimAt = player.global_position if (seesPlayer and player != null) else Vector3.ZERO
+			if aimAt != Vector3.ZERO:
+				_fireOne(aimAt)
+			burstLeft -= 1
+			burstTimer = burstGap
+			if burstLeft <= 0:
+				attackTimer.start()
+
+	hopCd -= delta
+	if hopCd <= 0 and is_on_floor() and player != null and is_instance_valid(player):
+		var away = global_position - player.global_position
+		away.y = 0
+		if away.length() < scareDist and away.length() > 0.05:
+			away = away.normalized()
+			var probe = global_position + away * 1.8
+			var space = get_world_3d().direct_space_state
+			var ray = PhysicsRayQueryParameters3D.create(probe + Vector3.UP, probe + Vector3(0, -3, 0))
+			ray.exclude = [self.get_rid()]
+			if space.intersect_ray(ray):
+				velocity.x = away.x * 7.0
+				velocity.z = away.z * 7.0
+				velocity.y = 3.5
+				hopCd = 1.6
+				Audio.play("boing", 1.3, -14.0)
+
 	move_and_slide()
+	if global_position.y < -80:
+		_die()
 func _process(delta: float) -> void:
 	if dead:
 		return
@@ -171,7 +209,7 @@ func _process(delta: float) -> void:
 		if look.length() > 0.1:
 			rotation.y = lerp_angle(rotation.y, atan2(-look.x, -look.z), delta * 8.0)
 	else:
-		body.rotation.y = sin(animTime * 1.3) * 0.12
+		body.rotation.y = baseBodyRotY + sin(animTime * 1.3) * 0.12
 	if txt == null:
 		textActive = false
 func _updateDmgTxt(moreDamage:int):

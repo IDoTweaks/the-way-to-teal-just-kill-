@@ -63,7 +63,7 @@ var invertY := false
 var toggleScope := false
 var toggleSlide := false
 var showGhost := true
-var toonOutlines := false
+var toonOutlines := true
 
 const SETTINGS_RES : Array[Vector2i] = [
 	Vector2i(2560, 1440),
@@ -144,7 +144,7 @@ func _resetDefaultsNoSave():
 	toggleScope = false
 	toggleSlide = false
 	showGhost = true
-	toonOutlines = false
+	toonOutlines = true
 	resIndex = 1
 	_applySettings()
 
@@ -218,7 +218,6 @@ func _rebind(action : String, event : InputEvent) -> bool:
 	var d = _eventToDict(event)
 	if d.is_empty():
 		return false
-	# if another action already owns this input, SWAP rather than leaving it unbound
 	var oldEvents = InputMap.action_get_events(action)
 	var oldEvent = oldEvents[0] if oldEvents.size() > 0 else null
 	for other in REBINDABLE:

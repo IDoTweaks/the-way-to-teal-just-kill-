@@ -8,7 +8,6 @@ const MAXCAMSHAKE = 0.03
 var shakeAmount : float = 0.0
 var shakeDecay : float = 8.0
 var recoilOffset : Vector3 = Vector3.ZERO
-# juice
 var camPitch : float = 0.0
 var camRoll : float = 0.0
 var camKickPitch : float = 0.0
@@ -101,7 +100,6 @@ var upDashed = false;
 var knockbackTimer: float = 0.0
 const KNOCKBACK_LOCK_TIME = 0.15
 
-# tutorial ability locks + action counters (all abilities on by default outside the tutorial)
 var abJump := true
 var abDash := true
 var abSlide := true
@@ -124,9 +122,12 @@ func _setAbilities(j, d, s, w, sl, sh):
 	abSlam = sl
 	abShoot = sh
 @export var slamVeloc = 25.0
+@export var slamAccel : float = 3.2
+@export var slamMaxVeloc : float = 90.0
+@export var slamDmgPerUnit : float = 3.0
+@export var slamMaxDmg : float = 80.0
 var airTime :float = 0.0
 
-# stamina system
 const DASH_COST = 100.0 / 3.0
 @export var wallJumpCost : float = 25.0
 @export var slamCost : float = 20.0
@@ -146,7 +147,6 @@ var _staminaMsg : Label
 @onready var healthBar : ColorRect = $HUD/healthBar
 @onready var weaponSlots = [$HUD/WeaponIndicator/Slot0, $HUD/WeaponIndicator/Slot1, $HUD/WeaponIndicator/Slot2]
 
-# wall jumping
 var wallNormal  = Vector3.ZERO
 var canWallJump = false
 var wallJumpCd = 0
@@ -334,7 +334,10 @@ func _decalCap(base : int) -> int:
 @export var damage : float = 10
 @export var bullet_hole_size: float = 0.15
 @export var max_bullet_holes: int = 100
-@export var shotGunDmg : float = 10
+@export var shotGunDmg : float = 20
+@export var shotGunCloseRange : float = 5.0
+@export var shotGunFalloffRange : float = 14.0
+@export var shotGunMinDmgMult : float = 0.4
 @export var sniperDmg : float = 150
 @export var sniperCooldown : float = 2.2
 @onready var shotGunCdTimer = $shotGunCd
@@ -376,6 +379,8 @@ var shotGunRestRot : Vector3
 
 var slamming = false
 var slamStartHeight : float = 0.0
+var slamSpeed : float = 0.0
+var slamSlideQueued = false
 var weaponPunchTween : Tween
 
 func _showGunModels():
@@ -719,12 +724,19 @@ func _shoot():
 			for ray in rayContainer.get_children():
 				if ray.is_colliding():
 					var target = ray.get_collider()
+					var hit_pos = ray.get_collision_point()
 					if target and target.has_method("_damage"):
 						_hitmarker(false)
-						target._damage(shotGunDmg)
+						var dist = gunParticleSpawn.global_position.distance_to(hit_pos)
+						var mult = 1.0
+						if dist >= shotGunFalloffRange:
+							mult = shotGunMinDmgMult
+						elif dist > shotGunCloseRange:
+							var t = (dist - shotGunCloseRange) / (shotGunFalloffRange - shotGunCloseRange)
+							mult = lerp(1.0, shotGunMinDmgMult, t)
+						target._damage(shotGunDmg * mult)
 					if target and target.has_method("_makeTarg"):
 						target._makeTarg(self)
-					var hit_pos = ray.get_collision_point()
 					var hit_normal = ray.get_collision_normal()
 					_spawn_bullet_hole(hit_pos, hit_normal)
 					_spawnParticleAt(bulletImpactParticles, hit_pos + hit_normal * 0.05)
@@ -787,7 +799,7 @@ func _buildToonPost():
 	quad.mesh = m
 	var mat = ShaderMaterial.new()
 	mat.shader = load("res://shaders/toonPost.gdshader")
-	mat.render_priority = 127
+	mat.render_priority = -128
 	quad.material_override = mat
 	quad.extra_cull_margin = 16384.0
 	quad.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -1049,6 +1061,9 @@ func _physics_process(delta: float) -> void:
 	if is_on_floor():
 		if slamming == true:
 			_spawnSlam()
+			if slamSlideQueued and slideHeld and _canSlide() and stamina > 0:
+				wasSliding = false
+			slamSlideQueued = false
 		if airTime > 0.35:
 			_spawnParticleAt(landParticles, feet.global_position)
 			_landImpact(airTime)
@@ -1081,6 +1096,8 @@ func _physics_process(delta: float) -> void:
 			elif slamming == false and abSlam and _useStamina(slamCost):
 				slamming = true
 				slamStartHeight = global_position.y
+				slamSpeed = slamVeloc
+				slamSlideQueued = false
 				animaPlayer.play("slam"); slamCount += 1
 		if Input.is_action_just_pressed("slide") and !is_on_floor() and !slamming and _canSlide() and stamina < slamCost - 0.05:
 			_staminaFail()
@@ -1214,7 +1231,12 @@ func _physics_process(delta: float) -> void:
 			Audio.footstep()
 			_last_footprint_pos = global_position
 	if slamming:
-		velocity.y = -slamVeloc
+		slamSpeed = min(slamSpeed * pow(slamAccel, delta), slamMaxVeloc)
+		velocity.x = 0
+		velocity.z = 0
+		velocity.y = -slamSpeed
+		if slideHeld:
+			slamSlideQueued = true
 	move_and_slide()
 	_checkWall()
 
@@ -1454,7 +1476,7 @@ func _spawnSlam():
 	slam.source = self
 	_spawnParticleAt(slamParticles, feet.global_position)
 	var fallHeight = slamStartHeight - global_position.y
-	slam.damage = clamp(fallHeight * 3.0, 1.0, 60.0)
+	slam.damage = clamp(fallHeight * slamDmgPerUnit, 1.0, slamMaxDmg)
 
 #func here so i can jump here fast
 func wallJump():pass

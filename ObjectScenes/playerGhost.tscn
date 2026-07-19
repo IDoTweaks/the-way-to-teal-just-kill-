@@ -1,68 +1,44 @@
 [gd_scene format=3 uid="uid://cna3205ggf26a"]
 
 [ext_resource type="Script" uid="uid://dhba8ckv8pnud" path="res://Scripts/player_ghost.gd" id="1_154x3"]
-[ext_resource type="PackedScene" uid="uid://b62f64giqmj4h" path="res://Models/shotgun_low_poly.glb" id="2_6uxra"]
-[ext_resource type="PackedScene" uid="uid://dnfrb64vva6ff" path="res://Models/scorpious9.glb" id="3_0ng02"]
+[ext_resource type="Shader" path="res://shaders/ghost.gdshader" id="2_ghost"]
+[ext_resource type="Script" path="res://Scripts/enemy_face.gd" id="3_face"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m8bbn"]
-transparency = 1
-blend_mode = 1
-albedo_color = Color(0.21568628, 0.5686275, 1, 1)
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ghost"]
+render_priority = 0
+shader = ExtResource("2_ghost")
+shader_parameter/body_color = Color(0.35, 0.64, 1, 1)
+shader_parameter/rim_color = Color(0.82, 0.96, 1, 1)
+shader_parameter/ghost_alpha = 0.55
+shader_parameter/rim_power = 2.2
+shader_parameter/cel_bands = 4
+shader_parameter/tail_top = 0.1
+shader_parameter/tail_cut = -0.3
+shader_parameter/wave_amp = 0.18
+shader_parameter/wave_freq = 9.0
+shader_parameter/wave_speed = 3.4
+shader_parameter/sway_amp = 0.05
+shader_parameter/sway_speed = 1.7
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_8heul"]
-
-[sub_resource type="ORMMaterial3D" id="ORMMaterial3D_iixog"]
-transparency = 1
-blend_mode = 1
-albedo_color = Color(0.28669193, 0.50101376, 1, 1)
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_ramtr"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_e3k8h"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_ramtr"]
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_ghost"]
+radius = 0.46
+height = 1.5
 
 [node name="Player" type="CharacterBody3D" unique_id=659499291]
 script = ExtResource("1_154x3")
 
 [node name="body" type="MeshInstance3D" parent="." unique_id=1599943581]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
-material_override = SubResource("StandardMaterial3D_m8bbn")
-mesh = SubResource("CapsuleMesh_8heul")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.62, 0)
+material_override = SubResource("ShaderMaterial_ghost")
+mesh = SubResource("CapsuleMesh_ghost")
+
+[node name="face" type="MeshInstance3D" parent="body"]
+script = ExtResource("3_face")
+style = "ghost"
+face_size = 0.62
+face_forward = 0.44
+face_height = 0.95
 
 [node name="playerCam" type="Camera3D" parent="." unique_id=1441979209]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.590254, 0)
-
-[node name="leftArm" type="MeshInstance3D" parent="playerCam" unique_id=1259226239]
-transform = Transform3D(-6.7128036e-05, -0.00023131243, 0.34499997, -0.3313299, 0.096153624, -6.9876587e-12, -0.096153595, -0.33132985, -0.00024085601, -0.474, -0.333, -0.211)
-material_override = SubResource("ORMMaterial3D_iixog")
-mesh = SubResource("CapsuleMesh_ramtr")
-
-[node name="rightArm" type="MeshInstance3D" parent="playerCam" unique_id=1446399764]
-transform = Transform3D(-0.21907628, -0.18368958, 0.19310309, -0.26651582, 0.15106383, -0.15866357, -7.54993e-05, -0.2499259, -0.2378279, 0.523, -0.40280876, -0.55258656)
-material_override = SubResource("ORMMaterial3D_iixog")
-mesh = SubResource("CapsuleMesh_ramtr")
-
-[node name="hand" type="Node3D" parent="playerCam" unique_id=800072338]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.022098154, -0.109722495, -0.78610706)
-
-[node name="shotGun" parent="playerCam" unique_id=1514895802 instance=ExtResource("2_6uxra")]
-transform = Transform3D(0.004387453, 0.004973183, 0.035841603, 0.0057020364, 0.03555799, -0.0056318343, -0.035732906, 0.006284756, 0.0035021058, 0.44230926, -0.0076372027, -0.6982862)
-visible = false
-
-[node name="shotGunForcePoint" type="MeshInstance3D" parent="playerCam/shotGun" unique_id=1122982092]
-transform = Transform3D(1, 2.9802322e-08, 5.2154064e-08, -8.940697e-08, 1, 5.2154064e-08, -5.9604645e-08, -1.2107193e-07, 1, 16.999542, -5.9808464, 0.5125623)
-visible = false
-mesh = SubResource("BoxMesh_e3k8h")
-
-[node name="gun" parent="playerCam" unique_id=1487719564 instance=ExtResource("3_0ng02")]
-transform = Transform3D(-0.088497795, 0.012279475, 0.010833219, 0.013905769, 0.08779758, 0.014079109, -0.0086471755, 0.015517932, -0.0882294, 0.388, -0.31, -0.652)
-
-[node name="particleSpawnGun" type="MeshInstance3D" parent="playerCam/gun" unique_id=1268103117]
-transform = Transform3D(0.4209742, 1.8626451e-09, 2.6077032e-08, 2.2817403e-08, 0.5239, 4.4703484e-08, 2.2351742e-08, -1.4901161e-08, 0.42500958, 0.0027680397, 3.6811652, 7.116807)
-visible = false
-mesh = SubResource("BoxMesh_ramtr")
-
-[node name="shotGunDemo" parent="playerCam/gun" unique_id=52586278 instance=ExtResource("2_6uxra")]
-transform = Transform3D(-2.0107239e-08, 4.231196e-09, -0.46, -1.6924774e-08, 0.46, 4.2311967e-09, 0.46, 1.6924774e-08, -2.0107239e-08, -0.025, 3.271, -0.628)
-visible = false
+current = false

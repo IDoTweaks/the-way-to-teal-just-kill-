@@ -5,15 +5,15 @@
 [ext_resource type="PackedScene" uid="uid://cna3205ggf26a" path="res://ObjectScenes/playerGhost.tscn" id="3_gh"]
 [ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="4_fin"]
 [ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="5_pause"]
-[ext_resource type="PackedScene" path="res://ObjectScenes/Exploder.tscn" id="6_expl"]
+[ext_resource type="PackedScene" uid="uid://bxgdhkmypcm0s" path="res://ObjectScenes/Exploder.tscn" id="6_expl"]
 [ext_resource type="PackedScene" uid="uid://dh8322144axab" path="res://ObjectScenes/walker.tscn" id="7_walk"]
 [ext_resource type="PackedScene" uid="uid://du4s8p1pljnlb" path="res://ObjectScenes/jumpOrb.tscn" id="8_orb"]
-
-[sub_resource type="StandardMaterial3D" id="mat_level"]
-albedo_color = Color(0.2, 0.22, 0.15, 1)
+[ext_resource type="Material" uid="uid://dagdbpsvta3ue" path="res://shaders/new_standard_material_3d.tres" id="mat_wall"]
 
 [sub_resource type="Environment" id="env"]
-ssao_enabled = false
+ambient_light_source = 3
+ambient_light_color = Color(0.55, 0.85, 0.8, 1)
+ambient_light_energy = 0.35
 tonemap_mode = 2
 glow_enabled = true
 glow_intensity = 0.5
@@ -22,101 +22,100 @@ fog_enabled = true
 fog_light_energy = 1.4
 fog_density = 0.006
 
-[node name="MainScene" type="Node3D"]
+[node name="MainScene" type="Node3D" unique_id=1718952970]
 script = ExtResource("1_lvl")
 levelIndex = 5
 
-[node name="Level" type="CSGCombiner3D" parent="."]
-material_override = SubResource("mat_level")
+[node name="Level" type="CSGCombiner3D" parent="." unique_id=658087771]
+material_override = ExtResource("mat_wall")
 use_collision = true
 collision_layer = 17
 
-[node name="Floor" type="CSGBox3D" parent="Level"]
+[node name="Floor" type="CSGBox3D" parent="Level" unique_id=683534060]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, -0.5, 0)
 size = Vector3(52, 1, 24)
 
-[node name="Ceiling" type="CSGBox3D" parent="Level"]
+[node name="Ceiling" type="CSGBox3D" parent="Level" unique_id=463250088]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 8.5, 0)
 size = Vector3(52, 1, 24)
 
-[node name="BackWall" type="CSGBox3D" parent="Level"]
+[node name="BackWall" type="CSGBox3D" parent="Level" unique_id=1181055394]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 4, 0)
 size = Vector3(1, 8, 24)
 
-[node name="EndWall" type="CSGBox3D" parent="Level"]
+[node name="EndWall" type="CSGBox3D" parent="Level" unique_id=155078810]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.5, 4, 0)
 size = Vector3(1, 8, 24)
 
-[node name="WallLeft" type="CSGBox3D" parent="Level"]
+[node name="WallLeft" type="CSGBox3D" parent="Level" unique_id=1281156683]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 4, -11.5)
 size = Vector3(52, 8, 1)
 
-[node name="WallRight" type="CSGBox3D" parent="Level"]
+[node name="WallRight" type="CSGBox3D" parent="Level" unique_id=471325495]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 4, 11.5)
 size = Vector3(52, 8, 1)
 
-[node name="Divider1" type="CSGBox3D" parent="Level"]
+[node name="Divider1" type="CSGBox3D" parent="Level" unique_id=1972096962]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 4, -4)
 size = Vector3(1, 8, 15)
 
-[node name="Divider2" type="CSGBox3D" parent="Level"]
+[node name="Divider2" type="CSGBox3D" parent="Level" unique_id=151100220]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 4, 4)
 size = Vector3(1, 8, 15)
 
-[node name="CenterBlock" type="CSGBox3D" parent="Level"]
+[node name="CenterBlock" type="CSGBox3D" parent="Level" unique_id=1081790787]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37, 1.5, 0)
 size = Vector3(4, 3, 4)
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1534285416]
 environment = SubResource("env")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1460255939]
 transform = Transform3D(1, 0, 0, 0, -0.37609485, 0.9265812, 0, -0.9265812, -0.37609485, 0, 18.215263, 0)
 
-[node name="Player" parent="." instance=ExtResource("2_pl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2, -7)
-dashBoost = 22.0
-shotGunDmg = 10.0
+[node name="Player" parent="." unique_id=1951261115 instance=ExtResource("2_pl")]
+transform = Transform3D(-0.89474744, 0, -0.44657257, 0, 1, 0, 0.44657257, 0, -0.89474744, 3, 2, -7)
 parTime = 40.0
+dashBoost = 22.0
 
-[node name="Player2" parent="." instance=ExtResource("3_gh")]
+[node name="Player2" parent="." unique_id=1791039939 instance=ExtResource("3_gh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2, -7)
 
-[node name="Exploder1" parent="." instance=ExtResource("6_expl")]
+[node name="Exploder1" parent="." unique_id=1627379544 instance=ExtResource("6_expl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1, 6)
 wallLayer = 16
 
-[node name="Exploder2" parent="." instance=ExtResource("6_expl")]
+[node name="Exploder2" parent="." unique_id=699534849 instance=ExtResource("6_expl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 1, 8)
 wallLayer = 16
 
-[node name="Exploder3" parent="." instance=ExtResource("6_expl")]
+[node name="Exploder3" parent="." unique_id=1426732553 instance=ExtResource("6_expl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 1, -7)
 wallLayer = 16
 
-[node name="Exploder4" parent="." instance=ExtResource("6_expl")]
+[node name="Exploder4" parent="." unique_id=547242170 instance=ExtResource("6_expl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 1, 6)
 wallLayer = 16
 
-[node name="Exploder5" parent="." instance=ExtResource("6_expl")]
+[node name="Exploder5" parent="." unique_id=483538825 instance=ExtResource("6_expl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 1, -6)
 wallLayer = 16
 
-[node name="Walker1" parent="." instance=ExtResource("7_walk")]
+[node name="Walker1" parent="." unique_id=43154645 instance=ExtResource("7_walk")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 1, -5)
 
-[node name="Walker2" parent="." instance=ExtResource("7_walk")]
+[node name="Walker2" parent="." unique_id=813575275 instance=ExtResource("7_walk")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 1, 5)
 
-[node name="Walker3" parent="." instance=ExtResource("7_walk")]
+[node name="Walker3" parent="." unique_id=1342273239 instance=ExtResource("7_walk")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 1, 0)
 
-[node name="OrbRiser" parent="." instance=ExtResource("8_orb")]
+[node name="OrbRiser" parent="." unique_id=1277447696 instance=ExtResource("8_orb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37, 3.6, 0)
 
-[node name="FinishOrb" parent="." node_paths=PackedStringArray("player") instance=ExtResource("4_fin")]
+[node name="FinishOrb" parent="." unique_id=1392456027 node_paths=PackedStringArray("player") instance=ExtResource("4_fin")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 1.5, 8)
 toLevel = 6
 player = NodePath("../Player")
 
-[node name="PauseMenu" parent="." instance=ExtResource("5_pause")]
+[node name="PauseMenu" parent="." unique_id=346570735 instance=ExtResource("5_pause")]

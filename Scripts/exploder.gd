@@ -6,6 +6,7 @@ const SPEED = 8.0
 @export var scoreWorth = 4500
 @export var health = 25
 @onready var body = $body
+@onready var face = $body/face
 @onready var dmgTxt = preload("res://ObjectScenes/damageText.tscn")
 @onready var textSpawn = $body/textSpawn
 @export var navAgent : NavigationAgent3D
@@ -80,6 +81,8 @@ func _boom(doDamage : bool):
 	if doDamage and _targetValid():
 		if global_position.distance_to(target.global_position) <= blastRadius and target.has_method("_takeDamage"):
 			target._takeDamage(damage, global_position)
+			if target.has_method("_applyForce"):
+				target._applyForce(global_position, 14.0, blastRadius, true)
 
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
@@ -107,6 +110,8 @@ func _physics_process(delta: float) -> void:
 				velocity.z = 0
 
 	move_and_slide()
+	if global_position.y < -80:
+		_die()
 
 func _process(delta: float) -> void:
 	animTime += delta
@@ -115,6 +120,7 @@ func _process(delta: float) -> void:
 		var d = global_position.distance_to(target.global_position)
 		prox = clamp(1.0 - d / 15.0, 0.0, 1.0)
 	var rate = lerp(3.0, 22.0, prox)
+	face._set_face("panic" if prox > 0.55 else "grin")
 	var pulse = 1.0 + 0.12 * prox * abs(sin(animTime * rate))
 	body.scale = Vector3(pulse, pulse, pulse)
 	var shake = prox * 0.06

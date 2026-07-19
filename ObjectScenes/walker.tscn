@@ -5,6 +5,7 @@
 [ext_resource type="Shader" path="res://shaders/toonEnemy.gdshader" id="2_p5c4o"]
 [ext_resource type="Script" uid="uid://4gxcy6cx0q1m" path="res://Scripts/meshInstanceBody.gd" id="3_0ogls"]
 [ext_resource type="PackedScene" path="res://ObjectScenes/enemyMarker.tscn" id="4_mark"]
+[ext_resource type="Script" path="res://Scripts/enemy_face.gd" id="99_face"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nv1fp"]
 render_priority = 0
@@ -44,7 +45,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(0.3, 0, -0.4)]
+"values": [Vector3(-0.3, 0, -0.375)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -56,7 +57,7 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(0.3, 0, 0.34734395)]
+"values": [Vector3(-0.3, 0, 0.375)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -96,7 +97,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.2, 0.5),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector3(0.3, 0, -0.4), Vector3(0.24173051, -0.052776337, -0.4), Vector3(0.3, 0, -0.4)]
+"values": [Vector3(-0.3, 0, -0.375), Vector3(-0.241731, -0.0527763, -0.375), Vector3(-0.3, 0, -0.375)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -108,7 +109,7 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.2, 0.5),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector3(0.3, 0, 0.34734395), Vector3(0.7507265, 0.08132172, 0.34734395), Vector3(0.3, 0, 0.34734395)]
+"values": [Vector3(-0.3, 0, 0.375), Vector3(-0.750726, 0.0813217, 0.375), Vector3(-0.3, 0, 0.375)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -155,12 +156,12 @@ mesh = SubResource("CapsuleMesh_d7swv")
 script = ExtResource("3_0ogls")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="body" unique_id=364199810]
-transform = Transform3D(-1.7484556e-08, -0.4, 0, 0.4, -1.7484556e-08, 0, 0, 0, 0.4, 0.3, 0, -0.4)
+transform = Transform3D(-1.7484556e-08, -0.4, 0, 0.4, -1.7484556e-08, 0, 0, 0, 0.4, -0.3, 0, -0.375)
 material_override = SubResource("StandardMaterial3D_58yt4")
 mesh = SubResource("CapsuleMesh_bbfly")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="body" unique_id=292477246]
-transform = Transform3D(-1.7484554e-08, -0.39999998, 0, 0.39999998, -1.7484554e-08, 0, 0, 0, 0.4, 0.3, 0, 0.34734395)
+transform = Transform3D(-1.7484554e-08, -0.39999998, 0, 0.39999998, -1.7484554e-08, 0, 0, 0, 0.4, -0.3, 0, 0.375)
 material_override = SubResource("StandardMaterial3D_58yt4")
 mesh = SubResource("CapsuleMesh_bbfly")
 
@@ -168,6 +169,13 @@ mesh = SubResource("CapsuleMesh_bbfly")
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, -1.4990325e-08, 1.1007339, -0.34293866)
 visible = false
 mesh = SubResource("BoxMesh_p5c4o")
+
+[node name="face" type="MeshInstance3D" parent="body"]
+script = ExtResource("99_face")
+style = "angry"
+face_size = 0.85
+face_forward = 0.54
+face_height = 0.3
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=162224433]
 shape = SubResource("CapsuleShape3D_cwb1f")

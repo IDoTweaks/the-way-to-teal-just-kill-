@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://d0slpiipfipmg"]
+
+[resource]
+resource_name = "world_platform"
+specular_mode = 1
+albedo_color = Color(0.32, 0.62, 0.36, 1)
+metallic_specular = 0.0

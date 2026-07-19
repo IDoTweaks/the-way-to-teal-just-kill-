@@ -68,7 +68,6 @@ void fragment() {
 	float r_edge = mix(1.0, edge_position + 0.01, edge_hardness);
 	value = smoothstep(l_edge,r_edge,value);
 	
-	// flat stepped bands + a hard white-hot core = painted, not glowy
 	float banded = floor(value * float(cel_bands)) / float(cel_bands - 1);
 	banded = clamp(banded, 0.0, 1.0);
 	vec3 col = mix(secondary_color, primary_color, banded);

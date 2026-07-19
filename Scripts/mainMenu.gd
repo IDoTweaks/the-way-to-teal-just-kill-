@@ -216,7 +216,6 @@ func _buildMusicOverlay() -> void:
 	_refreshMusicRows()
 
 
-# --- guided tour of the menu, run once straight after the tutorial ---------
 
 func _btn(name : String) -> Callable:
 	return func(): return menuButtons.get_node_or_null(name)

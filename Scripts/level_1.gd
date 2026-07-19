@@ -1,9 +1,12 @@
 extends Node3D
 @export var levelIndex : int = 1
 var perfectTime = 10.0
+var freezer
 
 func _ready() -> void:
 	Global.currentLevel = levelIndex
+	freezer = preload("res://Scripts/level_freeze.gd").new()
+	add_child.call_deferred(freezer)
 
 func _reload():
 	Global._restartCurrent()

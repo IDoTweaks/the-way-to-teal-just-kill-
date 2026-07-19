@@ -35,7 +35,7 @@ func _process(delta: float) -> void:
 	var tickDelta = TICK_RATE
 	var count = 0
 	for entity in navObjects:
-		if entity != null and is_instance_valid(entity) and entity.has_method("_enemy"):
+		if entity != null and is_instance_valid(entity) and entity.has_method("_enemy") and not entity.has_method("_selfDriven"):
 			if count < tickAssigned.size() and tickAssigned[count] == currentTick:
 				var navAgent = entity.get("navAgent")
 				var target = entity.get("target")

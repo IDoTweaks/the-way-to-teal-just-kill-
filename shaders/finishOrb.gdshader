@@ -1,10 +1,10 @@
 shader_type spatial;
 render_mode blend_mix, depth_draw_always, cull_back, unshaded;
-uniform vec4 core_color : source_color = vec4(0.0, 0.15, 0.65, 1.0);    // saturated blue core
-uniform vec4 mid_color  : source_color = vec4(0.0, 0.40, 1.0, 1.0);     // pure bright blue body
-uniform vec4 rim_color  : source_color = vec4(0.4, 0.85, 1.0, 1.0);     // bright cyan rim
-uniform vec4 wisp_color : source_color = vec4(0.2, 0.95, 1.0, 1.0);     // electric cyan
-uniform vec4 arrow_color : source_color = vec4(0.7, 1.0, 1.0, 1.0);     // near-white cyan arrows
+uniform vec4 core_color : source_color = vec4(0.0, 0.15, 0.65, 1.0);
+uniform vec4 mid_color  : source_color = vec4(0.0, 0.40, 1.0, 1.0);
+uniform vec4 rim_color  : source_color = vec4(0.4, 0.85, 1.0, 1.0);
+uniform vec4 wisp_color : source_color = vec4(0.2, 0.95, 1.0, 1.0);
+uniform vec4 arrow_color : source_color = vec4(0.7, 1.0, 1.0, 1.0);
 uniform float swirl_speed : hint_range(0.0, 3.0) = 0.6;
 uniform float rise_speed : hint_range(0.0, 6.0) = 3.0;
 uniform float pulse_speed : hint_range(0.0, 5.0) = 2.2;
@@ -49,7 +49,6 @@ void vertex() {
 	VERTEX *= pulse;
 }
 void fragment() {
-	// cartoon: quantise the animated bands into flat steps
 	vec3 n = normalize(world_normal);
 	if(!FRONT_FACING){
 		n = -n;
@@ -67,13 +66,12 @@ void fragment() {
 	bands = bands * 0.5 + 0.5;
 	bands = floor(bands * 4.0) / 3.0;
 	bands = clamp(bands, 0.0, 1.0);
-	// --- upward chevrons wrapped around the whole sphere (spherical mapping) ---
 	vec3 dir = normalize(local_pos);
-	float lon = atan(dir.z, dir.x);                          // azimuth around Y, wraps seamlessly
-	float lat = asin(clamp(dir.y, -1.0, 1.0)) / 1.5707963;   // -1 (bottom) .. 1 (top)
+	float lon = atan(dir.z, dir.x);
+	float lat = asin(clamp(dir.y, -1.0, 1.0)) / 1.5707963;
 
-	float arrows_around = max(floor(chevron_count * 0.5), 2.0);     // how many V's around the equator
-	float zig = abs(fract(lon / TAU * arrows_around) - 0.5) * 2.0;  // 0 at each arrow center, 1 between
+	float arrows_around = max(floor(chevron_count * 0.5), 2.0);
+	float zig = abs(fract(lon / TAU * arrows_around) - 0.5) * 2.0;
 	float chev_phase = (lat * chevron_count) - zig * 2.0 - rise * 1.5;
 	float chev_wave = sin(chev_phase);
 	float chev = smoothstep(0.5, 0.8, chev_wave * 0.5 + 0.5) * chevron_strength;
@@ -81,7 +79,6 @@ void fragment() {
 	vec4 base = mix(core_color, mid_color, core_mix);
 	float wisp_mask = smoothstep(0.55, 0.95, combined_noise) * smoothstep(0.3, 0.7, bands);
 	base = mix(base, wisp_color, wisp_mask * 0.7);
-	// arrows painted hard on top in near-white cyan
 	base = mix(base, arrow_color, chev);
 	float fresnel = pow(1.0 - clamp(dot(n, v), 0.0, 1.0), rim_power);
 	vec4 col = mix(base, rim_color, fresnel);

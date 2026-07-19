@@ -24,7 +24,6 @@ void fragment() {
 }
 
 void light() {
-	// hard-stepped diffuse: the core of the cel look
 	float ndl = dot(normalize(NORMAL), normalize(LIGHT));
 	float lit = clamp(ndl, 0.0, 1.0);
 	float stepped = floor(lit * float(bands) + 0.5) / float(bands);
@@ -32,7 +31,6 @@ void light() {
 	vec3 shaded = mix(shade_tint.rgb * ALBEDO, ALBEDO, stepped);
 	DIFFUSE_LIGHT += shaded * LIGHT_COLOR * ATTENUATION / 3.14159;
 
-	// rim keeps the silhouette readable against the green world
 	float rim = 1.0 - clamp(dot(normalize(VIEW), normalize(NORMAL)), 0.0, 1.0);
 	rim = pow(rim, rim_width);
 	rim = smoothstep(0.35, 0.65, rim) * rim_amount;

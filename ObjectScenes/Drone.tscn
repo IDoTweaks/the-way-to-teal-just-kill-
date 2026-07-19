@@ -4,10 +4,13 @@
 [ext_resource type="Shader" path="res://Scripts/enemy.gdshader" id="2_sh"]
 [ext_resource type="Script" path="res://Scripts/meshInstanceBody.gd" id="3_body"]
 [ext_resource type="PackedScene" path="res://ObjectScenes/enemyMarker.tscn" id="4_mark"]
+[ext_resource type="Script" path="res://Scripts/enemy_face.gd" id="99_face"]
+[ext_resource type="Material" path="res://shaders/toonOutline.tres" id="98_out"]
 
 [sub_resource type="ShaderMaterial" id="green_mat"]
 shader = ExtResource("2_sh")
-shader_parameter/base_color = Color(0, 0.36, 0.13, 1)
+shader_parameter/base_color = Color(0.35, 1, 0.86, 1)
+next_pass = ExtResource("98_out")
 shader_parameter/fill_color = Color(0, 1, 0.27, 1)
 shader_parameter/fill_percent = 1.0
 shader_parameter/min_y = -0.7
@@ -64,6 +67,13 @@ mesh = SubResource("fin")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.65, 0, 0)
 material_override = SubResource("dark")
 mesh = SubResource("fin")
+
+[node name="face" type="MeshInstance3D" parent="body"]
+script = ExtResource("99_face")
+style = "visor"
+face_size = 0.95
+face_forward = 0.72
+face_height = 0.1
 
 [node name="textSpawn" type="MeshInstance3D" parent="body"]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 1.0, 0)

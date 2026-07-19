@@ -8,10 +8,7 @@
 [ext_resource type="FontVariation" path="res://Fonts/LilitaOne.tres" id="6_orb"]
 [ext_resource type="PackedScene" uid="uid://du4s8p1pljnlb" path="res://ObjectScenes/jumpOrb.tscn" id="90_orb"]
 [ext_resource type="Theme" uid="uid://bfunkytheme01" path="res://UI/funkyTheme.tres" id="99_theme"]
-
-[sub_resource type="StandardMaterial3D" id="mat_level"]
-specular_mode = 1
-albedo_color = Color(0.16, 0.26, 0.18, 1)
+[ext_resource type="Material" uid="uid://dagdbpsvta3ue" path="res://shaders/new_standard_material_3d.tres" id="mat_wall"]
 
 [sub_resource type="StandardMaterial3D" id="mat_hurdle"]
 specular_mode = 1
@@ -66,7 +63,7 @@ corner_radius_bottom_left = 6
 script = ExtResource("1_tut")
 
 [node name="Level" type="CSGCombiner3D" parent="." unique_id=227979527]
-material_override = SubResource("mat_level")
+material_override = ExtResource("mat_wall")
 use_collision = true
 collision_layer = 17
 
@@ -459,6 +456,7 @@ outline_size = 28
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 181, 2, 0)
 toLevel = 1
 tutorialExit = true
+killLock = false
 player = NodePath("../Player")
 
 [node name="PauseMenu" parent="." unique_id=1897128334 instance=ExtResource("4_pause")]

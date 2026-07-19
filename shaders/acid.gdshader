@@ -24,10 +24,8 @@ float voronoiIQ(vec2 _pos) {
     vec2 f = fract(_pos);
     float res = 0.0;
     
-    // Clamp the sharpness to avoid extreme behavior.
     float sharp = clamp(sharpness, 1.0, 50.0);
     
-    // Sum contributions from neighboring cells.
     for (int j = -1; j <= 1; j++) {
         for (int i = -1; i <= 1; i++) {
             vec2 b = vec2(float(i), float(j));
@@ -39,10 +37,8 @@ float voronoiIQ(vec2 _pos) {
         }
     }
     
-    // Ensure we never take the log of zero.
     res = max(res, 1e-6);
     
-    // Calculate the final value. Optionally, clamp the result.
     float result = -(1.0 / sharp) * log(res);
     return clamp(result, 0.0, 1.0);
 }
@@ -51,11 +47,9 @@ void fragment() {
     vec2 uv = UV * scale;
     float voronoi_value = voronoiIQ(uv);
 
-    // quantise the gradient into flat cel bands
     float v = floor(voronoi_value * float(cel_bands)) / float(cel_bands - 1);
     v = clamp(v, 0.0, 1.0);
     vec4 final_color = mix(dark_lava_color, light_lava_color, v);
-    // dark ink line along the cell borders
     float cell_edge = smoothstep(edge_width, 0.0, voronoi_value);
     final_color.rgb = mix(final_color.rgb, edge_color.rgb, cell_edge);
     ALBEDO = final_color.rgb;

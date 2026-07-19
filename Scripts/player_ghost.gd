@@ -13,10 +13,20 @@ var weapons : PackedInt32Array
 var cursor : float = 0.0
 var max = 0
 
-@onready var gun = $playerCam/gun
-@onready var shotGun = $playerCam/shotGun
+@onready var body = $body
+var bobTime : float = 0.0
+var baseBodyY : float = 0.0
+
+const GUN_TINT = {
+	0: Color(0.35, 0.64, 1.0),
+	1: Color(1.0, 0.72, 0.30),
+	2: Color(0.45, 1.0, 0.85),
+}
 
 func _ready() -> void:
+	if body.material_override:
+		body.material_override = body.material_override.duplicate()
+	baseBodyY = body.position.y
 	var lvl = Global.currentLevel
 	var root = get_parent()
 	if "levelIndex" in root:
@@ -47,16 +57,16 @@ func _physics_process(delta: float) -> void:
 	global_rotation = _lerpRot(rotations[i], rotations[i + 1], f)
 	cam.global_position = camPositions[i].lerp(camPositions[i + 1], f)
 	cam.global_rotation = _lerpRot(camRotations[i], camRotations[i + 1], f)
-	if weapons[i] == 0:
-		gun.visible = true
-		shotGun.visible = false
-	elif weapons[i] == 1:
-		gun.visible = false
-		shotGun.visible = true
-	elif weapons[i] == 2:
-		gun.visible = false
-		shotGun.visible = false
+	if body.material_override:
+		body.material_override.set_shader_parameter("body_color", GUN_TINT.get(weapons[i], GUN_TINT[0]))
 	cursor += delta * Global.GHOST_HZ
+
+func _process(delta: float) -> void:
+	if not visible:
+		return
+	bobTime += delta
+	body.position.y = baseBodyY + sin(bobTime * 2.1) * 0.07
+	body.rotation.z = sin(bobTime * 1.4) * 0.05
 
 func _lerpRot(a : Vector3, b : Vector3, f : float) -> Vector3:
 	return Vector3(lerp_angle(a.x, b.x, f), lerp_angle(a.y, b.y, f), lerp_angle(a.z, b.z, f))

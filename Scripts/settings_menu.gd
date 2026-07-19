@@ -120,7 +120,6 @@ func open() -> void:
 	_syncAll()
 	_showTab(0)
 
-# --- deferred save ---------------------------------------------------------
 
 const WATCHED := ["toonOutlines", "masterVol", "musicVol", "sfxVol", "displayMode", "resIndex", "sensitivity",
 	"scopedSens", "fov", "screenShake", "reducedFlash", "renderScale", "glowOn", "decalDensity",
@@ -177,7 +176,6 @@ func _on_reset_pressed() -> void:
 	_syncAll()
 	_touch()
 
-# --- syncing ---------------------------------------------------------------
 
 func _syncAll() -> void:
 	volumeSlider.set_value_no_signal(Global.masterVol)
@@ -205,7 +203,6 @@ func _syncAll() -> void:
 func _syncResEnabled() -> void:
 	resOption.disabled = DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED
 
-# --- keybinds --------------------------------------------------------------
 
 func _buildBinds() -> void:
 	for c in bindList.get_children():

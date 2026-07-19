@@ -67,6 +67,7 @@ var sleeping := false
 var damageable := false
 var stageDmg : float = 0.0
 var segMats : Array = []
+var glowTween : Tween
 var marker : MeshInstance3D
 var glasses : Node3D
 var nextDealAt : float = 0.0
@@ -140,7 +141,6 @@ var atkCd : float = 0.0
 var lastAtk : String = ""
 var stepTimer : Timer
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	segms = [$head,$hulia,$hulia2,$hulia3,$hulia4,$hulia5]
 	for seg in segms:
@@ -234,7 +234,6 @@ func _step():
 	await tween.finished
 	moving = false
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	if sleeping and marker != null and is_instance_valid(marker):
 		var bob = sin(Time.get_ticks_msec() * .006)
@@ -565,10 +564,18 @@ func _makeGlasses():
 	segms[0].add_child(glasses)
 
 func _setExposed(on : bool):
+	if glowTween:
+		glowTween.kill()
+	glowTween = create_tween()
+	glowTween.set_parallel(true)
+	glowTween.set_trans(Tween.TRANS_CUBIC)
+	glowTween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	for mat in segMats:
-		mat.emission_enabled = on
-		mat.emission = OPEN_COL
-		mat.emission_energy_multiplier = 2.2 if on else 0.0
+		mat.set_shader_parameter("glow_color", OPEN_COL)
+		var cur = mat.get_shader_parameter("glow")
+		glowTween.tween_method(
+			func(v): mat.set_shader_parameter("glow", v),
+			float(cur) if cur != null else 0.0, 1.0 if on else 0.0, .22)
 	if marker != null and is_instance_valid(marker):
 		marker.visible = on
 

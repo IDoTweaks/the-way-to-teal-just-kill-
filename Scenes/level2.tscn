@@ -1,8 +1,7 @@
 [gd_scene format=3 uid="uid://671irfg6vdax"]
 
 [ext_resource type="Script" uid="uid://2pcnmn74i67n" path="res://Scripts/level_1.gd" id="1_mmf1u"]
-[ext_resource type="Texture2D" uid="uid://ep187n5c5y83" path="res://Textures/AquilariusRetroTextures/t38.png" id="2_vn460"]
-[ext_resource type="Texture2D" uid="uid://b5rofp7b01qpc" path="res://Textures/AquilariusRetroTextures/t13.png" id="3_r8hce"]
+[ext_resource type="Material" uid="uid://dagdbpsvta3ue" path="res://shaders/new_standard_material_3d.tres" id="mat_wall"]
 [ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="5_yj6rp"]
 [ext_resource type="PackedScene" uid="uid://ctoceg007wby5" path="res://ObjectScenes/Xenon.tscn" id="7_5flq6"]
 [ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="9_in4v8"]
@@ -11,16 +10,9 @@
 [ext_resource type="PackedScene" uid="uid://q146235yscy8" path="res://ObjectScenes/acid.tscn" id="12_1apgh"]
 [ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="pause_lvl2"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_room"]
-albedo_texture = ExtResource("2_vn460")
-
 [sub_resource type="NavigationMesh" id="NavigationMesh_vn2uo"]
 vertices = PackedVector3Array(30, 5.5, -12, 30, 5.5, -10, 32, 5.5, -10, 32, 5.5, -12, 56, 10, -9, 56, 10, -5, 60, 10, -5, 60, 10, -9, 46, 9.5, -8, 46, 9.5, -6, 48, 9.5, -6, 48, 9.5, -8, 52, 6, -8, 52, 6, -6, 54, 6, -6, 54, 6, -8, 44.5, 2.5, -4.5, 44.75, 2.5, -1.75, 45, 2.5, -1.75, 49, 2.5, -2, 39.5, 2.5, -2.75, 41.5, 2.5, -2.75, 41.75, 2.5, -4.5, 39.5, 2.5, -7.5, 54.5, 2.5, -0.5, 54.5, 2.5, -7.5, 49.25, 2.5, -0.25, 61, 12.5, -4, 61, 12.5, 0, 65, 12.5, 0, 65, 12.5, -4, 5.5, 0.5, -3.5, 5.5, 0.5, 3.5, 14.5, 0.5, 3.5, 14.5, 0.5, -3.5, 26.5, 1.5, -3.5, 26.5, 1.5, 1.5, 31.5, 1.5, 1.5, 31.5, 1.5, -3.5, 42.5, 4.5, -3.5, 42.5, 4.5, -2.5, 43.5, 4.5, -2.5, 43.5, 4.5, -3.5, 42.75, 2.5, -3.25, 42.75, 2.5, -2.5, 43.5, 2.5, -2.5, 43.5, 2.5, -3.25, 59, 7, -3, 59, 7, 1, 63, 7, 1, 63, 7, -3, 44.25, 2.5, -1.25, 45.25, 2.5, 2.25, 41.75, 2.5, -1.25, 49.5, 2.5, 5.5, 49.75, 2.5, 2.5, 49, 2.5, 2, 39.5, 2.5, 7.5, 49.5, 2.5, 7.5, 46, 5.5, -1, 46, 5.5, 1, 48, 5.5, 1, 48, 5.5, -1, 46.25, 2.5, -0.75, 46.25, 2.5, 1, 48, 2.5, 1, 48, 2.5, -0.75, 52.5, 2.5, 2.5, 52.25, 2.5, 5.75, 54, 2.5, 7.5, 52.75, 2.5, 5.25, 17.5, 1, 0.5, 17.5, 1, 5.5, 22.5, 1, 5.5, 22.5, 1, 0.5, 32.5, 2, 0.5, 32.5, 2, 5.5, 37.5, 2, 5.5, 37.5, 2, 0.5, 62.5, 14.5, 1.5, 62.5, 14.5, 8.5, 69.5, 14.5, 8.5, 69.5, 14.5, 1.5, 50.5, 4.5, 3.5, 50.5, 4.5, 4.5, 51.5, 4.5, 4.5, 51.5, 4.5, 3.5, 50.75, 2.5, 3.75, 50.75, 2.5, 4.5, 51.5, 2.5, 4.5, 51.5, 2.5, 3.75, 55, 3.5, 5, 55, 3.5, 9, 59, 3.5, 9, 59, 3.5, 5, 40, 6, 6, 40, 6, 8, 42, 6, 8, 42, 6, 6, 23, 5, 10, 23, 5, 12, 25, 5, 12, 25, 5, 10)
 polygons = [PackedInt32Array(3, 2, 0), PackedInt32Array(0, 2, 1), PackedInt32Array(7, 6, 4), PackedInt32Array(4, 6, 5), PackedInt32Array(11, 10, 8), PackedInt32Array(8, 10, 9), PackedInt32Array(15, 14, 12), PackedInt32Array(12, 14, 13), PackedInt32Array(17, 16, 18), PackedInt32Array(18, 16, 19), PackedInt32Array(21, 20, 22), PackedInt32Array(22, 20, 23), PackedInt32Array(24, 19, 25), PackedInt32Array(25, 19, 16), PackedInt32Array(25, 16, 23), PackedInt32Array(16, 22, 23), PackedInt32Array(24, 26, 19), PackedInt32Array(30, 29, 27), PackedInt32Array(27, 29, 28), PackedInt32Array(34, 33, 31), PackedInt32Array(31, 33, 32), PackedInt32Array(38, 37, 35), PackedInt32Array(35, 37, 36), PackedInt32Array(42, 41, 39), PackedInt32Array(39, 41, 40), PackedInt32Array(46, 45, 43), PackedInt32Array(43, 45, 44), PackedInt32Array(50, 49, 47), PackedInt32Array(47, 49, 48), PackedInt32Array(17, 18, 51), PackedInt32Array(51, 18, 52), PackedInt32Array(20, 21, 53), PackedInt32Array(56, 55, 54), PackedInt32Array(53, 52, 20), PackedInt32Array(20, 52, 57), PackedInt32Array(57, 52, 58), PackedInt32Array(51, 52, 53), PackedInt32Array(54, 58, 56), PackedInt32Array(56, 58, 52), PackedInt32Array(62, 61, 59), PackedInt32Array(59, 61, 60), PackedInt32Array(66, 65, 63), PackedInt32Array(63, 65, 64), PackedInt32Array(56, 26, 55), PackedInt32Array(55, 26, 67), PackedInt32Array(67, 26, 24), PackedInt32Array(54, 68, 58), PackedInt32Array(58, 68, 69), PackedInt32Array(70, 67, 69), PackedInt32Array(69, 67, 24), PackedInt32Array(69, 68, 70), PackedInt32Array(74, 73, 71), PackedInt32Array(71, 73, 72), PackedInt32Array(78, 77, 75), PackedInt32Array(75, 77, 76), PackedInt32Array(82, 81, 79), PackedInt32Array(79, 81, 80), PackedInt32Array(86, 85, 83), PackedInt32Array(83, 85, 84), PackedInt32Array(90, 89, 87), PackedInt32Array(87, 89, 88), PackedInt32Array(94, 93, 91), PackedInt32Array(91, 93, 92), PackedInt32Array(98, 97, 95), PackedInt32Array(95, 97, 96), PackedInt32Array(102, 101, 99), PackedInt32Array(99, 101, 100)]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_level"]
-albedo_texture = ExtResource("3_r8hce")
-uv1_triplanar = true
 
 [sub_resource type="Environment" id="Environment_52fb6"]
 ssao_enabled = false
@@ -40,7 +32,7 @@ script = ExtResource("1_mmf1u")
 levelIndex = 2
 
 [node name="SpawnRoom" type="CSGCombiner3D" parent="." unique_id=1065732380]
-material_override = SubResource("StandardMaterial3D_room")
+material_override = ExtResource("mat_wall")
 use_collision = true
 
 [node name="CSGBox3D" type="CSGBox3D" parent="SpawnRoom" unique_id=15475435]
@@ -60,7 +52,7 @@ size = Vector3(1, 4, 3)
 navigation_mesh = SubResource("NavigationMesh_vn2uo")
 
 [node name="Level" type="CSGCombiner3D" parent="." unique_id=1415439615]
-material_override = SubResource("StandardMaterial3D_level")
+material_override = ExtResource("mat_wall")
 use_collision = true
 collision_layer = 17
 
@@ -137,7 +129,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66, 13.5, 5)
 size = Vector3(8, 1, 8)
 
 [node name="Enclosure" type="CSGCombiner3D" parent="."]
-material_override = SubResource("StandardMaterial3D_level")
+material_override = ExtResource("mat_wall")
 use_collision = true
 collision_layer = 17
 
@@ -170,7 +162,7 @@ transform = Transform3D(1, 0, 0, 0, -0.37609485, 0.9265812, 0, -0.9265812, -0.37
 [node name="Player" parent="." unique_id=1096174911 instance=ExtResource("5_yj6rp")]
 transform = Transform3D(0.12933208, 0, -0.99160135, 0, 1, 0, 0.99160135, 0, 0.12933208, 0, 2.2655072, 0)
 dashBoost = 22.0
-shotGunDmg = 10.0
+shotGunDmg = 20.0
 parTime = 65.0
 
 [node name="Player2" parent="." unique_id=132587735 instance=ExtResource("10_mu7lp")]

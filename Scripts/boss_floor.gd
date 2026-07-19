@@ -13,7 +13,6 @@ extends Node3D
 @onready var briefingScript = preload("res://Scripts/para_briefing.gd")
 var floor = null
 var removedTiles : Dictionary = {}
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	Global.currentLevel = Global._snakeLevel()
 	Global._addTry(Global.currentLevel)
