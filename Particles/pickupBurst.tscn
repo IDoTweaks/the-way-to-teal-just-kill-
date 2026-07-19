@@ -1,53 +1,61 @@
-[gd_scene format=3 uid="uid://dpickupbrst01"]
+[gd_scene load_steps=9 format=3 uid="uid://dpickupbrst01"]
 
 [ext_resource type="Script" uid="uid://bc6ahec3jfp1w" path="res://Scripts/shoot_particles.gd" id="1"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.15, 1.0, 0.62, 1)
+
 [sub_resource type="Gradient" id="Gradient_1"]
-offsets = PackedFloat32Array(0, 0.3, 1)
-colors = PackedColorArray(1, 1, 1, 1, 0.2, 1, 0.6, 1, 0.2, 1, 0.6, 0)
+interpolation_mode = 1
+offsets = PackedFloat32Array(0.0, 0.25, 0.5, 0.75, 1.0)
+colors = PackedColorArray(1.0, 1.0, 1.0, 1.0, 0.7, 1.0, 0.85, 1.0, 0.15, 1.0, 0.62, 1.0, 0.03, 0.45, 0.3, 1.0, 0.03, 0.45, 0.3, 0.0)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_1"]
 gradient = SubResource("Gradient_1")
 
 [sub_resource type="Curve" id="Curve_1"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
-point_count = 2
+max_value = 1.25
+_data = [Vector2(0.0, 0.3), 0.0, 0.0, 0, 0, Vector2(0.16, 1.25), 0.0, 0.0, 0, 0, Vector2(0.62, 0.95), 0.0, 0.0, 0, 0, Vector2(1.0, 0.0), 0.0, 0.0, 0, 0]
+point_count = 4
 
 [sub_resource type="CurveTexture" id="CurveTexture_1"]
 curve = SubResource("Curve_1")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
-transparency = 1
-shading_mode = 0
-blend_mode = 1
-vertex_color_use_as_albedo = true
-albedo_color = Color(0.2, 1, 0.6, 1)
-emission_enabled = true
-emission = Color(0.2, 1, 0.6, 1)
-emission_energy_multiplier = 5.0
-
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_1"]
+lifetime_randomness = 0.35
 emission_shape = 1
-emission_sphere_radius = 0.12
-spread = 180.0
-initial_velocity_min = 2.0
-initial_velocity_max = 4.5
-gravity = Vector3(0, -2, 0)
-damping_min = 1.0
-damping_max = 2.0
-scale_min = 0.4
-scale_max = 0.9
+emission_sphere_radius = 0.22
+direction = Vector3(0.0, 0.5, 0.0)
+spread = 140.0
+flatness = 0.0
+initial_velocity_min = 2.8
+initial_velocity_max = 6.0
+angle_min = -180.0
+angle_max = 180.0
+angular_velocity_min = -700.0
+angular_velocity_max = 700.0
+gravity = Vector3(0.0, -3.0, 0.0)
+radial_accel_min = 2.0
+radial_accel_max = 5.0
+damping_min = 1.5
+damping_max = 4.0
+scale_min = 0.7
+scale_max = 1.5
 scale_curve = SubResource("CurveTexture_1")
 color_ramp = SubResource("GradientTexture1D_1")
 
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
-size = Vector3(0.06, 0.06, 0.06)
+size = Vector3(0.09, 0.09, 0.09)
 
 [node name="PickupBurst" type="GPUParticles3D"]
 material_override = SubResource("StandardMaterial3D_1")
 emitting = false
-amount = 20
-lifetime = 0.5
+amount = 30
+lifetime = 0.55
 one_shot = true
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_1")

@@ -110,9 +110,15 @@ func _briefingUp():
 			return true
 	return false
 
+func _storyUp():
+	for n in get_tree().root.find_children("*", "CanvasLayer", true, false):
+		if n.has_method("_storyCard"):
+			return true
+	return false
+
 func _startIntro():
 	await get_tree().create_timer(.6, true, false, true).timeout
-	while _briefingUp():
+	while _briefingUp() or _storyUp():
 		await get_tree().process_frame
 		if dead or !is_instance_valid(self):
 			introPlaying = false

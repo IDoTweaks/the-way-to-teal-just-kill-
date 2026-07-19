@@ -25,6 +25,7 @@ itch.io: https://idotweaks.itch.io/the-way-to-tealjust-kill
 - untested mac support
 - almost full web support
 - 9 levels + a boss fight
+- a story mode - 10 chapters, you get evicted and go argue about it
 - a understanding boss he even has a office!
 - scoring and grading system (S+ to F)
 - stamina system
@@ -51,6 +52,7 @@ itch.io: https://idotweaks.itch.io/the-way-to-tealjust-kill
 
 - models - i dont remember who made each model but they're from sketchfab (sorry)
 - sound effects - all CC0 (public domain) from [Freesound.org](https://freesound.org), no attribution required but thanks to: rifle (cabled_mess), shotgun (CraftyIndividual), enemy_hit (G40X), enemy_death (mrickey13), player_hurt (aruscio28), jump (Bastianhallo), dash (florianreichelt), walljump (vacuumfan7072), slam (Kneeling), footstep1 (Fission9), footstep2 (Yoyodaman234), ui_hover (ConarB13), ui_click (benzix2), win (ggSqRed), lose (jivatma07), boing (magnuswaker)
+- music - every level (+ menu + boss) has its own track now, all CC0 chiptune from [OpenGameArt.org](https://opengameart.org), no attribution required but thanks to: Juhani Junkala ("5 Chiptunes (Action)" and "4 Chiptunes (Adventure)" packs - menu, levels 1-5 and 9) and SketchyLogic ("NES Shooter Music" pack - levels 6-8 and the boss theme)
 - fonts - [Lilita One](https://fonts.google.com/specimen/Lilita+One) (UI) and Orbitron, both under the SIL Open Font License 1.1
 - ai - thank you for debugging + making shaders + scripts to generate decals + general use/refactoring
 - everything else - me (da goat)

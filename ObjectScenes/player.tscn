@@ -17,11 +17,6 @@
 [ext_resource type="PackedScene" uid="uid://blkrl04v60e0i" path="res://Models/blue-night_a.v.as-m24.glb" id="14_va7cm"]
 [ext_resource type="Shader" uid="uid://10bvbyc3gcgu" path="res://shaders/scope.gdshader" id="15_scope"]
 
-[sub_resource type="Gradient" id="Gradient_gacgy"]
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_rt1b1"]
-gradient = SubResource("Gradient_gacgy")
-
 [sub_resource type="ShaderMaterial" id="StandardMaterial3D_m8bbn"]
 shader = ExtResource("91_toon")
 shader_parameter/base_color = Color(0.24, 0.6, 1, 1)
@@ -794,86 +789,6 @@ max_footprints = 100
 visible = false
 script = ExtResource("8_rfol3")
 
-[node name="MainContainer" type="Control" parent="GameOver" unique_id=1252809543]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Title" type="Label" parent="GameOver/MainContainer" unique_id=1728092983]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -500.0
-offset_top = -300.0
-offset_right = 500.0
-offset_bottom = -140.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0, 0.9, 0.82, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
-theme_override_colors/font_outline_color = Color(0, 0.12, 0.11, 1)
-theme_override_constants/outline_size = 34
-theme_type_variation = &"Display"
-text = "YOU FUCKING DIED
-GAME OVER"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="MenuButtons" type="VBoxContainer" parent="GameOver/MainContainer" unique_id=1438979862]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -160.0
-offset_top = -40.0
-offset_right = 160.0
-offset_bottom = 220.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = ExtResource("13_theme")
-theme_override_constants/separation = 16
-
-[node name="retry" type="Button" parent="GameOver/MainContainer/MenuButtons" unique_id=79681632]
-z_index = 7
-custom_minimum_size = Vector2(300, 58)
-layout_mode = 2
-theme_type_variation = &"H2"
-text = "RETRY"
-
-[node name="VSeparator" type="VSeparator" parent="GameOver/MainContainer/MenuButtons" unique_id=1002454785]
-self_modulate = Color(0.05, 0.88, 0.42, 1)
-layout_mode = 2
-
-[node name="SettingsBtn" type="Button" parent="GameOver/MainContainer/MenuButtons" unique_id=1682905405]
-visible = false
-layout_mode = 2
-theme_type_variation = &"H2"
-text = "SETTINGS"
-
-[node name="QuitBtn" type="Button" parent="GameOver/MainContainer/MenuButtons" unique_id=206990400]
-z_index = 7
-custom_minimum_size = Vector2(300, 58)
-layout_mode = 2
-theme_type_variation = &"H2"
-text = "QUIT"
-
-[node name="TextureRect" type="TextureRect" parent="GameOver" unique_id=859501969]
-z_index = -1
-offset_left = -492.0
-offset_top = -602.0
-offset_right = 2213.0
-offset_bottom = 1297.0
-mouse_filter = 2
-texture = SubResource("GradientTexture1D_rt1b1")
-
 [node name="body" type="MeshInstance3D" parent="." unique_id=1599943581]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
 material_override = SubResource("StandardMaterial3D_m8bbn")
@@ -1124,6 +1039,4 @@ text = "3 SNIPER"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[connection signal="button_down" from="GameOver/MainContainer/MenuButtons/retry" to="GameOver" method="_on_retry_button_down"]
-[connection signal="button_down" from="GameOver/MainContainer/MenuButtons/QuitBtn" to="GameOver" method="_on_quit_btn_button_down"]
 [connection signal="timeout" from="shotGunCd" to="." method="_on_shot_gun_cd_timeout"]

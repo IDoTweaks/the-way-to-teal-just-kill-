@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://bwj0mp7brst4k"]
+[gd_scene load_steps=9 format=3 uid="uid://dplyrdeath01"]
 
 [ext_resource type="Script" uid="uid://bc6ahec3jfp1w" path="res://Scripts/shoot_particles.gd" id="1"]
 
@@ -6,12 +6,12 @@
 transparency = 1
 shading_mode = 0
 vertex_color_use_as_albedo = true
-albedo_color = Color(0.2, 0.86, 0.82, 1)
+albedo_color = Color(1.0, 0.25, 0.22, 1)
 
 [sub_resource type="Gradient" id="Gradient_1"]
 interpolation_mode = 1
-offsets = PackedFloat32Array(0.0, 0.25, 0.5, 0.75, 1.0)
-colors = PackedColorArray(1.0, 1.0, 1.0, 1.0, 0.7, 1.0, 0.96, 1.0, 0.2, 0.86, 0.82, 1.0, 0.05, 0.4, 0.4, 1.0, 0.05, 0.4, 0.4, 0.0)
+offsets = PackedFloat32Array(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
+colors = PackedColorArray(1.0, 1.0, 1.0, 1.0, 1.0, 0.8, 0.7, 1.0, 1.0, 0.25, 0.22, 1.0, 0.55, 0.06, 0.08, 1.0, 0.2, 0.02, 0.03, 1.0, 0.2, 0.02, 0.03, 0.0)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_1"]
 gradient = SubResource("Gradient_1")
@@ -27,34 +27,34 @@ curve = SubResource("Curve_1")
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_1"]
 lifetime_randomness = 0.35
 emission_shape = 1
-emission_sphere_radius = 0.24
-direction = Vector3(0.0, 0.2, 0.0)
-spread = 110.0
-flatness = 0.35
-initial_velocity_min = 2.5
-initial_velocity_max = 5.5
+emission_sphere_radius = 0.45
+direction = Vector3(0.0, 0.35, 0.0)
+spread = 180.0
+flatness = 0.0
+initial_velocity_min = 5.0
+initial_velocity_max = 12.0
 angle_min = -180.0
 angle_max = 180.0
-angular_velocity_min = -620.0
-angular_velocity_max = 620.0
-gravity = Vector3(0.0, -4.5, 0.0)
-radial_accel_min = 2.0
-radial_accel_max = 5.0
-damping_min = 1.5
-damping_max = 4.0
-scale_min = 0.7
-scale_max = 1.5
+angular_velocity_min = -840.0
+angular_velocity_max = 840.0
+gravity = Vector3(0.0, -9.5, 0.0)
+radial_accel_min = 3.0
+radial_accel_max = 8.0
+damping_min = 0.8
+damping_max = 2.5
+scale_min = 0.6
+scale_max = 2.0
 scale_curve = SubResource("CurveTexture_1")
 color_ramp = SubResource("GradientTexture1D_1")
 
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
-size = Vector3(0.105, 0.105, 0.105)
+size = Vector3(0.16, 0.16, 0.16)
 
-[node name="WallJumpBurst" type="GPUParticles3D" unique_id=1036040091]
+[node name="PlayerDeath" type="GPUParticles3D"]
 material_override = SubResource("StandardMaterial3D_1")
 emitting = false
-amount = 24
-lifetime = 0.48
+amount = 160
+lifetime = 1.25
 one_shot = true
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_1")

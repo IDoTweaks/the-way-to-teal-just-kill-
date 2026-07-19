@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 Global="*uid://t2dgc0yarvoq"
 Audio="*res://Scripts/audio_manager.gd"
+Story="*res://Scripts/story.gd"
 
 [display]
 

@@ -21,10 +21,14 @@ func _ready() -> void:
 	var selected = _selectRemoveable(100)
 	for i in selected:
 		i._activate(0)
-	if showBriefing:
-		var brief = CanvasLayer.new()
-		brief.set_script(briefingScript)
-		add_child(brief)
+	Story._spawn.call_deferred(self, Global.currentLevel, _startBriefing)
+
+func _startBriefing():
+	if !showBriefing:
+		return
+	var brief = CanvasLayer.new()
+	brief.set_script(briefingScript)
+	add_child(brief)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("restart"):

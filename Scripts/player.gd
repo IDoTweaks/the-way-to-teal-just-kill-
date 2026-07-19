@@ -73,6 +73,10 @@ var paraVignette : TextureRect
 @onready var jumpParticles = preload("res://Particles/jumpPuff.tscn")
 @onready var landParticles = preload("res://Particles/landDust.tscn")
 @onready var finishParticles = preload("res://Particles/finishBurst.tscn")
+@onready var stepParticles = preload("res://Particles/stepPuff.tscn")
+@onready var enemyHitParticles = preload("res://Particles/enemyHit.tscn")
+@onready var deathParticles = preload("res://Particles/playerDeath.tscn")
+@onready var slideSparkParticles = preload("res://Particles/slideSparks.tscn")
 @onready var groundSlam = preload("res://ObjectScenes/slamRIng.tscn")
 @onready var gunParticleSpawn = $playerCam/gun/particleSpawnGun
 @onready var rayContainer = $playerCam/rayContainer
@@ -89,6 +93,7 @@ var paraVignette : TextureRect
 @onready var enemyCounter :Label = $HUD/enemyCounter
 @onready var slamFrom = $body/slamFrom
 var muzzleParticles
+var slideSparks
 
 #general movement
 var airAccel = 8
@@ -506,7 +511,11 @@ func _die():
 	if !count:
 		return
 	count = false
+	Story._endLevel()
 	Audio.play("lose")
+	_spawnParticleAt(deathParticles, global_position)
+	if slideSparks:
+		slideSparks.emitting = false
 	_addShake(.25)
 	_hitStop(0.15, 0.35)
 	await get_tree().create_timer(0.5, true, false, true).timeout
@@ -521,6 +530,7 @@ func _die():
 func _finishLevel():
 	count = false
 	Engine.time_scale = 1.0
+	Story._endLevel()
 	Audio.play("win")
 	_spawnParticleAt(finishParticles, global_position)
 	var earnedScore = maxScore - _calcMaxScore()
@@ -707,8 +717,7 @@ func _shoot():
 				target._damage(damage)
 			var hit_pos = gunRay.get_collision_point()
 			var hit_normal = gunRay.get_collision_normal()
-			_spawn_bullet_hole(hit_pos, hit_normal)
-			_spawnParticleAt(bulletImpactParticles, hit_pos + hit_normal * 0.05)
+			_spawnImpact(target, hit_pos, hit_normal)
 			_draw_laser_line(gunParticleSpawn.global_position, gunRay.get_collision_point(), 0.25)
 		else:
 			var end_point = gunRay.to_global(gunRay.target_position)
@@ -738,8 +747,7 @@ func _shoot():
 					if target and target.has_method("_makeTarg"):
 						target._makeTarg(self)
 					var hit_normal = ray.get_collision_normal()
-					_spawn_bullet_hole(hit_pos, hit_normal)
-					_spawnParticleAt(bulletImpactParticles, hit_pos + hit_normal * 0.05)
+					_spawnImpact(target, hit_pos, hit_normal)
 					_draw_laser_line(gunParticleSpawn.global_position, ray.get_collision_point(), 0.25)
 				else:
 					var end_point = ray.to_global(ray.target_position)
@@ -771,8 +779,7 @@ func _shoot():
 				if target and target.has_method("_damage"):
 					_hitmarker(false)
 					target._damage(sniperDmg)
-				_spawn_bullet_hole(hit.position, hit.normal)
-				_spawnParticleAt(bulletImpactParticles, hit.position + hit.normal * 0.05)
+				_spawnImpact(target, hit.position, hit.normal)
 				_draw_laser_beam(beamStart, hit.position, 0.35)
 			else:
 				_draw_laser_beam(beamStart, far_point, 0.35)
@@ -945,6 +952,9 @@ func _ready() -> void:
 	muzzleParticles.finished.disconnect(Callable(muzzleParticles, "_on_finished"))
 	gunParticleSpawn.add_child(muzzleParticles)
 	muzzleParticles.position = Vector3()
+	slideSparks = slideSparkParticles.instantiate()
+	feet.add_child(slideSparks)
+	slideSparks.position = Vector3()
 	_prewarmFx.call_deferred()
 	_updateHud()
 	_updateWeaponHud()
@@ -1103,6 +1113,8 @@ func _physics_process(delta: float) -> void:
 			_staminaFail()
 		if slide and is_on_floor():
 			_drainStamina(slideDrain * delta)
+		if slideSparks:
+			slideSparks.emitting = slide and is_on_floor() and Vector2(velocity.x, velocity.z).length() > 3.0
 		wasSliding = slide
 		if !slide:
 			if animaPlayer.current_animation == "inSlide":
@@ -1228,6 +1240,8 @@ func _physics_process(delta: float) -> void:
 			var side = (_footprint_pool.size() % 2) * 2 - 1
 			var perp = transform.basis.x * 0.15 * side
 			_spawn_footprint(feet.global_position + perp)
+			if not slide:
+				_spawnParticleAt(stepParticles, feet.global_position + perp)
 			Audio.footstep()
 			_last_footprint_pos = global_position
 	if slamming:
@@ -1490,9 +1504,16 @@ func _spawnParticleAt(scene, pos : Vector3):
 	p.global_position = pos
 	p.emitting = true
 
+func _spawnImpact(target, pos : Vector3, normal : Vector3):
+	if target and target.has_method("_damage"):
+		_spawnParticleAt(enemyHitParticles, pos + normal * 0.05)
+	else:
+		_spawn_bullet_hole(pos, normal)
+		_spawnParticleAt(bulletImpactParticles, pos + normal * 0.05)
+
 func _prewarmFx():
 	var pos = global_position + Vector3(0, -400, 0)
-	for scene in [bulletImpactParticles, shotgunBlast, dashParticles, wallJumpParticles, hurtParticles, jumpParticles, landParticles, finishParticles, slamParticles]:
+	for scene in [bulletImpactParticles, shotgunBlast, dashParticles, wallJumpParticles, hurtParticles, jumpParticles, landParticles, finishParticles, slamParticles, stepParticles, deathParticles, enemyHitParticles]:
 		_spawnParticleAt(scene, pos)
 	_spawn_bullet_hole(pos, Vector3.UP)
 	_draw_laser_line(pos, pos + Vector3.UP, 0.1)

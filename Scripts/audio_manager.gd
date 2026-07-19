@@ -11,8 +11,18 @@ var _next := 0
 var _music : AudioStreamPlayer
 
 var _musicMenu : AudioStream = preload("res://Audio/music/music_menu.ogg")
-var _musicLevel : AudioStream = preload("res://Audio/music/music_level.ogg")
 var _musicBoss : AudioStream = preload("res://Audio/music/music_boss.ogg")
+var _musicLevels : Array[AudioStream] = [
+	preload("res://Audio/music/music_level1.ogg"),
+	preload("res://Audio/music/music_level2.ogg"),
+	preload("res://Audio/music/music_level3.ogg"),
+	preload("res://Audio/music/music_level4.ogg"),
+	preload("res://Audio/music/music_level5.ogg"),
+	preload("res://Audio/music/music_level6.ogg"),
+	preload("res://Audio/music/music_level7.ogg"),
+	preload("res://Audio/music/music_level8.ogg"),
+	preload("res://Audio/music/music_level9.ogg"),
+]
 var _musicOverrides : Dictionary = {}
 var _musicNames : Dictionary = {}
 
@@ -102,7 +112,7 @@ func music_for_level(idx : int) -> void:
 	elif Global._isBoss(idx):
 		play_music(_musicBoss)
 	else:
-		play_music(_musicLevel)
+		play_music(_musicLevels[idx - 1])
 
 func _on_music_finished() -> void:
 	if _music.stream != null:

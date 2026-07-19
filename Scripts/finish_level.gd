@@ -14,10 +14,30 @@ var revealScale : float = 1.0
 @onready var gradeShow = $UI/MainContainer/gradeShow
 @onready var gradeFire = $UI/MainContainer/GradeFire
 @onready var ui = $UI
+@onready var mainContainer = $UI/MainContainer
+var storyLbl : Label
 func _ready() -> void:
 	ui.visible = visible
 	set_process(visible)
 	visibility_changed.connect(_onVisibilityChanged)
+	_buildStoryLine()
+
+func _buildStoryLine() -> void:
+	storyLbl = Label.new()
+	storyLbl.theme_type_variation = &"Accent"
+	storyLbl.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	storyLbl.offset_left = 180
+	storyLbl.offset_right = -180
+	storyLbl.offset_top = -244
+	storyLbl.offset_bottom = -176
+	storyLbl.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	storyLbl.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	storyLbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	storyLbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	storyLbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	storyLbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	storyLbl.visible = false
+	mainContainer.add_child(storyLbl)
 
 func _onVisibilityChanged() -> void:
 	ui.visible = visible
@@ -68,10 +88,23 @@ func _setGrade(newGrade: String):
 
 func _setLevel(lvl):
 	currentLevel = lvl
+	_showStoryLine(lvl)
 	if Global._hasNextLevel(lvl):
 		nextBtn.text = "NEXT LEVEL"
 	else:
 		nextBtn.text = "MENU"
+
+func _showStoryLine(lvl):
+	if storyLbl == null or !is_instance_valid(storyLbl):
+		return
+	var line = Story._outro(lvl)
+	storyLbl.text = line
+	storyLbl.visible = line != ""
+	if line == "":
+		return
+	storyLbl.modulate.a = 0.0
+	var tw = create_tween()
+	tw.tween_property(storyLbl, "modulate:a", 1.0, 0.6).set_delay(1.2)
 
 func _process(delta: float) -> void:
 	if targScore > score:

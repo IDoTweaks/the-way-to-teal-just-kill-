@@ -28,6 +28,7 @@ var currentLevel = 1
 var maxUnlocked = 1
 var tutorialComplete := false
 var menuTourPending := false
+var storySeen : Dictionary = {}
 
 const GHOST_FILE = "user://ghosts.dat"
 const GHOST_VERSION = 1
@@ -46,7 +47,7 @@ var bestTimes : Dictionary = {}
 var levelTries : Dictionary = {}
 
 var masterVol := 1.0
-var musicVol := 1.0
+var musicVol := 0.3
 var sfxVol := 1.0
 var displayMode := 1
 var resIndex := 1
@@ -127,7 +128,7 @@ func _saveSettings():
 
 func _resetDefaultsNoSave():
 	masterVol = 1.0
-	musicVol = 1.0
+	musicVol = 0.3
 	sfxVol = 1.0
 	displayMode = 1
 	resIndex = 0
@@ -335,6 +336,7 @@ func _localLoad():
 		tutorialComplete = config.get_value("player", "tutorialComplete", tutorialComplete)
 		bestTimes = config.get_value("player", "bestTimes", bestTimes)
 		levelTries = config.get_value("player", "levelTries", levelTries)
+		storySeen = config.get_value("player", "storySeen", storySeen)
 	_loadGhosts()
 
 func _localSave():
@@ -345,6 +347,7 @@ func _localSave():
 	config.set_value("player", "tutorialComplete", tutorialComplete)
 	config.set_value("player", "bestTimes", bestTimes)
 	config.set_value("player", "levelTries", levelTries)
+	config.set_value("player", "storySeen", storySeen)
 	config.save("user://save.cfg")
 
 func _loadGhosts():
