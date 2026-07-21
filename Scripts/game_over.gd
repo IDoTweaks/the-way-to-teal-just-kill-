@@ -97,10 +97,18 @@ func _build() -> void:
 
 	var retry := Button.new()
 	retry.theme_type_variation = &"MenuBtn"
-	retry.text = "RETRY"
+	retry.text = "SAME SEED" if Global.endlessRun else "RETRY"
 	retry.custom_minimum_size = Vector2(300, 74)
 	retry.pressed.connect(_onRetry)
 	buttons.add_child(retry)
+
+	if Global.endlessRun:
+		var fresh := Button.new()
+		fresh.theme_type_variation = &"MenuBtn"
+		fresh.text = "NEW RUN"
+		fresh.custom_minimum_size = Vector2(300, 74)
+		fresh.pressed.connect(_onNewRun)
+		buttons.add_child(fresh)
 
 	var menu := Button.new()
 	menu.theme_type_variation = &"MenuBtn"
@@ -161,6 +169,13 @@ func _refresh() -> void:
 	for c in statsRow.get_children():
 		c.queue_free()
 	var lvl = Global.currentLevel
+	if Global.endlessRun:
+		statsRow.add_child(_makeTile("ROOM", "%d" % Global.endlessRoom, TEAL))
+		statsRow.add_child(_makeTile("SCORE", "%d" % Global.endlessScore, MINT))
+		statsRow.add_child(_makeTile("UPGRADES", "%d" % Global.endlessUpgrades, MINT))
+		statsRow.add_child(_makeTile("BEST", "%d" % Global.endlessBest, DANGER))
+		statsRow.add_child(_makeTile("SEED", "%d" % Global.endlessSeed, CREAM))
+		return
 	statsRow.add_child(_makeTile("STAGE", Global._levelLabel(lvl), TEAL))
 	statsRow.add_child(_makeTile("TIME", _fmtTime(_runTime()), MINT))
 	statsRow.add_child(_makeTile("LEFT", "%d" % _enemiesLeft(), DANGER))
@@ -231,6 +246,9 @@ func _playIn() -> void:
 
 func _onRetry() -> void:
 	Global._restartCurrent()
+
+func _onNewRun() -> void:
+	Global._goToEndless(randi())
 
 func _onMenu() -> void:
 	Global._goToLevel(0)

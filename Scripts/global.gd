@@ -21,6 +21,7 @@ const LOADING_SETTLE_FRAMES = 6
 @onready var level9 = preload("res://Scenes/level9.tscn")
 @onready var snakeBoss = preload("res://Scenes/bossFloor.tscn")
 @onready var tutorial = preload("res://Scenes/tutorial.tscn")
+@onready var endlessScene = preload("res://Scenes/endless.tscn")
 @onready var levels : Array
 var bossLevels : Array = []
 var bossNames : Dictionary = {}
@@ -29,6 +30,13 @@ var maxUnlocked = 1
 var tutorialComplete := false
 var menuTourPending := false
 var storySeen : Dictionary = {}
+
+var endlessRun := false
+var endlessSeed := 0
+var endlessRoom := 0
+var endlessBest := 0
+var endlessScore := 0
+var endlessUpgrades := 0
 
 const GHOST_FILE = "user://ghosts.dat"
 const GHOST_VERSION = 1
@@ -337,6 +345,7 @@ func _localLoad():
 		bestTimes = config.get_value("player", "bestTimes", bestTimes)
 		levelTries = config.get_value("player", "levelTries", levelTries)
 		storySeen = config.get_value("player", "storySeen", storySeen)
+		endlessBest = config.get_value("player", "endlessBest", endlessBest)
 	_loadGhosts()
 
 func _localSave():
@@ -348,6 +357,7 @@ func _localSave():
 	config.set_value("player", "bestTimes", bestTimes)
 	config.set_value("player", "levelTries", levelTries)
 	config.set_value("player", "storySeen", storySeen)
+	config.set_value("player", "endlessBest", endlessBest)
 	config.save("user://save.cfg")
 
 func _loadGhosts():
@@ -471,6 +481,8 @@ func _buildLoading():
 	_loading.add_child(_loadBar)
 
 func _levelLabel(idx) -> String:
+	if endlessRun:
+		return "ENDLESS"
 	if idx == 0:
 		return "MAIN MENU"
 	if _isBoss(idx):
@@ -571,6 +583,7 @@ func _goToLevel(idx):
 	if _fading:
 		return
 	_fading = true
+	endlessRun = false
 	currentLevel = idx
 	await _fadeTo(1.0, .2)
 	_showLoading(_levelLabel(idx))
@@ -586,8 +599,27 @@ func _restartCurrent():
 	var scn = get_tree().current_scene
 	if scn != null and scn.has_method("_tutorial"):
 		_goToTutorial()
+	elif scn != null and scn.has_method("_endless"):
+		_goToEndless(endlessSeed)
 	else:
 		_goToLevel(currentLevel)
+
+func _goToEndless(seedVal : int):
+	if _fading:
+		return
+	_fading = true
+	endlessRun = true
+	endlessSeed = seedVal
+	endlessRoom = 0
+	await _fadeTo(1.0, .2)
+	_showLoading("ENDLESS")
+	Audio.music_for_level(1)
+	get_tree().change_scene_to_packed(endlessScene)
+	await _settleFrames()
+	_applyGlow()
+	await _hideLoading()
+	_fading = false
+	await _fadeTo(0.0, .3)
 
 func _goToTutorial():
 	if _fading:

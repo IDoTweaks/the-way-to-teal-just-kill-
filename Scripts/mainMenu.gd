@@ -55,6 +55,10 @@ func _on_tutorial_btn_button_down() -> void:
 	Global._goToTutorial()
 
 
+func _on_endless_btn_button_down() -> void:
+	Global._goToEndless(randi())
+
+
 func _on_stage_closed() -> void:
 	pass
 
@@ -232,6 +236,7 @@ func _startMenuTour() -> void:
 		{"text": "Nice work! This is the main menu. Let's have a quick look around.", "target": func(): return null},
 		{"text": "PLAY takes you to the level select, where you pick a stage and see your best score and time.", "target": _btn("JoinGameBtn")},
 		{"text": "TUTORIAL replays the course you just finished, any time you want.", "target": _btn("TutorialBtn")},
+		{"text": "ENDLESS drops you into randomly generated rooms that get harder every time. It only ends when you die.", "target": _btn("EndlessBtn")},
 		{"text": "MUSIC lets you drop your own songs in - pick a level, then drag an audio file onto the window.", "target": _btn("MusicBtn")},
 		{"text": "SETTINGS is where everything is tuned. Let's open it.", "target": _btn("SettingsBtn")},
 		{"text": "AUDIO: master, music and SFX volume.", "target": _tab(0),

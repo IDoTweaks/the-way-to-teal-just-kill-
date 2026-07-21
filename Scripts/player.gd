@@ -22,6 +22,21 @@ var _hitDir : Control
 var _hitArrow : Label
 @export var health = 100
 @export var killHeal : float = 5.0
+var maxHealth : float = 100.0
+var upSpeed : float = 1.0
+var upJump : float = 1.0
+var upStamCost : float = 1.0
+var upFireRate : float = 1.0
+var critChance : float = 0.0
+var critMult : float = 2.0
+var lifesteal : float = 0.0
+var extraJumps : int = 0
+var jumpsLeft : int = 0
+var thorns : float = 0.0
+var upKnock : float = 1.0
+var killStam : bool = false
+var scoreMult : float = 1.0
+var extraChoice : int = 0
 var time = 0.0;
 @export var parTime : float = 60.0
 var count = true
@@ -87,7 +102,7 @@ var paraVignette : TextureRect
 @onready var leftArm = $playerCam/leftArm
 @onready var rightArm = $playerCam/rightArm
 @onready var scopeOverlay = $HUD/Scope
-@onready var finishOrb = $"../FinishOrb"
+@onready var finishOrb = get_node_or_null("../FinishOrb")
 @onready var levelEnd = $levelEnd
 @onready var timer :Label = $HUD/timer
 @onready var enemyCounter :Label = $HUD/enemyCounter
@@ -168,14 +183,15 @@ var _footprint_pool: Array[Node] = []
 var _footprint_tex: ImageTexture
 
 func _useStamina(amount : float) -> bool:
-	if stamina < amount - 0.05:
+	var cost = amount * upStamCost
+	if stamina < cost - 0.05:
 		return false
-	stamina = max(stamina - amount, 0.0)
+	stamina = max(stamina - cost, 0.0)
 	staminaIdle = 0.0
 	return true
 
 func _drainStamina(amount : float):
-	stamina = max(stamina - amount, 0.0)
+	stamina = max(stamina - amount * upStamCost, 0.0)
 	staminaIdle = 0.0
 
 func _giveStamina(amount : float):
@@ -187,9 +203,20 @@ func _staminaRegen():
 func _onKill():
 	_hitStop(0.05, 0.06)
 	_hitmarker(true)
-	health = min(health + killHeal, 100)
+	health = min(health + killHeal, maxHealth)
+	if killStam:
+		_giveStamina(25.0)
 	Audio.play("pickup", 1.35, -6.0)
 	Audio.play("enemy_hit", 0.65, -3.0)
+
+func _dealDamage(target, amount : float):
+	var dmg = amount
+	if critChance > 0.0 and randf() < critChance:
+		dmg *= critMult
+		_hitmarker(true)
+	if lifesteal > 0.0:
+		health = min(health + dmg * lifesteal, maxHealth)
+	target._damage(dmg)
 
 func _buildStaminaHud():
 	var ui = $HUD/StyleMeterUI
@@ -714,7 +741,7 @@ func _shoot():
 				target._makeTarg(self)
 			if target and target.has_method("_damage"):
 				_hitmarker(false)
-				target._damage(damage)
+				_dealDamage(target, damage)
 			var hit_pos = gunRay.get_collision_point()
 			var hit_normal = gunRay.get_collision_normal()
 			_spawnImpact(target, hit_pos, hit_normal)
@@ -743,7 +770,7 @@ func _shoot():
 						elif dist > shotGunCloseRange:
 							var t = (dist - shotGunCloseRange) / (shotGunFalloffRange - shotGunCloseRange)
 							mult = lerp(1.0, shotGunMinDmgMult, t)
-						target._damage(shotGunDmg * mult)
+						_dealDamage(target, shotGunDmg * mult)
 					if target and target.has_method("_makeTarg"):
 						target._makeTarg(self)
 					var hit_normal = ray.get_collision_normal()
@@ -778,7 +805,7 @@ func _shoot():
 					target._makeTarg(self)
 				if target and target.has_method("_damage"):
 					_hitmarker(false)
-					target._damage(sniperDmg)
+					_dealDamage(target, sniperDmg)
 				_spawnImpact(target, hit.position, hit.normal)
 				_draw_laser_beam(beamStart, hit.position, 0.35)
 			else:
@@ -929,10 +956,12 @@ func _draw_laser_beam(from_pos: Vector3, to_pos: Vector3, duration: float = 0.35
 
 func _ready() -> void:
 	maxScore = _calcMaxScore()
-	finishOrb.open = true
-	finishOrb.canvas =$levelEnd
+	if finishOrb:
+		finishOrb.open = true
+		finishOrb.canvas =$levelEnd
 	playerCam.fov = Global.fov
-	Global._addTry(Global.currentLevel)
+	if not Global.endlessRun:
+		Global._addTry(Global.currentLevel)
 	if not OS.has_feature("web"):
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	_footprint_tex = _make_teal_texture()
@@ -1081,6 +1110,7 @@ func _physics_process(delta: float) -> void:
 		slamming = false
 		dashing = false
 		upDashed = false
+		jumpsLeft = extraJumps
 		airTime = 0.0
 	elif coyoteTimer > 0:
 		coyoteTimer -= delta
@@ -1177,6 +1207,11 @@ func _physics_process(delta: float) -> void:
 				velocity.y = JUMP_VELOCITY * _jumpMult()
 				Audio.play("jump", 1.0, -7.0); jumpCount += 1
 				_spawnParticleAt(jumpParticles, feet.global_position)
+			elif Input.is_action_just_pressed("jump") and jumpsLeft > 0 and _canJump():
+				jumpsLeft -= 1
+				velocity.y = JUMP_VELOCITY * _jumpMult()
+				Audio.play("jump", 1.15, -7.0); jumpCount += 1
+				_spawnParticleAt(jumpParticles, feet.global_position)
 
 			var input_dir := Input.get_vector("left", "right", "forward", "backward")
 			var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
@@ -1256,7 +1291,7 @@ func _physics_process(delta: float) -> void:
 
 func _updateHud():
 	if healthBar.material:
-		healthBar.material.set_shader_parameter("health", clamp(_hudHealth / 100.0, 0.0, 1.0))
+		healthBar.material.set_shader_parameter("health", clamp(_hudHealth / maxHealth, 0.0, 1.0))
 
 
 func _takeDamage(damage, source = null):
@@ -1265,12 +1300,23 @@ func _takeDamage(damage, source = null):
 		_spawnParticleAt(hurtParticles, global_position)
 		Audio.play("player_hurt", 1.0, -13.0)
 		health -= damage
+		if thorns > 0.0:
+			_retaliate()
 		_hurtFlash = 0.6
 		if source != null:
 			_showHitDir(source)
 		_updateHud()
 		if health <= 0:
 			_die()
+
+func _retaliate():
+	for e in get_tree().get_nodes_in_group("enemies"):
+		if e.get("dead") == true or not e is Node3D:
+			continue
+		if global_position.distance_to(e.global_position) > 9.0:
+			continue
+		if e.has_method("_damage"):
+			e._damage(thorns)
 
 func _paralyze(amount : int = 1):
 	if !count or paraLevel >= MAX_PARA:
@@ -1310,17 +1356,17 @@ func _dashPower():
 	return dashBoost
 
 func _jumpMult():
-	return 0.6 if paraLevel >= 5 else 1.0
+	return (0.6 if paraLevel >= 5 else 1.0) * upJump
 
 func _airMult():
 	return 0.0 if paraLevel >= 6 else 1.0
 
 func _speedMult():
 	if paraLevel >= 9:
-		return 0.25
+		return 0.25 * upSpeed
 	if paraLevel >= 7:
-		return 0.6
-	return 1.0
+		return 0.6 * upSpeed
+	return upSpeed
 
 func _paraChip(delta : float):
 	if paraLevel < 9 or !count:
