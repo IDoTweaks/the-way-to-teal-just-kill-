@@ -172,6 +172,7 @@ func _refresh() -> void:
 	if Global.endlessRun:
 		statsRow.add_child(_makeTile("ROOM", "%d" % Global.endlessRoom, TEAL))
 		statsRow.add_child(_makeTile("SCORE", "%d" % Global.endlessScore, MINT))
+		statsRow.add_child(_makeTile("KILLS", "%d" % Global.endlessKills, MINT))
 		statsRow.add_child(_makeTile("UPGRADES", "%d" % Global.endlessUpgrades, MINT))
 		statsRow.add_child(_makeTile("BEST", "%d" % Global.endlessBest, DANGER))
 		statsRow.add_child(_makeTile("SEED", "%d" % Global.endlessSeed, CREAM))

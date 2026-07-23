@@ -1,0 +1,77 @@
+[gd_scene format=3 uid="uid://barchiveboss1"]
+
+[ext_resource type="Script" path="res://Scripts/archive.gd" id="1_arc"]
+[ext_resource type="Shader" uid="uid://bloi2q6drjuc1" path="res://Scripts/enemy.gdshader" id="2_arc"]
+[ext_resource type="Script" uid="uid://4gxcy6cx0q1m" path="res://Scripts/meshInstanceBody.gd" id="3_arc"]
+[ext_resource type="Script" path="res://Scripts/enemy_face.gd" id="4_arc"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/enemyMarker.tscn" id="5_arc"]
+[ext_resource type="Material" path="res://shaders/toonOutline.tres" id="98_out"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_arcbody"]
+render_priority = 0
+shader = ExtResource("2_arc")
+shader_parameter/base_color = Color(0.35, 1, 0.86, 1)
+next_pass = ExtResource("98_out")
+shader_parameter/fill_color = Color(0, 1, 0.35, 1)
+shader_parameter/fill_percent = 1.0
+shader_parameter/min_y = -1.7
+shader_parameter/max_y = 1.7
+
+[sub_resource type="BoxMesh" id="BoxMesh_arcbody"]
+size = Vector3(2.2, 3.4, 1.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_arcbody"]
+size = Vector3(2.2, 3.4, 1.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_arcdraw"]
+albedo_color = Color(0.11, 0.13, 0.14, 1)
+metallic = 0.6
+roughness = 0.4
+emission_enabled = true
+emission = Color(1, 0.55, 0.08, 1)
+emission_energy_multiplier = 0.6
+
+[sub_resource type="BoxMesh" id="BoxMesh_arcdraw"]
+size = Vector3(2.0, 0.8, 1.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_arcsweep"]
+size = Vector3(2.0, 0.8, 1.5)
+
+[node name="Archive" type="CharacterBody3D" unique_id=4416001]
+script = ExtResource("1_arc")
+
+[node name="body" type="MeshInstance3D" parent="." unique_id=4416002]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+material_override = SubResource("ShaderMaterial_arcbody")
+mesh = SubResource("BoxMesh_arcbody")
+script = ExtResource("3_arc")
+
+[node name="face" type="MeshInstance3D" parent="body" unique_id=4416003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+script = ExtResource("4_arc")
+style = "angry"
+face_size = 0.9
+face_forward = 0.86
+face_height = 0.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=4416004]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+shape = SubResource("BoxShape3D_arcbody")
+
+[node name="drawer" type="Node3D" parent="." unique_id=4416005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, -0.9)
+
+[node name="mesh" type="MeshInstance3D" parent="drawer" unique_id=4416006]
+material_override = SubResource("StandardMaterial3D_arcdraw")
+mesh = SubResource("BoxMesh_arcdraw")
+
+[node name="sweepArea" type="Area3D" parent="drawer" unique_id=4416007]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="drawer/sweepArea" unique_id=4416008]
+shape = SubResource("BoxShape3D_arcsweep")
+
+[node name="textSpawn" type="Node3D" parent="." unique_id=4416009]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7, 0)
+
+[node name="EnemyMarker" parent="." instance=ExtResource("5_arc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)

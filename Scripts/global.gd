@@ -31,11 +31,13 @@ var tutorialComplete := false
 var menuTourPending := false
 var storySeen : Dictionary = {}
 
+var inTutorial := false
 var endlessRun := false
 var endlessSeed := 0
 var endlessRoom := 0
 var endlessBest := 0
 var endlessScore := 0
+var endlessKills := 0
 var endlessUpgrades := 0
 
 const GHOST_FILE = "user://ghosts.dat"
@@ -584,6 +586,7 @@ func _goToLevel(idx):
 		return
 	_fading = true
 	endlessRun = false
+	inTutorial = false
 	currentLevel = idx
 	await _fadeTo(1.0, .2)
 	_showLoading(_levelLabel(idx))
@@ -603,6 +606,14 @@ func _restartCurrent():
 		_goToEndless(endlessSeed)
 	else:
 		_goToLevel(currentLevel)
+
+func _seedFrom(txt : String) -> int:
+	txt = txt.strip_edges()
+	if txt == "":
+		return randi()
+	if txt.is_valid_int():
+		return abs(txt.to_int())
+	return abs(hash(txt.to_upper()))
 
 func _goToEndless(seedVal : int):
 	if _fading:
@@ -625,6 +636,7 @@ func _goToTutorial():
 	if _fading:
 		return
 	_fading = true
+	inTutorial = true
 	await _fadeTo(1.0, .2)
 	_showLoading("TUTORIAL")
 	Audio.music_for_level(0)

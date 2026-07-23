@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://bcubfarmboss1"]
+
+[ext_resource type="Script" path="res://Scripts/cubicle_farm.gd" id="1_cub"]
+[ext_resource type="Shader" uid="uid://bloi2q6drjuc1" path="res://Scripts/enemy.gdshader" id="2_cub"]
+[ext_resource type="Script" uid="uid://4gxcy6cx0q1m" path="res://Scripts/meshInstanceBody.gd" id="3_cub"]
+[ext_resource type="Script" path="res://Scripts/enemy_face.gd" id="4_cub"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/enemyMarker.tscn" id="5_cub"]
+[ext_resource type="Material" path="res://shaders/toonOutline.tres" id="98_out"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cubbody"]
+render_priority = 0
+shader = ExtResource("2_cub")
+shader_parameter/base_color = Color(0.35, 1, 0.86, 1)
+next_pass = ExtResource("98_out")
+shader_parameter/fill_color = Color(0, 1, 0.35, 1)
+shader_parameter/fill_percent = 1.0
+shader_parameter/min_y = -0.75
+shader_parameter/max_y = 0.75
+
+[sub_resource type="BoxMesh" id="BoxMesh_cubbody"]
+size = Vector3(3.2, 1.5, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cubbody"]
+size = Vector3(3.2, 1.5, 2.2)
+
+[node name="CubicleFarm" type="CharacterBody3D" unique_id=4413001]
+script = ExtResource("1_cub")
+
+[node name="body" type="MeshInstance3D" parent="." unique_id=4413002]
+material_override = SubResource("ShaderMaterial_cubbody")
+mesh = SubResource("BoxMesh_cubbody")
+script = ExtResource("3_cub")
+
+[node name="face" type="MeshInstance3D" parent="body" unique_id=4413003]
+script = ExtResource("4_cub")
+style = "ghost"
+face_size = 1.1
+face_forward = 1.15
+face_height = 0.15
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=4413004]
+shape = SubResource("BoxShape3D_cubbody")
+
+[node name="textSpawn" type="Node3D" parent="." unique_id=4413005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+
+[node name="EnemyMarker" parent="." instance=ExtResource("5_cub")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)

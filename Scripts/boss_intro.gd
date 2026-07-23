@@ -6,6 +6,7 @@ const TEAL = Color(0, .85, .78)
 const RED = Color(1, .35, .35)
 const BLUE = Color(.24, .6, 1)
 const INK = Color(.03, .13, .15)
+const SKIP_KEYS = [KEY_ESCAPE, KEY_ENTER, KEY_KP_ENTER, KEY_SPACE]
 
 @export var barHeight : float = 110.0
 @export var holdTime : float = 1.9
@@ -144,7 +145,7 @@ func _build() -> void:
 	skipLbl.add_theme_color_override("font_color", Color(.6, .84, .82))
 	skipLbl.add_theme_color_override("font_outline_color", INK)
 	skipLbl.add_theme_constant_override("outline_size", 6)
-	skipLbl.text = "PRESS ANY KEY TO SKIP"
+	skipLbl.text = "ESC / SPACE TO SKIP"
 	skipLbl.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	skipLbl.offset_left = -260
 	skipLbl.offset_top = -40
@@ -360,10 +361,9 @@ func _process(delta : float) -> void:
 func _unhandled_input(event : InputEvent) -> void:
 	if !playing or elapsed < skipAfter:
 		return
-	if event is InputEventKey and event.pressed and !event.echo:
-		get_viewport().set_input_as_handled()
-		_skip()
-	elif event is InputEventMouseButton and event.pressed:
+	if !(event is InputEventKey) or !event.pressed or event.echo:
+		return
+	if event.keycode in SKIP_KEYS:
 		get_viewport().set_input_as_handled()
 		_skip()
 

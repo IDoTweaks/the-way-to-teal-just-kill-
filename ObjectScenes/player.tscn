@@ -32,6 +32,8 @@ shader_parameter/rim_color = Color(0.7, 0.95, 1, 1)
 [sub_resource type="BoxMesh" id="BoxMesh_rfol3"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_m8bbn"]
+radius = 0.5
+height = 2.0
 
 [sub_resource type="ShaderMaterial" id="ORMMaterial3D_iixog"]
 shader = ExtResource("91_toon")
