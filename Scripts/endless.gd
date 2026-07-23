@@ -71,6 +71,7 @@ var banner : Label
 
 func _ready() -> void:
 	runSeed = Global.endlessSeed
+	Global.endlessNewBest = false
 	_buildHud()
 	picker = preload("res://Scripts/upgrade_pick.gd").new()
 	add_child(picker)
@@ -78,8 +79,7 @@ func _ready() -> void:
 	picker.picked.connect(_onUpgradePicked)
 	_buildRoom(1)
 	if player:
-		var r = current["data"]
-		player.global_position = Vector3(r["x"] + 5.0, 2.0, 0.0)
+		_positionPlayerSafe.call_deferred()
 
 func _buildHud():
 	hudLayer = CanvasLayer.new()
@@ -128,9 +128,17 @@ func _upgradeCount() -> int:
 		n += taken[k]
 	return n
 
+func _choiceCount() -> int:
+	return 3 + (player.extraChoice if player else 0)
+
 func _updateHud():
 	roomLabel.text = "ROOM %d" % roomNum
-	scoreLabel.text = "%d PTS   %d KILLS   %d UPGRADES" % [runScore, runKills, _upgradeCount()]
+	var line = "%d PTS   %d KILLS   %d UPGRADES" % [runScore, runKills, _upgradeCount()]
+	if player and player.pPointsUnlocked:
+		line += "   GREED ACTIVE" if runScore >= player._greedThreshold() else "   GREED"
+	scoreLabel.text = line
+	Global.endlessScore = runScore
+	Global.endlessUpgrades = _upgradeCount()
 
 func _flash(txt : String):
 	banner.text = txt
@@ -213,8 +221,6 @@ func _buildRoom(n : int):
 	nextOriginX = x + w + ROOM_GAP
 
 	Global.endlessRoom = n
-	Global.endlessScore = runScore
-	Global.endlessUpgrades = _upgradeCount()
 	if n > Global.endlessBest:
 		Global.endlessBest = n
 		Global._localSave()
@@ -460,6 +466,13 @@ func _spawn(room : Node3D, scene : PackedScene, pos : Vector3, n : int):
 	if "scoreWorth" in inst:
 		roomWorth += inst.scoreWorth
 
+func _positionPlayerSafe():
+	for i in 4:
+		await get_tree().physics_frame
+	if is_instance_valid(player) and is_instance_valid(current):
+		var r = current["data"]
+		player.global_position = Vector3(r["x"] + 5.0, 2.0, 0.0)
+
 func _refloor(inst):
 	for i in 4:
 		await get_tree().physics_frame
@@ -479,7 +492,14 @@ func _enemiesLeft() -> int:
 	return c
 
 func _process(delta: float) -> void:
-	if cleared or current == null:
+	if current == null:
+		return
+	if player:
+		if player.pPointBleed and not cleared and runScore > 0.0:
+			runScore = max(runScore - player.pBleedRate * delta, 0.0)
+			_updateHud()
+		player.points = runScore
+	if cleared:
 		return
 	pollAccum += delta
 	if pollAccum < CLEAR_POLL:
@@ -490,8 +510,13 @@ func _process(delta: float) -> void:
 
 func _clearRoom():
 	cleared = true
-	runScore += int(roomWorth * (player.scoreMult if player else 1.0))
+	var gainMul = player.pGainMult if player else 1.0
+	runScore += int(roomWorth * (player.scoreMult if player else 1.0) * gainMul)
 	runKills += roomSpawned
+	if runScore > Global.endlessBestScore:
+		Global.endlessBestScore = runScore
+		Global.endlessNewBest = true
+		Global._localSave()
 	_updateHud()
 	_openDoor()
 	Audio.play("win", 1.5, -8.0)
@@ -507,8 +532,7 @@ func _openDoor():
 	tw.tween_property(door, "position:y", -DOOR_H * 0.5 - 0.6, 0.6)
 
 func _grantReward(n : int):
-	var count = 3 + (player.extraChoice if player else 0)
-	var options = upgradeList.roll(rng, taken, count)
+	var options = upgradeList.roll(rng, taken, _choiceCount())
 	if options.is_empty():
 		_flash("ROOM CLEAR")
 		rewardGranted.emit(n)

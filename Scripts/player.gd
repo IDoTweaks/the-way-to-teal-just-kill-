@@ -37,6 +37,20 @@ var upKnock : float = 1.0
 var killStam : bool = false
 var scoreMult : float = 1.0
 var extraChoice : int = 0
+
+var points : float = 0.0
+var pPointsUnlocked : bool = false
+var pPointBleed : bool = false
+var pBleedRate : float = 500.0
+var pGainMult : float = 1.0
+var pGreedDmg : float = 0.0
+var pScaleDmg : float = 0.0
+var pGreedSpeed : float = 0.0
+var pGreedCrit : float = 0.0
+const GREED_THRESH := 20000.0
+const GREED_BLOCK := 20000.0
+const GREED_SCALE_CAP := 8.0
+
 var time = 0.0;
 @export var parTime : float = 60.0
 var count = true
@@ -210,8 +224,9 @@ func _onKill():
 	Audio.play("enemy_hit", 0.65, -3.0)
 
 func _dealDamage(target, amount : float):
-	var dmg = amount
-	if critChance > 0.0 and randf() < critChance:
+	var dmg = amount * _greedDmgMult()
+	var chance = critChance + _greedCrit()
+	if chance > 0.0 and randf() < chance:
 		dmg *= critMult
 		_hitmarker(true)
 	if lifesteal > 0.0:
@@ -827,6 +842,8 @@ func _applyForce(point :Vector3,force , maxRange:float = 10, lockInput : bool = 
 func _buildToonPost():
 	if not Global.toonOutlines:
 		return
+	if OS.has_feature("web"):
+		return
 	var quad = MeshInstance3D.new()
 	var m = QuadMesh.new()
 	m.size = Vector2(2, 2)
@@ -1362,11 +1379,32 @@ func _airMult():
 	return 0.0 if paraLevel >= 6 else 1.0
 
 func _speedMult():
+	var g = _greedSpeedMult()
 	if paraLevel >= 9:
-		return 0.25 * upSpeed
+		return 0.25 * upSpeed * g
 	if paraLevel >= 7:
-		return 0.6 * upSpeed
-	return upSpeed
+		return 0.6 * upSpeed * g
+	return upSpeed * g
+
+func _greedThreshold() -> float:
+	return GREED_THRESH
+
+func _greedActive() -> bool:
+	return pPointsUnlocked and points >= GREED_THRESH
+
+func _greedDmgMult() -> float:
+	var m = 1.0
+	if _greedActive():
+		m += pGreedDmg
+	if pScaleDmg > 0.0 and pPointsUnlocked:
+		m += pScaleDmg * min(points / GREED_BLOCK, GREED_SCALE_CAP)
+	return m
+
+func _greedSpeedMult() -> float:
+	return 1.0 + (pGreedSpeed if _greedActive() else 0.0)
+
+func _greedCrit() -> float:
+	return pGreedCrit if _greedActive() else 0.0
 
 func _paraChip(delta : float):
 	if paraLevel < 9 or !count:

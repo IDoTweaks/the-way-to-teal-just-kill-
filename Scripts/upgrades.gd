@@ -61,6 +61,14 @@ const LIST = [
 	{"id": "greed", "name": "GREED", "desc": "Score from rooms +25%", "tier": COMMON, "cap": 6, "special": "score25"},
 	{"id": "jackpot", "name": "JACKPOT", "desc": "Score from rooms +60%", "tier": RARE, "cap": 4, "special": "score60"},
 	{"id": "scholar", "name": "SCHOLAR", "desc": "See one extra upgrade choice", "tier": EPIC, "cap": 2, "special": "extrachoice"},
+
+	{"id": "greedpact", "name": "GREED PACT", "desc": "Your points bleed away over time - but this unlocks POINTS cards", "tier": EPIC, "cap": 1, "special": "greedpact"},
+	{"id": "bloodmoney", "name": "BLOOD MONEY", "desc": "+30% damage while points are high", "tier": RARE, "cap": 4, "req": "greedpact", "special": "greed_dmg"},
+	{"id": "compound", "name": "COMPOUND INTEREST", "desc": "+8% damage per 20k points held", "tier": EPIC, "cap": 3, "req": "greedpact", "special": "greed_scale"},
+	{"id": "highroller", "name": "HIGH ROLLER", "desc": "+15% move speed while points are high", "tier": RARE, "cap": 3, "req": "greedpact", "special": "greed_speed"},
+	{"id": "luckystreak", "name": "LUCKY STREAK", "desc": "+20% crit chance while points are high", "tier": RARE, "cap": 3, "req": "greedpact", "special": "greed_crit"},
+	{"id": "dividends", "name": "DIVIDENDS", "desc": "+25% points gained", "tier": COMMON, "cap": 5, "req": "greedpact", "special": "greed_gain"},
+	{"id": "offshore", "name": "OFFSHORE ACCOUNT", "desc": "Points bleed 40% slower", "tier": COMMON, "cap": 3, "req": "greedpact", "special": "greed_calm"},
 ]
 
 static func byId(id : String):
@@ -72,8 +80,11 @@ static func byId(id : String):
 static func roll(rng : RandomNumberGenerator, taken : Dictionary, count : int) -> Array:
 	var pool = []
 	for u in LIST:
-		if taken.get(u["id"], 0) < u["cap"]:
-			pool.append(u)
+		if taken.get(u["id"], 0) >= u["cap"]:
+			continue
+		if u.has("req") and taken.get(u["req"], 0) <= 0:
+			continue
+		pool.append(u)
 	var out = []
 	while out.size() < count and pool.size() > 0:
 		var total = 0.0
@@ -151,3 +162,18 @@ static func _special(p, what : String):
 			p.scoreMult += 0.6
 		"extrachoice":
 			p.extraChoice += 1
+		"greedpact":
+			p.pPointsUnlocked = true
+			p.pPointBleed = true
+		"greed_dmg":
+			p.pGreedDmg += 0.30
+		"greed_scale":
+			p.pScaleDmg += 0.08
+		"greed_speed":
+			p.pGreedSpeed += 0.15
+		"greed_crit":
+			p.pGreedCrit += 0.20
+		"greed_gain":
+			p.pGainMult += 0.25
+		"greed_calm":
+			p.pBleedRate *= 0.6

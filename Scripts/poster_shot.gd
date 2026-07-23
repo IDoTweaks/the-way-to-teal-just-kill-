@@ -18,7 +18,6 @@ func _ready() -> void:
 	var ui = menu.get_node_or_null("MainMenu2")
 	if ui:
 		ui.visible = false
-		# CanvasLayers render independently of their parent Control's visibility
 		for cl in ui.find_children("*", "CanvasLayer", true, false):
 			cl.visible = false
 	var sky = menu.get_node_or_null("Sky")

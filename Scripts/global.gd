@@ -35,8 +35,10 @@ var endlessRun := false
 var endlessSeed := 0
 var endlessRoom := 0
 var endlessBest := 0
+var endlessBestScore := 0
 var endlessScore := 0
 var endlessUpgrades := 0
+var endlessNewBest := false
 
 const GHOST_FILE = "user://ghosts.dat"
 const GHOST_VERSION = 1
@@ -346,6 +348,7 @@ func _localLoad():
 		levelTries = config.get_value("player", "levelTries", levelTries)
 		storySeen = config.get_value("player", "storySeen", storySeen)
 		endlessBest = config.get_value("player", "endlessBest", endlessBest)
+		endlessBestScore = config.get_value("player", "endlessBestScore", endlessBestScore)
 	_loadGhosts()
 
 func _localSave():
@@ -358,6 +361,7 @@ func _localSave():
 	config.set_value("player", "levelTries", levelTries)
 	config.set_value("player", "storySeen", storySeen)
 	config.set_value("player", "endlessBest", endlessBest)
+	config.set_value("player", "endlessBestScore", endlessBestScore)
 	config.save("user://save.cfg")
 
 func _loadGhosts():
