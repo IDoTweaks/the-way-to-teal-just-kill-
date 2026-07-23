@@ -1,0 +1,103 @@
+[gd_scene format=3 uid="uid://bojjt1i00blcr"]
+
+[ext_resource type="PackedScene" uid="uid://bcugc3piu2xws" path="res://ObjectScenes/player.tscn" id="1_ktg"]
+[ext_resource type="PackedScene" uid="uid://bnotaryboss1" path="res://ObjectScenes/notary.tscn" id="2_ktg"]
+[ext_resource type="PackedScene" uid="uid://c0c2rfy32f6xl" path="res://ObjectScenes/pauseMenu.tscn" id="3_ktg"]
+[ext_resource type="Shader" uid="uid://gs1w87wuiau3" path="res://shaders/bossFloor.gdshader" id="4_ktg"]
+[ext_resource type="PackedScene" uid="uid://bo37d1e2o4rkn" path="res://ObjectScenes/finishOrb.tscn" id="5_ktg"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ktgout"]
+render_priority = 0
+shader = ExtResource("4_ktg")
+shader_parameter/outline_color = Color(0, 0, 0, 1)
+shader_parameter/outline_width = 1.0
+shader_parameter/fade_start = 10.0
+shader_parameter/fade_end = 40.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ktgfloor"]
+next_pass = SubResource("ShaderMaterial_ktgout")
+albedo_color = Color(0, 0.8666667, 0, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ktg"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ktg"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ktgwall"]
+next_pass = SubResource("ShaderMaterial_ktgout")
+albedo_color = Color(0, 0.45, 0.12, 1)
+
+[sub_resource type="Environment" id="Environment_ktg"]
+background_mode = 1
+background_color = Color(0.84313726, 1, 1, 1)
+
+[node name="NotaryTest" type="Node3D" unique_id=6611000]
+
+[node name="Floor" type="StaticBody3D" parent="." unique_id=6611001]
+transform = Transform3D(40, 0, 0, 0, 1, 0, 0, 0, 40, 0, -0.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Floor" unique_id=6611002]
+transform = Transform3D(0.99999976, 0, 0, 0, 1, 0, 0, 0, 0.99999976, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_ktgfloor")
+mesh = SubResource("BoxMesh_ktg")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=6611003]
+shape = SubResource("BoxShape3D_ktg")
+
+[node name="WallN" type="StaticBody3D" parent="." unique_id=6611004]
+transform = Transform3D(40, 0, 0, 0, 14, 0, 0, 0, 1, 0, 4, -20)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallN" unique_id=6611005]
+material_override = SubResource("StandardMaterial3D_ktgwall")
+mesh = SubResource("BoxMesh_ktg")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallN" unique_id=6611006]
+shape = SubResource("BoxShape3D_ktg")
+
+[node name="WallS" type="StaticBody3D" parent="." unique_id=6611007]
+transform = Transform3D(40, 0, 0, 0, 14, 0, 0, 0, 1, 0, 4, 20)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallS" unique_id=6611008]
+material_override = SubResource("StandardMaterial3D_ktgwall")
+mesh = SubResource("BoxMesh_ktg")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallS" unique_id=6611009]
+shape = SubResource("BoxShape3D_ktg")
+
+[node name="WallE" type="StaticBody3D" parent="." unique_id=6611010]
+transform = Transform3D(1, 0, 0, 0, 14, 0, 0, 0, 40, 20, 4, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallE" unique_id=6611011]
+material_override = SubResource("StandardMaterial3D_ktgwall")
+mesh = SubResource("BoxMesh_ktg")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallE" unique_id=6611012]
+shape = SubResource("BoxShape3D_ktg")
+
+[node name="WallW" type="StaticBody3D" parent="." unique_id=6611013]
+transform = Transform3D(1, 0, 0, 0, 14, 0, 0, 0, 40, -20, 4, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="WallW" unique_id=6611014]
+material_override = SubResource("StandardMaterial3D_ktgwall")
+mesh = SubResource("BoxMesh_ktg")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallW" unique_id=6611015]
+shape = SubResource("BoxShape3D_ktg")
+
+[node name="Player2" parent="." unique_id=659499291 instance=ExtResource("1_ktg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 11)
+
+[node name="Notary" parent="." unique_id=6611022 node_paths=PackedStringArray("player") instance=ExtResource("2_ktg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4)
+player = NodePath("../Player2")
+
+[node name="FinishOrb" parent="." unique_id=6611025 node_paths=PackedStringArray("player") instance=ExtResource("5_ktg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1, 16)
+player = NodePath("../Player2")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=6611023]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 207, 971, 378)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=6611024]
+environment = SubResource("Environment_ktg")
+
+[node name="PauseMenu" parent="." unique_id=598058488 instance=ExtResource("3_ktg")]

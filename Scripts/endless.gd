@@ -14,6 +14,7 @@ const STEP_RISE = 0.85
 const CLEAR_POLL = 0.2
 const SPAWN_CLEAR = 2.0
 const VOID_Y = -60.0
+const STRAY_STRIKES = 3
 const SIZE_CLASSES = [0.6, 0.8, 0.8, 1.0, 1.0, 1.0, 1.3, 1.3, 1.7]
 const PIT_MIN_W = 46.0
 const CATWALK_MIN_W = 36.0
@@ -39,12 +40,18 @@ const ROSTER = [
 ]
 
 const BOSSES = [
-	{"path": "res://ObjectScenes/kettle.tscn", "name": "THE KETTLE"},
-	{"path": "res://ObjectScenes/landlord.tscn", "name": "THE LANDLORD"},
+	{"path": "res://ObjectScenes/kettle.tscn", "name": "THE KETTLE", "arena": "kettle"},
+	{"path": "res://ObjectScenes/landlord.tscn", "name": "THE LANDLORD", "arena": "landlord"},
+	{"path": "res://ObjectScenes/cubicleFarm.tscn", "name": "THE CUBICLE FARM", "arena": "cubicle"},
+	{"path": "res://ObjectScenes/consultant.tscn", "name": "THE CONSULTANT", "arena": "consultant"},
+	{"path": "res://ObjectScenes/complianceOfficer.tscn", "name": "THE COMPLIANCE OFFICER", "arena": "compliance"},
+	{"path": "res://ObjectScenes/archive.tscn", "name": "THE ARCHIVE", "arena": "archive"},
+	{"path": "res://ObjectScenes/notary.tscn", "name": "THE NOTARY", "arena": "notary"},
 ]
 
 @onready var rooms = $Rooms
 @onready var roomMat = preload("res://shaders/new_standard_material_3d.tres")
+@onready var outlineMat = preload("res://shaders/toonOutline.tres")
 @onready var upgradeList = preload("res://Scripts/upgrades.gd")
 
 var taken : Dictionary = {}
@@ -59,9 +66,11 @@ var current = null
 var cleared = false
 var pollAccum : float = 0.0
 var runScore : int = 0
-var runKills : int = 0
 var roomWorth : int = 0
-var roomSpawned : int = 0
+var lastBoss : String = ""
+var strays : Dictionary = {}
+var bossPending = null
+var propMats : Dictionary = {}
 
 var hudLayer : CanvasLayer
 var roomLabel : Label
@@ -133,12 +142,20 @@ func _choiceCount() -> int:
 
 func _updateHud():
 	roomLabel.text = "ROOM %d" % roomNum
-	var line = "%d PTS   %d KILLS   %d UPGRADES" % [runScore, runKills, _upgradeCount()]
+	var line = "%d PTS   %d KILLS   %d UPGRADES" % [runScore, _kills(), _upgradeCount()]
 	if player and player.pPointsUnlocked:
 		line += "   GREED ACTIVE" if runScore >= player._greedThreshold() else "   GREED"
 	scoreLabel.text = line
+
+func _kills() -> int:
+	return player.killCount if player else 0
+
+func _syncGlobals():
+	Global.endlessRoom = roomNum
 	Global.endlessScore = runScore
+	Global.endlessKills = _kills()
 	Global.endlessUpgrades = _upgradeCount()
+	_updateHud()
 
 func _flash(txt : String):
 	banner.text = txt
@@ -169,9 +186,10 @@ func _buildRoom(n : int):
 	roomNum = n
 	cleared = false
 	roomWorth = 0
-	roomSpawned = 0
+	bossPending = null
 
 	var boss = _isBossRoom(n)
+	var bossPick = _pickBoss() if boss else {}
 	var sizeMul = SIZE_CLASSES[rng.randi_range(0, SIZE_CLASSES.size() - 1)]
 	var stretch = rng.randf_range(0.75, 1.35)
 	var w = clamp((32.0 + n * 1.7) * sizeMul * stretch, 24.0, 115.0)
@@ -200,7 +218,9 @@ func _buildRoom(n : int):
 	_shell(solid, x, w, d, h, arch != 3, n > 1)
 	_corridor(solid, x + w)
 
-	if not boss:
+	if boss:
+		_bossArena(room, data, bossPick["arena"])
+	else:
 		match arch:
 			1: _archPillars(solid, data)
 			2: _archCatwalks(solid, data)
@@ -214,17 +234,17 @@ func _buildRoom(n : int):
 	live.append(current)
 
 	if boss:
-		_spawnBoss(room, data, n)
+		_spawnBoss(room, data, n, bossPick)
 	else:
 		_spawnWave(room, data, n)
 
 	nextOriginX = x + w + ROOM_GAP
 
-	Global.endlessRoom = n
+	Audio.music_for_endless(n, boss)
 	if n > Global.endlessBest:
 		Global.endlessBest = n
 		Global._localSave()
-	_updateHud()
+	_syncGlobals()
 
 func _box(parent : Node3D, pos : Vector3, size : Vector3):
 	var b = CSGBox3D.new()
@@ -232,6 +252,45 @@ func _box(parent : Node3D, pos : Vector3, size : Vector3):
 	b.position = pos
 	parent.add_child(b)
 	return b
+
+func _propMat(col : Color) -> StandardMaterial3D:
+	var key = col.to_html(false)
+	if propMats.has(key):
+		return propMats[key]
+	var m = StandardMaterial3D.new()
+	m.albedo_color = col
+	m.roughness = 1.0
+	m.metallic = 0.0
+	m.specular_mode = BaseMaterial3D.SPECULAR_TOON
+	m.next_pass = outlineMat
+	propMats[key] = m
+	return m
+
+func _prop(room : Node3D, data, pos : Vector3, size : Vector3, col : Color) -> StaticBody3D:
+	var body = StaticBody3D.new()
+	body.collision_layer = ROOM_LAYER
+	body.position = pos
+	room.add_child(body)
+
+	var mesh = MeshInstance3D.new()
+	var bm = BoxMesh.new()
+	bm.size = size
+	mesh.mesh = bm
+	mesh.material_override = _propMat(col)
+	body.add_child(mesh)
+
+	var col3 = CollisionShape3D.new()
+	var shape = BoxShape3D.new()
+	shape.size = size
+	col3.shape = shape
+	body.add_child(col3)
+
+	if data != null:
+		data["blocked"].append({
+			"minX": pos.x - size.x * 0.5, "maxX": pos.x + size.x * 0.5,
+			"minZ": pos.z - size.z * 0.5, "maxZ": pos.z + size.z * 0.5,
+		})
+	return body
 
 func _solid(parent : Node3D, data : Dictionary, pos : Vector3, size : Vector3):
 	data["blocked"].append({
@@ -382,6 +441,166 @@ func _archPit(solid : CSGCombiner3D, data : Dictionary):
 		"minZ": -d * 0.5, "maxZ": d * 0.5,
 	})
 
+func _bossArena(room : Node3D, data : Dictionary, key : String):
+	match key:
+		"kettle": _arenaKettle(room, data)
+		"landlord": _arenaLandlord(room, data)
+		"cubicle": _arenaCubicle(room, data)
+		"consultant": _arenaConsultant(room, data)
+		"compliance": _arenaCompliance(room, data)
+		"archive": _arenaArchive(room, data)
+		"notary": _arenaNotary(room, data)
+
+func _steps(room : Node3D, data : Dictionary, x : float, z : float, count : int, wide : float, deep : float, dir : float, col : Color):
+	for i in count:
+		var top = STEP_RISE * (i + 1)
+		var sx = x + dir * (count - 1 - i) * deep
+		_prop(room, data, Vector3(sx, top * 0.5, z), Vector3(deep, top, wide), col)
+
+func _arenaKettle(room : Node3D, data : Dictionary):
+	var x = data["x"]
+	var w = data["w"]
+	var d = data["d"]
+	var cx = x + w * 0.5
+	var METAL = Color(.42, .28, .18)
+	var PIPE = Color(.88, .48, .17)
+	var GRATE = Color(.17, .19, .18)
+
+	for sx in [-1.0, 1.0]:
+		for sz in [-1.0, 1.0]:
+			var px = cx + sx * w * 0.26
+			var pz = sz * (d * 0.5 - 7.0)
+			_prop(room, data, Vector3(px, STEP_RISE * 0.5, pz), Vector3(9, STEP_RISE, 9), GRATE)
+
+	for sz in [-1.0, 1.0]:
+		_prop(room, data, Vector3(x + 9.0, 5.0, sz * (d * 0.5 - 6.0)), Vector3(7, 10, 7), METAL)
+		_prop(room, null, Vector3(cx, 4.2, sz * (d * 0.5 - 1.0)), Vector3(w - 6.0, 1.1, 1.1), PIPE)
+		_prop(room, null, Vector3(cx, 6.6, sz * (d * 0.5 - 1.0)), Vector3(w - 16.0, .8, .8), PIPE)
+		_prop(room, data, Vector3(x + w - 4.0, 2.0, sz * 6.5), Vector3(2.2, 4.0, 2.2), PIPE)
+
+func _arenaLandlord(room : Node3D, data : Dictionary):
+	var x = data["x"]
+	var w = data["w"]
+	var d = data["d"]
+	var h = data["h"]
+	var cx = x + w * 0.5
+	var PURPLE = Color(.36, .2, .52)
+	var BRASS = Color(.76, .62, .22)
+	var CARPET = Color(.28, .16, .34)
+	var MARBLE = Color(.82, .8, .74)
+
+	_prop(room, null, Vector3(cx, .04, 0), Vector3(w - 4.0, .08, 11), CARPET)
+
+	for i in 4:
+		var px = x + w * (0.22 + i * 0.19)
+		for sz in [-1.0, 1.0]:
+			_prop(room, data, Vector3(px, h * 0.5, sz * (d * 0.5 - 5.0)), Vector3(2.4, h, 2.4), BRASS)
+
+	for sz in [-1.0, 1.0]:
+		_prop(room, data, Vector3(x + 11.0, .9, sz * (d * 0.5 - 9.0)), Vector3(13, 1.8, 3), MARBLE)
+
+	_prop(room, null, Vector3(x + w - 1.4, h * 0.62, 0), Vector3(.4, h * 0.4, d * 0.5), PURPLE)
+
+func _arenaCubicle(room : Node3D, data : Dictionary):
+	var x = data["x"]
+	var w = data["w"]
+	var d = data["d"]
+	var PART = Color(.85, .81, .68)
+	var DESK = Color(.45, .38, .3)
+
+	var gx0 = x + 8.0
+	var gx1 = x + w - 8.0
+	var cells = clamp(int((gx1 - gx0) / 10.0), 3, 6)
+	var cw = (gx1 - gx0) / float(cells)
+	var span = d - 12.0
+	var rowsN = clamp(int(span / 10.0), 2, 4)
+	var rh = span / float(rowsN)
+
+	for i in cells:
+		for j in rowsN:
+			var px = gx0 + cw * (i + .5)
+			var pz = -span * .5 + rh * (j + .5)
+			_prop(room, data, Vector3(px - cw * .5, .4, pz), Vector3(.5, .8, rh - 1.5), PART)
+			_prop(room, data, Vector3(px, .4, pz - rh * .5), Vector3(cw - 1.5, .8, .5), PART)
+			if (i + j) % 2 == 0:
+				_prop(room, data, Vector3(px + 1.2, .35, pz + 1.2), Vector3(3.4, .7, 2.2), DESK)
+
+func _arenaConsultant(room : Node3D, data : Dictionary):
+	var x = data["x"]
+	var w = data["w"]
+	var d = data["d"]
+	var cx = x + w * 0.5
+	var SLATE = Color(.24, .3, .31)
+	var BOARD = Color(.9, .89, .82)
+
+	var deckLen = w - 24.0
+	var deckTop = STEP_RISE * 3.0
+	for sz in [-1.0, 1.0]:
+		var dz = sz * (d * 0.5 - 5.5)
+		_prop(room, data, Vector3(cx, deckTop - .5, dz), Vector3(deckLen, 1.0, 9.0), SLATE)
+		for e in [-1.0, 1.0]:
+			_steps(room, data, cx + e * (deckLen * .5 + 1.5), dz, 3, 9.0, 3.0, e, SLATE)
+
+	_prop(room, data, Vector3(x + w * .42, STEP_RISE * .5, 0), Vector3(11, STEP_RISE, 6), BOARD)
+	_prop(room, data, Vector3(x + 7.0, STEP_RISE * .5, 0), Vector3(6, STEP_RISE, 8), BOARD)
+
+func _arenaCompliance(room : Node3D, data : Dictionary):
+	var x = data["x"]
+	var w = data["w"]
+	var d = data["d"]
+	var h = data["h"]
+	var cx = x + w * 0.5
+	var STONE = Color(.34, .38, .38)
+	var TAPE = Color(.66, .27, .22)
+	var CREAM = Color(.88, .85, .76)
+
+	for i in 4:
+		var px = x + w * (0.24 + i * 0.17)
+		for sz in [-1.0, 1.0]:
+			_prop(room, data, Vector3(px, h * .38, sz * 8.5), Vector3(2.6, h * .76, 2.6), STONE)
+
+	for sz in [-1.0, 1.0]:
+		_prop(room, data, Vector3(cx, STEP_RISE * .5, sz * (d * .5 - 6.0)), Vector3(w - 18.0, STEP_RISE, 1.2), TAPE)
+		_prop(room, data, Vector3(x + 9.0, 1.1, sz * (d * .5 - 4.0)), Vector3(6, 2.2, 3), CREAM)
+
+func _arenaArchive(room : Node3D, data : Dictionary):
+	var x = data["x"]
+	var w = data["w"]
+	var d = data["d"]
+	var MANILA = Color(.78, .62, .3)
+	var SHELF = Color(.33, .27, .21)
+
+	for i in 4:
+		var px = x + w * (0.16 + i * 0.13)
+		for sz in [-1.0, 1.0]:
+			_prop(room, data, Vector3(px, 2.0, sz * (d * .5 - 8.0)), Vector3(2.4, 4.0, d * .34), MANILA)
+
+	for i in 3:
+		var bx = x + w * (0.23 + i * 0.13)
+		_prop(room, data, Vector3(bx, 2.6, 0), Vector3(2.0, 2.0, 13.0), SHELF)
+
+	for sz in [-1.0, 1.0]:
+		_prop(room, data, Vector3(x + w - 6.0, 1.4, sz * 6.5), Vector3(4, 2.8, 4), SHELF)
+
+func _arenaNotary(room : Node3D, data : Dictionary):
+	var x = data["x"]
+	var w = data["w"]
+	var d = data["d"]
+	var WOOD = Color(.36, .22, .13)
+	var PEW = Color(.44, .3, .18)
+	var PAPER = Color(.88, .85, .74)
+
+	var benchTop = STEP_RISE * 3.0
+	for sz in [-1.0, 1.0]:
+		var bz = sz * (d * .25 + 3.0)
+		_prop(room, data, Vector3(x + w - 8.0, benchTop - .5, bz), Vector3(10, 1.0, 10), WOOD)
+		_steps(room, data, x + w - 14.5, bz, 3, 10.0, 3.0, -1.0, WOOD)
+		_prop(room, null, Vector3(x + w - 8.0, benchTop + .5, bz), Vector3(6, 1.0, 1.0), PAPER)
+
+	for i in 4:
+		var px = x + 9.0 + i * 5.0
+		_prop(room, data, Vector3(px, STEP_RISE * .5, 0), Vector3(1.8, STEP_RISE, d - 15.0), PEW)
+
 func _free(data : Dictionary, px : float, pz : float, margin : float = SPAWN_CLEAR) -> bool:
 	for b in data["blocked"]:
 		if px > b["minX"] - margin and px < b["maxX"] + margin:
@@ -450,10 +669,21 @@ func _spawnWave(room : Node3D, data : Dictionary, n : int):
 		budget -= pick["cost"]
 		_spawn(room, load(pick["path"]), _spot(data, pick["fly"]), n)
 
-func _spawnBoss(room : Node3D, data : Dictionary, n : int):
-	var pick = BOSSES[rng.randi_range(0, BOSSES.size() - 1)]
-	_spawn(room, load(pick["path"]), Vector3(data["x"] + data["w"] * 0.7, 2.0, 0.0), n)
-	_flash(pick["name"])
+func _pickBoss() -> Dictionary:
+	var pool = []
+	for b in BOSSES:
+		if b["name"] != lastBoss:
+			pool.append(b)
+	if pool.is_empty():
+		pool = BOSSES
+	return pool[rng.randi_range(0, pool.size() - 1)]
+
+func _spawnBoss(room : Node3D, data : Dictionary, n : int, pick : Dictionary):
+	lastBoss = pick["name"]
+	var inst = _spawn(room, load(pick["path"]), Vector3(data["x"] + data["w"] * 0.7, 2.0, 0.0), n)
+	if "sightRange" in inst:
+		inst.sightRange = 0.0
+		bossPending = inst
 
 func _spawn(room : Node3D, scene : PackedScene, pos : Vector3, n : int):
 	var inst = scene.instantiate()
@@ -462,9 +692,9 @@ func _spawn(room : Node3D, scene : PackedScene, pos : Vector3, n : int):
 	room.add_child(inst)
 	if "floorY" in inst:
 		_refloor.call_deferred(inst)
-	roomSpawned += 1
 	if "scoreWorth" in inst:
 		roomWorth += inst.scoreWorth
+	return inst
 
 func _positionPlayerSafe():
 	for i in 4:
@@ -479,6 +709,28 @@ func _refloor(inst):
 	if is_instance_valid(inst) and inst.has_method("_floorLevel"):
 		inst.floorY = inst._floorLevel()
 
+func _inAnyRoom(pos : Vector3) -> bool:
+	for entry in live:
+		var r = entry["data"]
+		if pos.x < r["x"] - 2.0 or pos.x > r["x"] + r["w"] + ROOM_GAP + 3.0:
+			continue
+		if abs(pos.z) > r["d"] * 0.5 + 2.0:
+			continue
+		if pos.y < -6.0 or pos.y > r["h"] + 4.0:
+			continue
+		return true
+	return false
+
+func _rescue(e : Node3D) -> bool:
+	var id = e.get_instance_id()
+	strays[id] = strays.get(id, 0) + 1
+	if strays[id] > STRAY_STRIKES or current == null:
+		return false
+	e.global_position = _spot(current["data"], false)
+	if "velocity" in e:
+		e.velocity = Vector3.ZERO
+	return true
+
 func _enemiesLeft() -> int:
 	var c = 0
 	for e in get_tree().get_nodes_in_group("enemies"):
@@ -488,6 +740,11 @@ func _enemiesLeft() -> int:
 			if e.has_method("_takeDamage"):
 				e._takeDamage(100000)
 			continue
+		if e is Node3D and not _inAnyRoom(e.global_position):
+			if not _rescue(e):
+				if e.has_method("_takeDamage"):
+					e._takeDamage(100000)
+				continue
 		c += 1
 	return c
 
@@ -497,14 +754,21 @@ func _process(delta: float) -> void:
 	if player:
 		if player.pPointBleed and not cleared and runScore > 0.0:
 			runScore = max(runScore - player.pBleedRate * delta, 0.0)
-			_updateHud()
+			_syncGlobals()
 		player.points = runScore
 	if cleared:
 		return
+	if bossPending != null:
+		if not is_instance_valid(bossPending):
+			bossPending = null
+		elif player != null and player.global_position.x > current["data"]["x"] + 2.5:
+			bossPending.sightRange = 9999.0
+			bossPending = null
 	pollAccum += delta
 	if pollAccum < CLEAR_POLL:
 		return
 	pollAccum = 0.0
+	_syncGlobals()
 	if _enemiesLeft() <= 0:
 		_clearRoom()
 
@@ -512,12 +776,11 @@ func _clearRoom():
 	cleared = true
 	var gainMul = player.pGainMult if player else 1.0
 	runScore += int(roomWorth * (player.scoreMult if player else 1.0) * gainMul)
-	runKills += roomSpawned
 	if runScore > Global.endlessBestScore:
 		Global.endlessBestScore = runScore
 		Global.endlessNewBest = true
 		Global._localSave()
-	_updateHud()
+	_syncGlobals()
 	_openDoor()
 	Audio.play("win", 1.5, -8.0)
 	_grantReward(roomNum)
@@ -544,7 +807,7 @@ func _onUpgradePicked(u : Dictionary):
 	taken[u["id"]] = taken.get(u["id"], 0) + 1
 	upgradeList.apply(player, u)
 	_flash(u["name"])
-	_updateHud()
+	_syncGlobals()
 
 func _advance():
 	var old = null

@@ -5,6 +5,9 @@ const SENS = 0.005;
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
 const MAXCAMSHAKE = 0.03
+const BULLET_RANGE = 200.0
+const CHAIN_GUARD = 14
+const DOT_TICK = 0.5
 var shakeAmount : float = 0.0
 var shakeDecay : float = 8.0
 var recoilOffset : Vector3 = Vector3.ZERO
@@ -51,6 +54,38 @@ const GREED_THRESH := 20000.0
 const GREED_BLOCK := 20000.0
 const GREED_SCALE_CAP := 8.0
 
+var killCount : int = 0
+var upArmor : float = 1.0
+var regen : float = 0.0
+var explosive : float = 0.0
+var explosiveRange : float = 7.0
+var momentum : float = 0.0
+var reviveCharges : int = 0
+var phoenixBlast : float = 0.0
+var phoenixRange : float = 12.0
+var phoenixInvuln : float = 0.0
+var _invulnT : float = 0.0
+var _exploding : bool = false
+var ricochet : int = 0
+var pierce : int = 0
+var splitShards : int = 0
+var splitMult : float = 0.45
+var splitRange : float = 14.0
+var homing : float = 0.0
+var homingCone : float = 13.0
+var homingRange : float = 60.0
+var poison : float = 0.0
+var poisonTime : float = 3.0
+var executeHp : float = 0.0
+var overkill : float = 0.0
+var lowHpDmg : float = 0.0
+var comboDmg : float = 0.0
+var comboWindow : float = 3.0
+var comboMax : int = 10
+var _combo : int = 0
+var _comboT : float = 0.0
+var _dots : Array = []
+var _dotAccum : float = 0.0
 var time = 0.0;
 @export var parTime : float = 60.0
 var count = true
@@ -72,6 +107,13 @@ var slide :bool = false
 @export var downForceDevide: float
 @export var slideFactor: float = 0.4
 @export var slideDownforce: float = 20
+
+const STAND_HEIGHT = 2.0
+const SLIDE_HEIGHT = 1.1
+const CROUCH_CAM_DROP = -0.45
+var crouched = false
+var slideCamOffset : Vector3 = Vector3.ZERO
+var _capsule : CapsuleShape3D
 #dashing
 @export var dashBoost: float = 18
 @export var dashCooldown: float = 0.6
@@ -90,6 +132,7 @@ var paraVignette : TextureRect
 
 @onready var feet = $feetPos;
 @onready var playerCam = $playerCam;
+@onready var collisionShape = $CollisionShape3D
 @onready var animaPlayer = $AnimationPlayer
 @onready var gunRay = $playerCam/RayCast3D
 @onready var shootingParticles =preload("res://Particles/shootParticles.tscn")
@@ -196,6 +239,20 @@ var _last_footprint_pos: Vector3 = Vector3.ZERO
 var _footprint_pool: Array[Node] = []
 var _footprint_tex: ImageTexture
 
+func _setCrouch(on : bool):
+	if crouched == on or _capsule == null:
+		return
+	crouched = on
+	var h = SLIDE_HEIGHT if on else STAND_HEIGHT
+	_capsule.height = h
+	collisionShape.position.y = (h - STAND_HEIGHT) * 0.5
+
+func _canStand() -> bool:
+	var space = get_world_3d().direct_space_state
+	var ray = PhysicsRayQueryParameters3D.create(global_position, global_position + Vector3(0, STAND_HEIGHT * 0.5 + 0.05, 0))
+	ray.exclude = [self.get_rid()]
+	return space.intersect_ray(ray).is_empty()
+
 func _useStamina(amount : float) -> bool:
 	var cost = amount * upStamCost
 	if stamina < cost - 0.05:
@@ -217,6 +274,9 @@ func _staminaRegen():
 func _onKill():
 	_hitStop(0.05, 0.06)
 	_hitmarker(true)
+	killCount += 1
+	_combo += 1
+	_comboT = comboWindow
 	health = min(health + killHeal, maxHealth)
 	if killStam:
 		_giveStamina(25.0)
@@ -225,13 +285,194 @@ func _onKill():
 
 func _dealDamage(target, amount : float):
 	var dmg = amount * _greedDmgMult()
+	var crit = false
+	if momentum > 0.0:
+		var flat = Vector2(velocity.x, velocity.z).length()
+		dmg *= 1.0 + momentum * clamp(flat / 18.0, 0.0, 1.0)
+	if lowHpDmg > 0.0:
+		dmg *= 1.0 + lowHpDmg * (1.0 - clamp(health / maxHealth, 0.0, 1.0))
+	if comboDmg > 0.0 and _combo > 0:
+		dmg *= 1.0 + comboDmg * min(_combo, comboMax)
 	var chance = critChance + _greedCrit()
 	if chance > 0.0 and randf() < chance:
 		dmg *= critMult
-		_hitmarker(true)
+		crit = true
 	if lifesteal > 0.0:
 		health = min(health + dmg * lifesteal, maxHealth)
+	var canBoom = explosive > 0.0 and not _exploding and target is Node3D and target.get("health") != null
+	var hpBefore = target.get("health")
+	if executeHp > 0.0 and hpBefore != null and hpBefore > dmg and hpBefore - dmg <= executeHp:
+		dmg = hpBefore
+	var at = target.global_position if target is Node3D else Vector3.ZERO
+	if poison > 0.0:
+		_addDot(target)
 	target._damage(dmg)
+	var gone = not is_instance_valid(target)
+	if gone or hpBefore == null or target.get("health") == null or target.get("health") < hpBefore:
+		_hitmarker(crit or gone)
+	var killed = gone or (target.get("dead") == true) or (target.get("health") != null and target.get("health") <= 0)
+	if overkill > 0.0 and killed and hpBefore != null and dmg > hpBefore:
+		_overkillSplash(at, (dmg - hpBefore) * overkill, target)
+	if canBoom and killed:
+		_explode(at)
+
+func _overkillSplash(at : Vector3, spill : float, ignore):
+	if spill <= 0.5:
+		return
+	var best = null
+	var bestD = 22.0
+	for e in get_tree().get_nodes_in_group("enemies"):
+		if e == ignore or not e is Node3D or e.get("dead") == true:
+			continue
+		var dist = at.distance_to(e.global_position)
+		if dist < bestD:
+			bestD = dist
+			best = e
+	if best != null and best.has_method("_damage"):
+		best._damage(spill)
+		_draw_laser_line(at + Vector3(0, 0.8, 0), best.global_position + Vector3(0, 0.9, 0), 0.22)
+
+func _addDot(target):
+	for d in _dots:
+		if d["e"] == target:
+			d["t"] = poisonTime
+			return
+	_dots.append({"e": target, "t": poisonTime})
+
+func _tickDots(delta : float):
+	if _dots.is_empty():
+		return
+	_dotAccum += delta
+	if _dotAccum < DOT_TICK:
+		return
+	_dotAccum = 0.0
+	var i = _dots.size() - 1
+	while i >= 0:
+		var d = _dots[i]
+		var e = d["e"]
+		if not is_instance_valid(e) or e.get("dead") == true or not e.has_method("_damage"):
+			_dots.remove_at(i)
+		else:
+			e._damage(poison * DOT_TICK)
+			d["t"] -= DOT_TICK
+			if d["t"] <= 0.0:
+				_dots.remove_at(i)
+		i -= 1
+
+func _rayQuery(from : Vector3, to : Vector3, skip : Array):
+	var space = get_world_3d().direct_space_state
+	var q = PhysicsRayQueryParameters3D.create(from, to, 1, skip)
+	return space.intersect_ray(q)
+
+func _aimPoint(e : Node3D) -> Vector3:
+	return e.global_position + Vector3(0, 0.9, 0)
+
+func _homeDir(from : Vector3, dir : Vector3) -> Vector3:
+	if homing <= 0.0:
+		return dir
+	var best = null
+	var bestDot = cos(deg_to_rad(homingCone))
+	for e in get_tree().get_nodes_in_group("enemies"):
+		if not e is Node3D or e.get("dead") == true:
+			continue
+		var to = _aimPoint(e) - from
+		var dist = to.length()
+		if dist < 1.5 or dist > homingRange:
+			continue
+		var dd = dir.dot(to / dist)
+		if dd > bestDot:
+			bestDot = dd
+			best = e
+	if best == null:
+		return dir
+	return dir.slerp((_aimPoint(best) - from).normalized(), clamp(homing, 0.0, 1.0)).normalized()
+
+func _fireBullet(origin : Vector3, dir : Vector3, dmg : float, muzzle : Vector3, reach : float = BULLET_RANGE):
+	var d = _homeDir(origin, dir).normalized()
+	var skip : Array[RID] = [self.get_rid()]
+	_chainBullet(origin, d, dmg, ricochet, pierce, muzzle, reach, skip)
+
+func _bulletAfter(at : Vector3, dir : Vector3, nrm : Vector3, dmg : float, body, reach : float = BULLET_RANGE):
+	if splitShards > 0:
+		_splitBurst(at, nrm, dmg)
+	if ricochet <= 0 and pierce <= 0:
+		return
+	var d = dir.normalized()
+	var skip : Array[RID] = [self.get_rid()]
+	if body != null and body.has_method("_damage"):
+		if pierce <= 0:
+			return
+		if body is CollisionObject3D:
+			skip.append(body.get_rid())
+		_chainBullet(at + d * 0.05, d, dmg, ricochet, pierce - 1, at, reach, skip)
+	else:
+		if ricochet <= 0:
+			return
+		var b = d.bounce(nrm).normalized()
+		_chainBullet(at + b * 0.08, b, dmg, ricochet - 1, pierce, at, reach, skip)
+
+func _chainBullet(pos : Vector3, d : Vector3, dmg : float, bounces : int, pierces : int, tracerFrom : Vector3, reach : float, skip : Array):
+	var guard = 0
+	var from = tracerFrom
+	while guard < CHAIN_GUARD:
+		guard += 1
+		var h = _rayQuery(pos, pos + d * reach, skip)
+		if h.is_empty():
+			_draw_laser_line(from, pos + d * reach, 0.35)
+			return
+		var body = h.collider
+		var at = h.position
+		var nrm = h.normal
+		_draw_laser_line(from, at, 0.25)
+		from = at
+		_spawnImpact(body, at, nrm)
+		if splitShards > 0:
+			_splitBurst(at, nrm, dmg)
+		if body != null and body.has_method("_damage"):
+			if body.has_method("_makeTarg"):
+				body._makeTarg(self)
+			_dealDamage(body, dmg)
+			if pierces <= 0:
+				return
+			pierces -= 1
+			if body is CollisionObject3D:
+				skip.append(body.get_rid())
+			pos = at + d * 0.05
+			continue
+		if bounces <= 0:
+			return
+		bounces -= 1
+		d = d.bounce(nrm).normalized()
+		pos = at + d * 0.08
+		skip = [self.get_rid()]
+
+func _splitBurst(at : Vector3, nrm : Vector3, dmg : float):
+	var skip : Array[RID] = [self.get_rid()]
+	for i in splitShards:
+		var d = (nrm + Vector3(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0), randf_range(-1.0, 1.0))).normalized()
+		var h = _rayQuery(at + d * 0.15, at + d * splitRange, skip)
+		if h.is_empty():
+			_draw_laser_line(at, at + d * splitRange * 0.5, 0.14)
+			continue
+		_draw_laser_line(at, h.position, 0.14)
+		var b = h.collider
+		if b != null and b.has_method("_damage"):
+			if b.has_method("_makeTarg"):
+				b._makeTarg(self)
+			_dealDamage(b, dmg * splitMult)
+
+func _explode(at : Vector3):
+	_exploding = true
+	_spawnParticleAt(deathParticles, at)
+	Audio.play("enemy_hit", 0.5, -2.0)
+	for e in get_tree().get_nodes_in_group("enemies"):
+		if e.get("dead") == true or not e is Node3D:
+			continue
+		if at.distance_to(e.global_position) > explosiveRange:
+			continue
+		if e.has_method("_damage"):
+			e._damage(explosive)
+	_exploding = false
 
 func _buildStaminaHud():
 	var ui = $HUD/StyleMeterUI
@@ -411,7 +652,7 @@ var _tracerLife : Array[float] = []
 var _tracerLen : Array[float] = []
 var _tracerIdx : int = 0
 var _toonPost : MeshInstance3D
-const TRACER_POOL_SIZE = 24
+const TRACER_POOL_SIZE = 64
 const TRACER_LIFE = 0.085
 var currentGun : int = 0
 var unlockedGuns : int = 3
@@ -551,6 +792,18 @@ func _updateSniperView():
 
 func _die():
 	if !count:
+		return
+	if reviveCharges > 0:
+		reviveCharges -= 1
+		health = maxHealth
+		paraLevel = 0
+		stamina = 100.0
+		_hurtFlash = 1.0
+		_addShake(.2)
+		_updateHud()
+		Audio.play("win", 0.8, -2.0)
+		if phoenixBlast > 0.0 or phoenixInvuln > 0.0:
+			_phoenixRise()
 		return
 	count = false
 	Story._endLevel()
@@ -750,20 +1003,7 @@ func _shoot():
 		Audio.play("rifle", 1.0, -5.0)
 		muzzleParticles.restart()
 		recoilOffset = Vector3(randf_range(-MAXCAMSHAKE, MAXCAMSHAKE), randf_range(-MAXCAMSHAKE, MAXCAMSHAKE), 0)
-		if gunRay.is_colliding():
-			var target = gunRay.get_collider()
-			if target and target.has_method("_makeTarg"):
-				target._makeTarg(self)
-			if target and target.has_method("_damage"):
-				_hitmarker(false)
-				_dealDamage(target, damage)
-			var hit_pos = gunRay.get_collision_point()
-			var hit_normal = gunRay.get_collision_normal()
-			_spawnImpact(target, hit_pos, hit_normal)
-			_draw_laser_line(gunParticleSpawn.global_position, gunRay.get_collision_point(), 0.25)
-		else:
-			var end_point = gunRay.to_global(gunRay.target_position)
-			_draw_laser_line(gunParticleSpawn.global_position, end_point, 0.5)
+		_fireBullet(playerCam.global_position, -playerCam.global_basis.z, damage, gunParticleSpawn.global_position, 200.0)
 	elif currentGun == 1:
 		if !shotGunCd:
 			_addShake(.04)
@@ -777,7 +1017,6 @@ func _shoot():
 					var target = ray.get_collider()
 					var hit_pos = ray.get_collision_point()
 					if target and target.has_method("_damage"):
-						_hitmarker(false)
 						var dist = gunParticleSpawn.global_position.distance_to(hit_pos)
 						var mult = 1.0
 						if dist >= shotGunFalloffRange:
@@ -791,6 +1030,7 @@ func _shoot():
 					var hit_normal = ray.get_collision_normal()
 					_spawnImpact(target, hit_pos, hit_normal)
 					_draw_laser_line(gunParticleSpawn.global_position, ray.get_collision_point(), 0.25)
+					_bulletAfter(hit_pos, (hit_pos - gunParticleSpawn.global_position).normalized(), hit_normal, shotGunDmg * shotGunMinDmgMult, target, 18.0)
 				else:
 					var end_point = ray.to_global(ray.target_position)
 					_draw_laser_line(gunParticleSpawn.global_position, end_point, 0.5)
@@ -808,6 +1048,7 @@ func _shoot():
 				var spread = deg_to_rad(hipfireSpread)
 				forward = forward.rotated(camXform.basis.x.normalized(), randf_range(-spread, spread))
 				forward = forward.rotated(camXform.basis.y.normalized(), randf_range(-spread, spread))
+			forward = _homeDir(origin, forward)
 			var beamStart = sniperGun.global_position if sniperGun.visible else origin
 			var far_point = origin + forward * 3000
 			var space = get_world_3d().direct_space_state
@@ -819,10 +1060,10 @@ func _shoot():
 				if target and target.has_method("_makeTarg"):
 					target._makeTarg(self)
 				if target and target.has_method("_damage"):
-					_hitmarker(false)
 					_dealDamage(target, sniperDmg)
 				_spawnImpact(target, hit.position, hit.normal)
 				_draw_laser_beam(beamStart, hit.position, 0.35)
+				_bulletAfter(hit.position, forward, hit.normal, sniperDmg, target)
 			else:
 				_draw_laser_beam(beamStart, far_point, 0.35)
 
@@ -972,12 +1213,15 @@ func _draw_laser_beam(from_pos: Vector3, to_pos: Vector3, duration: float = 0.35
 	beam.queue_free()
 
 func _ready() -> void:
+	if collisionShape and collisionShape.shape is CapsuleShape3D:
+		_capsule = collisionShape.shape.duplicate()
+		collisionShape.shape = _capsule
 	maxScore = _calcMaxScore()
 	if finishOrb:
 		finishOrb.open = true
 		finishOrb.canvas =$levelEnd
 	playerCam.fov = Global.fov
-	if not Global.endlessRun:
+	if not Global.endlessRun and not Global.inTutorial and Global.currentLevel > 0:
 		Global._addTry(Global.currentLevel)
 	if not OS.has_feature("web"):
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -1021,6 +1265,17 @@ func _process(delta: float) -> void:
 			staminaIdle += delta
 		else:
 			stamina = min(stamina + _staminaRegen() * delta, 100.0)
+		if regen > 0.0 and health < maxHealth:
+			health = min(health + regen * delta, maxHealth)
+			_updateHud()
+		if poison > 0.0:
+			_tickDots(delta)
+		if _invulnT > 0.0:
+			_invulnT -= delta
+		if _comboT > 0.0:
+			_comboT -= delta
+			if _comboT <= 0.0:
+				_combo = 0
 	var enemiesLeft = get_tree().get_node_count_in_group("enemies")
 	if enemiesLeft != _lastEnemyCount:
 		_lastEnemyCount = enemiesLeft
@@ -1035,7 +1290,8 @@ func _process(delta: float) -> void:
 	if shakeAmount > 0:
 		shakeOffset = Vector3(randf_range(-shakeAmount,shakeAmount),randf_range(-shakeAmount,shakeAmount),0)
 		shakeAmount = move_toward(shakeAmount,0,shakeDecay * delta)
-	playerCam.position = recoilOffset + shakeOffset
+	slideCamOffset.y = lerp(slideCamOffset.y, CROUCH_CAM_DROP if crouched else 0.0, clamp(delta * 12.0, 0.0, 1.0))
+	playerCam.position = recoilOffset + shakeOffset + slideCamOffset
 	var strafe = Input.get_axis("left", "right")
 	var rollMul = 0.25 if scoped else 1.0
 	camRoll = lerp(camRoll, -strafe * maxRoll * rollMul, delta * 8.0)
@@ -1143,6 +1399,10 @@ func _physics_process(delta: float) -> void:
 		else:
 			slideHeld = Input.is_action_pressed("slide")
 		slide = slideHeld and _canSlide() and stamina > 0
+		if !slide and crouched and !_canStand():
+			slide = true
+			slideHeld = true
+		_setCrouch(slide)
 		if slide and not wasSliding:
 			if is_on_floor():
 				animaPlayer.play("slide"); slideCount += 1
@@ -1312,11 +1572,13 @@ func _updateHud():
 
 
 func _takeDamage(damage, source = null):
+	if _invulnT > 0.0:
+		return
 	if count:
 		_addShake(.06)
 		_spawnParticleAt(hurtParticles, global_position)
 		Audio.play("player_hurt", 1.0, -13.0)
-		health -= damage
+		health -= damage * upArmor
 		if thorns > 0.0:
 			_retaliate()
 		_hurtFlash = 0.6
@@ -1325,6 +1587,22 @@ func _takeDamage(damage, source = null):
 		_updateHud()
 		if health <= 0:
 			_die()
+
+func _phoenixRise():
+	_invulnT = max(_invulnT, phoenixInvuln)
+	_spawnParticleAt(deathParticles, global_position)
+	_spawnParticleAt(slamParticles, global_position)
+	Audio.play("slam", .55, -1.0)
+	_addShake(.35)
+	if phoenixBlast <= 0.0:
+		return
+	for e in get_tree().get_nodes_in_group("enemies"):
+		if e.get("dead") == true or not e is Node3D:
+			continue
+		if global_position.distance_to(e.global_position) > phoenixRange:
+			continue
+		if e.has_method("_damage"):
+			e._damage(phoenixBlast)
 
 func _retaliate():
 	for e in get_tree().get_nodes_in_group("enemies"):
@@ -1369,7 +1647,7 @@ func _canJump():
 
 func _dashPower():
 	if paraLevel >= 1:
-		return SPEED + (dashBoost - SPEED) * paraDashMult
+		return SPEED + (dashBoost - SPEED) * min(paraDashMult, 1.0)
 	return dashBoost
 
 func _jumpMult():

@@ -3,6 +3,8 @@ func _warden(): pass
 func _enemy(): pass
 
 const SPEED = 3.5
+const SHUT_COL = Color(1, .38, 0)
+const OPEN_COL = Color(0, .9, .6)
 @onready var attackTimer = $attackCd
 @export var scoreWorth = 5000
 @export var health = 140
@@ -13,7 +15,7 @@ const SPEED = 3.5
 @export var navAgent : NavigationAgent3D
 @export var accelaration = 8
 @export var damage = 12
-@export var blockArc : float = 50.0
+@export var blockArc : float = 42.0
 @export var player : CharacterBody3D
 @onready var explosionParticles = preload("res://Particles/enemyExplode.tscn")
 var particleInstance
@@ -32,6 +34,11 @@ var clinkCd : float = 0.0
 var shieldFlash : float = 0.0
 var baseShieldScale : Vector3 = Vector3.ONE
 var buffMult : float = 1.0
+var shieldMat : StandardMaterial3D
+var shieldLit : float = 1.0
+var shieldDown : float = 0.0
+@export var shoveOpen : float = 0.9
+@onready var sparkParticles = preload("res://Particles/enemyBulletImpact.tscn")
 
 func _buff(on):
 	buffMult = 1.4 if on else 1.0
@@ -48,6 +55,9 @@ func _ready() -> void:
 	body._updateMat(1)
 	baseBodyY = body.position.y
 	baseShieldScale = shield.scale
+	if shield.material_override:
+		shield.material_override = shield.material_override.duplicate()
+		shieldMat = shield.material_override
 	await get_tree().physics_frame
 
 func _targetValid():
@@ -61,6 +71,8 @@ func _hurter():
 	return null
 
 func _blocked() -> bool:
+	if shieldDown > 0.0:
+		return false
 	var p = _hurter()
 	if p == null:
 		return false
@@ -77,8 +89,13 @@ func _clink():
 	shieldFlash = 1.0
 	if clinkCd > 0.0:
 		return
-	clinkCd = .07
-	Audio.play("enemy_hit", 1.6, -14.0)
+	clinkCd = .09
+	Audio.play("enemy_hit", 1.75, -6.0)
+	Audio.play("slam", 1.9, -14.0)
+	var s = sparkParticles.instantiate()
+	get_parent().add_child(s)
+	s.global_position = shield.global_position - global_transform.basis.z * .35
+	s.emitting = true
 
 func _takeDamage(dmg):
 	_damage(dmg)
@@ -148,6 +165,7 @@ func _shove():
 	tw.tween_property(shield, "position:z", shield.position.z - .55, .12)
 	tw.tween_property(shield, "position:z", shield.position.z, .25)
 	Audio.play("slam", 1.2, -10.0)
+	shieldDown = shoveOpen
 	if _targetValid():
 		target._takeDamage(damage, global_position)
 		if target.has_method("_applyForce"):
@@ -182,11 +200,19 @@ func _process(delta: float) -> void:
 	if dead:
 		return
 	clinkCd -= delta
+	if shieldDown > 0.0:
+		shieldDown -= delta
 	animTime += delta * (1.0 + Vector3(velocity.x, 0, velocity.z).length() * .3)
 	body.position.y = baseBodyY + abs(sin(animTime * 2.2)) * 0.07
 	body.rotation.z = sin(animTime * 2.2) * 0.05
 	shieldFlash = move_toward(shieldFlash, 0.0, delta * 5.0)
-	shield.scale = baseShieldScale * (1.0 + shieldFlash * .1)
+	shield.scale = baseShieldScale * (1.0 + shieldFlash * .22)
+	var want = 1.0 if _blocked() else 0.0
+	shieldLit = lerp(shieldLit, want, clamp(delta * 7.0, 0.0, 1.0))
+	if shieldMat != null:
+		shieldMat.emission = SHUT_COL.lerp(OPEN_COL, 1.0 - shieldLit).lerp(Color.WHITE, shieldFlash * .8)
+		shieldMat.emission_energy_multiplier = lerp(.15, 3.6, shieldLit) + shieldFlash * 5.0
+		shieldMat.albedo_color = SHUT_COL.lerp(OPEN_COL, 1.0 - shieldLit)
 	if _targetValid():
 		var look = target.global_position - global_position
 		look.y = 0

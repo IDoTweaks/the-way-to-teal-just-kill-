@@ -13,6 +13,23 @@ func _ready() -> void:
 
 
 
+func addRay():
+	var src = null
+	for ray in children:
+		if ray is RayCast3D:
+			src = ray
+			break
+	if src == null or orgPos.size() < 2:
+		return
+	var extra = src.duplicate()
+	add_child(extra)
+	children = get_children()
+	orgPos.append(orgPos[0])
+	orgPos.append(orgPos[1])
+	extra.enabled = src.enabled
+	randomizeRays()
+
+
 func randomizeRays():
 	var i : int = 0
 	for ray in children:

@@ -128,6 +128,12 @@ func _ready() -> void:
 	await get_tree().physics_frame
 
 func _takeDamage(dmg):
+	if dead:
+		return
+	if dmg >= 9999.0 or global_position.y < -50.0:
+		health = 0
+		_die()
+		return
 	_damage(dmg)
 
 func _damage(dmg):
@@ -138,8 +144,20 @@ func _damage(dmg):
 func _clink():
 	if clinkCd > 0.0:
 		return
-	clinkCd = .07
-	Audio.play("enemy_hit", 1.6, -14.0)
+	clinkCd = .09
+	Audio.play("enemy_hit", 1.75, -6.0)
+	Audio.play("slam", 1.9, -14.0)
+	var s = burstParticles.instantiate()
+	get_parent().add_child(s)
+	s.global_position = body.global_position + (global_position - _hurterPos()).normalized() * -1.2 + Vector3(0, 1.0, 0)
+	s.emitting = true
+	if bossBar and mode != "vent" and mode != "stagger":
+		bossBar._setStatus("ARMOURED - SLAM THE VENT", WARN_COL, true)
+
+func _hurterPos() -> Vector3:
+	if player != null and is_instance_valid(player):
+		return player.global_position
+	return global_position + Vector3(0, 0, 1)
 
 func _ventDamage(dmg):
 	if dead:

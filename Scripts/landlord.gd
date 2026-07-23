@@ -22,7 +22,8 @@ const SPELL_NAMES = {
 @export var scoreWorth = 10000
 @export var health = 320
 @export var sightRange : float = 30.0
-@export var maxHit : float = 60.0
+@export var stageDamage : float = .25
+@export var maxHit : float = .35
 @export var phase2At : float = .5
 @export var hoverHeight : float = 3.4
 @export var driftSpeed : float = 2.2
@@ -75,6 +76,7 @@ const SPELL_NAMES = {
 
 var maxHealth : float
 var exposed = false
+var stageDmg : float = 0.0
 var dead = false
 var phase = 1
 var target
@@ -148,6 +150,12 @@ func _floorLevel() -> float:
 	return global_position.y - hoverHeight
 
 func _takeDamage(dmg):
+	if dead:
+		return
+	if dmg >= 9999.0 or global_position.y < -50.0:
+		health = 0
+		_die()
+		return
 	_damage(dmg)
 
 func _damage(dmg):
@@ -156,7 +164,14 @@ func _damage(dmg):
 	if !exposed:
 		_clink()
 		return
-	dmg = min(dmg, maxHit)
+	var cap = maxHealth * stageDamage
+	var left = cap - stageDmg
+	if left <= 0:
+		_clink()
+		return
+	dmg = min(dmg, cap * maxHit)
+	dmg = min(dmg, left)
+	stageDmg += dmg
 	health -= dmg
 	Audio.play("enemy_hit", 1.0, -4.0)
 	body._hitPunch()
@@ -253,6 +268,7 @@ func _setExposed(on : bool):
 		orbMat.emission = CAST_COL if on else SHUT_COL
 		orbMat.emission_energy_multiplier = 6.0 if on else 1.2
 	if on:
+		stageDmg = 0.0
 		_breakShield()
 	else:
 		_formShield()

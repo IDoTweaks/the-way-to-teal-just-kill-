@@ -19,6 +19,10 @@ var musicOverlay : ColorRect
 var musicSelectedLevel : int = 0
 var musicRows : Array = []
 var musicStatus : Label
+var seedOpen : bool = false
+var seedOverlay : ColorRect
+var seedEdit : LineEdit
+var seedPreview : Label
 var funkyTheme = preload("res://UI/funkyTheme.tres")
 
 func _ready() -> void:
@@ -31,6 +35,7 @@ func _ready() -> void:
 	_baseTagRot = tagline.rotation
 	_baseBtnRot = menuButtons.rotation
 	_buildMusicOverlay()
+	_buildSeedOverlay()
 	get_window().files_dropped.connect(_onFilesDropped)
 	if Global.menuTourPending:
 		Global.menuTourPending = false
@@ -56,7 +61,11 @@ func _on_tutorial_btn_button_down() -> void:
 
 
 func _on_endless_btn_button_down() -> void:
-	Global._goToEndless(randi())
+	seedOpen = true
+	seedOverlay.visible = true
+	seedEdit.text = ""
+	seedEdit.grab_focus()
+	_refreshSeedPreview("")
 
 
 func _on_stage_closed() -> void:
@@ -219,6 +228,129 @@ func _buildMusicOverlay() -> void:
 	musicStatus.text = "selected: %s - drag a song into the window" % _levelName(musicSelectedLevel)
 	_refreshMusicRows()
 
+
+
+func _buildSeedOverlay() -> void:
+	seedOverlay = ColorRect.new()
+	seedOverlay.color = Color(0.01, 0.02, 0.03, 0.95)
+	seedOverlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	seedOverlay.visible = false
+	$UI.add_child(seedOverlay)
+
+	var box := VBoxContainer.new()
+	box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_theme_constant_override("separation", 20)
+	box.theme = funkyTheme
+	seedOverlay.add_child(box)
+
+	var header := Label.new()
+	header.text = "ENDLESS"
+	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	header.theme_type_variation = "Display"
+	header.add_theme_constant_override("outline_size", 16)
+	box.add_child(header)
+
+	var sub := Label.new()
+	sub.text = "type a seed to replay an exact run - a number, or any word.\nleave it empty for a fresh one."
+	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sub.theme_type_variation = "Small"
+	box.add_child(sub)
+
+	seedEdit = LineEdit.new()
+	seedEdit.custom_minimum_size = Vector2(620, 84)
+	seedEdit.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	seedEdit.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	seedEdit.placeholder_text = "RANDOM"
+	seedEdit.max_length = 24
+	seedEdit.add_theme_font_override("font", load("res://Fonts/LilitaOne.tres"))
+	seedEdit.add_theme_font_size_override("font_size", 40)
+	seedEdit.add_theme_color_override("font_color", Color(0.78, 1, 0.96))
+	seedEdit.add_theme_color_override("font_placeholder_color", Color(0.35, 0.6, 0.58))
+	seedEdit.add_theme_color_override("caret_color", Color(0.35, 1, 0.86))
+	seedEdit.add_theme_stylebox_override("normal", _seedBox(Color(0, 0.85, 0.78)))
+	seedEdit.add_theme_stylebox_override("focus", _seedBox(Color(0.35, 1, 0.86)))
+	seedEdit.text_changed.connect(_refreshSeedPreview)
+	seedEdit.text_submitted.connect(func(_t): _onSeedStart())
+	box.add_child(seedEdit)
+
+	seedPreview = Label.new()
+	seedPreview.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	seedPreview.theme_type_variation = "Accent"
+	box.add_child(seedPreview)
+
+	var best := Label.new()
+	best.text = "DEEPEST ROOM: %d" % Global.endlessBest
+	best.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	best.theme_type_variation = "Micro"
+	box.add_child(best)
+
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 22)
+	row.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	box.add_child(row)
+
+	var back := Button.new()
+	back.text = "BACK"
+	back.custom_minimum_size = Vector2(240, 64)
+	back.theme_type_variation = "BigBtn"
+	back.pressed.connect(_onSeedBack)
+	row.add_child(back)
+
+	var dice := Button.new()
+	dice.text = "SURPRISE ME"
+	dice.custom_minimum_size = Vector2(300, 64)
+	dice.theme_type_variation = "BigBtn"
+	dice.pressed.connect(_onSeedRandom)
+	row.add_child(dice)
+
+	var start := Button.new()
+	start.text = "DROP IN"
+	start.custom_minimum_size = Vector2(300, 64)
+	start.theme_type_variation = "BigBtn"
+	start.pressed.connect(_onSeedStart)
+	row.add_child(start)
+
+	_refreshSeedPreview("")
+
+
+func _seedBox(border : Color) -> StyleBoxFlat:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.03, 0.13, 0.15)
+	sb.border_color = border
+	sb.set_border_width_all(6)
+	sb.set_corner_radius_all(22)
+	sb.set_content_margin_all(18)
+	return sb
+
+
+func _refreshSeedPreview(txt : String) -> void:
+	if txt.strip_edges() == "":
+		seedPreview.text = "a brand new seed"
+	else:
+		seedPreview.text = "SEED %d" % Global._seedFrom(txt)
+
+
+func _onSeedRandom() -> void:
+	seedEdit.text = str(randi())
+	_refreshSeedPreview(seedEdit.text)
+
+
+func _onSeedStart() -> void:
+	seedOpen = false
+	seedOverlay.visible = false
+	Global._goToEndless(Global._seedFrom(seedEdit.text))
+
+
+func _onSeedBack() -> void:
+	seedOpen = false
+	seedOverlay.visible = false
+
+
+func _unhandled_input(event : InputEvent) -> void:
+	if seedOpen and event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()
+		_onSeedBack()
 
 
 func _btn(name : String) -> Callable:

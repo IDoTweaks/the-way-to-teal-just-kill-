@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://bconsultboss1"]
+
+[ext_resource type="Script" path="res://Scripts/consultant.gd" id="1_con"]
+[ext_resource type="Shader" uid="uid://bloi2q6drjuc1" path="res://Scripts/enemy.gdshader" id="2_con"]
+[ext_resource type="Script" uid="uid://4gxcy6cx0q1m" path="res://Scripts/meshInstanceBody.gd" id="3_con"]
+[ext_resource type="Script" path="res://Scripts/enemy_face.gd" id="4_con"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/enemyMarker.tscn" id="5_con"]
+[ext_resource type="Material" path="res://shaders/toonOutline.tres" id="98_out"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_conbody"]
+render_priority = 0
+shader = ExtResource("2_con")
+shader_parameter/base_color = Color(0.35, 1, 0.86, 1)
+next_pass = ExtResource("98_out")
+shader_parameter/fill_color = Color(0, 1, 0.35, 1)
+shader_parameter/fill_percent = 1.0
+shader_parameter/min_y = -1.4
+shader_parameter/max_y = 1.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_conbody"]
+size = Vector3(1.1, 2.8, 0.9)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_conbody"]
+radius = 0.7
+height = 2.8
+
+[node name="Consultant" type="CharacterBody3D" unique_id=4414001]
+script = ExtResource("1_con")
+
+[node name="body" type="MeshInstance3D" parent="." unique_id=4414002]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+material_override = SubResource("ShaderMaterial_conbody")
+mesh = SubResource("BoxMesh_conbody")
+script = ExtResource("3_con")
+
+[node name="face" type="MeshInstance3D" parent="body" unique_id=4414003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+script = ExtResource("4_con")
+style = "visor"
+face_size = 0.8
+face_forward = 0.5
+face_height = 0.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=4414004]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+shape = SubResource("CapsuleShape3D_conbody")
+
+[node name="handSpawn" type="Node3D" parent="." unique_id=4414005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 1.5, -0.6)
+
+[node name="textSpawn" type="Node3D" parent="." unique_id=4414006]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, 0)
+
+[node name="EnemyMarker" parent="." instance=ExtResource("5_con")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, 0)

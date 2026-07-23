@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://bnotaryboss1"]
+
+[ext_resource type="Script" path="res://Scripts/notary.gd" id="1_not"]
+[ext_resource type="Shader" uid="uid://bloi2q6drjuc1" path="res://Scripts/enemy.gdshader" id="2_not"]
+[ext_resource type="Script" uid="uid://4gxcy6cx0q1m" path="res://Scripts/meshInstanceBody.gd" id="3_not"]
+[ext_resource type="Script" path="res://Scripts/enemy_face.gd" id="4_not"]
+[ext_resource type="Script" path="res://Scripts/notary_board.gd" id="6_not"]
+[ext_resource type="PackedScene" path="res://ObjectScenes/enemyMarker.tscn" id="5_not"]
+[ext_resource type="Material" path="res://shaders/toonOutline.tres" id="98_out"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_notbody"]
+render_priority = 0
+shader = ExtResource("2_not")
+shader_parameter/base_color = Color(0.35, 1, 0.86, 1)
+next_pass = ExtResource("98_out")
+shader_parameter/fill_color = Color(0, 1, 0.35, 1)
+shader_parameter/fill_percent = 1.0
+shader_parameter/min_y = -1.3
+shader_parameter/max_y = 1.3
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_notbody"]
+radius = 0.75
+height = 2.6
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_notbody"]
+radius = 0.75
+height = 2.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_notboard"]
+albedo_color = Color(0.82, 0.72, 0.45, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_notboard"]
+size = Vector3(2.0, 2.5, 0.22)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_notboard"]
+size = Vector3(2.0, 2.5, 0.22)
+
+[node name="Notary" type="CharacterBody3D" unique_id=4417001]
+script = ExtResource("1_not")
+
+[node name="body" type="MeshInstance3D" parent="." unique_id=4417002]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+material_override = SubResource("ShaderMaterial_notbody")
+mesh = SubResource("CapsuleMesh_notbody")
+script = ExtResource("3_not")
+
+[node name="face" type="MeshInstance3D" parent="body" unique_id=4417003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+script = ExtResource("4_not")
+style = "grin"
+face_size = 0.7
+face_forward = 0.55
+face_height = 0.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=4417004]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+shape = SubResource("CapsuleShape3D_notbody")
+
+[node name="clipboard" type="StaticBody3D" parent="." unique_id=4417005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -1.05)
+script = ExtResource("6_not")
+
+[node name="mesh" type="MeshInstance3D" parent="clipboard" unique_id=4417006]
+material_override = SubResource("StandardMaterial3D_notboard")
+mesh = SubResource("BoxMesh_notboard")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="clipboard" unique_id=4417007]
+shape = SubResource("BoxShape3D_notboard")
+
+[node name="noticeSpawn" type="Node3D" parent="." unique_id=4417008]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 1.7, -0.7)
+
+[node name="textSpawn" type="Node3D" parent="." unique_id=4417009]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.9, 0)
+
+[node name="EnemyMarker" parent="." instance=ExtResource("5_not")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)

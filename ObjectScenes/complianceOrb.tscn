@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://bcomplyorb1"]
+
+[ext_resource type="Script" path="res://Scripts/compliance_orb.gd" id="1_orb"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_orb"]
+radius = 0.55
+height = 1.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_orb"]
+albedo_color = Color(1, 0.38, 0, 1)
+emission_enabled = true
+emission = Color(1, 0.38, 0, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_orb"]
+radius = 0.55
+
+[node name="ComplianceOrb" type="CharacterBody3D" unique_id=4415101]
+script = ExtResource("1_orb")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=4415102]
+material_override = SubResource("StandardMaterial3D_orb")
+mesh = SubResource("SphereMesh_orb")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=4415103]
+shape = SubResource("SphereShape3D_orb")

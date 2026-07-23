@@ -178,6 +178,7 @@ func _refresh() -> void:
 			scoreTint = Color(1.0, 0.85, 0.2)
 		statsRow.add_child(_makeTile(scoreCap, "%d" % Global.endlessScore, scoreTint))
 		statsRow.add_child(_makeTile("BEST", "%d" % Global.endlessBestScore, DANGER))
+		statsRow.add_child(_makeTile("KILLS", "%d" % Global.endlessKills, MINT))
 		statsRow.add_child(_makeTile("UPGRADES", "%d" % Global.endlessUpgrades, MINT))
 		statsRow.add_child(_makeTile("SEED", "%d" % Global.endlessSeed, CREAM))
 		return

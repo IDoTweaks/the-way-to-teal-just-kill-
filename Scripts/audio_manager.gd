@@ -114,6 +114,14 @@ func music_for_level(idx : int) -> void:
 	else:
 		play_music(_musicLevels[idx - 1])
 
+func music_for_endless(room : int, boss : bool) -> void:
+	if boss:
+		play_music(_musicBoss)
+		return
+	if _musicLevels.is_empty():
+		return
+	play_music(_musicLevels[(room - 1) % _musicLevels.size()])
+
 func _on_music_finished() -> void:
 	if _music.stream != null:
 		_music.play()
